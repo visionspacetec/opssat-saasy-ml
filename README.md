@@ -17,7 +17,7 @@
 
 # Requirements
 
-- JSAT library: Fork of the original one.
+- JSAT library: Fork of the original one. Use Java 8.
 
 # Install
 
