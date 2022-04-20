@@ -13,13 +13,13 @@
 # Table of Content
 
 - [Requirements](#requirements)
-- [Install steps](#install-steps)
+- [Install](#install)
 
 # Requirements
 
 - JSAT library: Fork of the original one.
 
-# Install steps
+# Install
 
 # References
 
