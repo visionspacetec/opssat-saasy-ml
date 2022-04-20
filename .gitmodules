@@ -1,0 +1,3 @@
+[submodule "src/lib-jsat"]
+	path = src/lib-jsat
+	url = https://github.com/IA-for-Space/jsat.git
