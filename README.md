@@ -17,6 +17,8 @@
 
 # Requirements
 
+- JSAT library: Fork of the original one.
+
 # Install steps
 
 # References
