@@ -1,3 +1,5 @@
+package saasyml.dataset.generate;
+
 import jsat.classifiers.CategoricalData;
 import jsat.classifiers.ClassificationDataSet;
 import jsat.distributions.multivariate.NormalM;
