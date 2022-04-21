@@ -5,6 +5,8 @@ import jsat.classifiers.linear.LogisticRegressionDCD;
 import jsat.clustering.Clusterer;
 import jsat.clustering.FLAME;
 import jsat.linear.distancemetrics.EuclideanDistance;
+import jsat.outlier.IsolationForest;
+import jsat.outlier.Outlier;
 
 /**
  * Factory to create ML models and identify the ML model type
@@ -21,6 +23,7 @@ public class FactoryMLModels {
     public enum TypeModel {
         Classifier,
         Cluster,
+        Outlier,
         Unknown,
     }
 
@@ -53,6 +56,20 @@ public class FactoryMLModels {
     }
 
     /**
+     * generate Outlier models
+     *
+     * @param modelName a string that holds the name of the model to create
+     * @return Outlier model
+     */
+    public static Outlier buildOutlier(String modelName) {
+
+        switch (modelName){
+            default:
+            case "IsolationForest" : return new IsolationForest();
+        }
+    }
+
+    /**
      * Given the name of the model, retrieve the type of model
      * @param modelName a string that holds the name of the model
      * @return TypeModel type of model
@@ -62,6 +79,7 @@ public class FactoryMLModels {
         switch (modelName){
             case "LogisticRegressionDCD" :  return TypeModel.Classifier;
             case "FLAME" :                  return TypeModel.Cluster;
+            case "IsolationForest":         return TypeModel.Outlier;
         }
 
         return TypeModel.Unknown;

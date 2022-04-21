@@ -6,6 +6,7 @@ import jsat.classifiers.DataPoint;
 import jsat.classifiers.DataPointPair;
 import jsat.clustering.Clusterer;
 import jsat.distributions.Normal;
+import jsat.outlier.Outlier;
 import jsat.utils.GridDataGenerator;
 import jsat.utils.IntSet;
 import jsat.utils.random.RandomUtil;
@@ -95,6 +96,9 @@ public class SaaSyML {
             case Cluster:
                 cluster();
                 break;
+            case Outlier:
+                outlier();
+                break;
         }
 
     }
@@ -144,6 +148,27 @@ public class SaaSyML {
     }
 
     /**
+     * Execute ML classifier
+     *
+     * Train and test the model
+     */
+    private void outlier() {
+        // build the model
+        Outlier model = FactoryMLModels.buildOutlier(modelName);
+
+        // train the model
+        model.fit((SimpleDataSet) train, thread);
+
+        // test the model
+        double numOutliersInTrain = ((SimpleDataSet)train).getDataPoints().stream().mapToDouble(model::score).filter(x -> x < 0).count();
+        System.out.println((numOutliersInTrain / train.size()) + " vs " + 0.05);//Better say something like 95% are inlines!
+
+        double numOutliersInOutliers = ((SimpleDataSet)test).getDataPoints().stream().mapToDouble(model::score).filter(x -> x < 0).count();
+        System.out.println((numOutliersInOutliers / test.size()) + " vs " + 0.1);//Better say 90% are outliers!
+
+    }
+
+    /**
      * Generate randomly the train and test dataset
      *
      * For testing propose
@@ -170,6 +195,19 @@ public class SaaSyML {
                     train = gdg.generateData(100);
                 }
                 break;
+
+            case Outlier:
+                int N = 5000;
+                if (train == null) {
+                    System.out.println("Generate train dataset: ");
+                    train = new GridDataGenerator(new Normal(), 1,1,1).generateData(N);
+                }
+
+                if (test == null) {
+                    System.out.println("Generate test dataset: ");
+                    test = new GridDataGenerator(new Normal(10, 1.0), 1,1,1).generateData(N);
+                }
+                break;
         }
 
     }
@@ -185,6 +223,9 @@ public class SaaSyML {
 
         System.out.println("************* Testing Clustering **************");
         testClustering();
+
+        System.out.println("************* Testing Regression **************");
+        testOutlier();
     }
 
     /**
@@ -233,5 +274,29 @@ public class SaaSyML {
         // start training and testing the model
         saasyml.execute();
 
+    }
+
+    /**
+     * test the Outlier ML model
+     */
+    private static void testOutlier() {
+        // instantiate the class
+        SaaSyML saasyml = new SaaSyML();
+
+        // subscribe to the service
+        saasyml.subscribe(1, "IsolationForest");
+
+        System.out.println("Generate the training dataset: ");
+        int N = 5000;
+        SimpleDataSet train = new GridDataGenerator(new Normal(), 1,1,1).generateData(N);
+
+        // upload the train dataset
+        saasyml.upload(train);
+
+        // deactivate the thread
+        saasyml.setThread(false);
+
+        // start training and testing the model
+        saasyml.execute();
     }
 }
