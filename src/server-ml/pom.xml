@@ -16,15 +16,15 @@
     </licenses>
     <developers>
         <developer>
-            <name>Edward Raff</name>
-            <email>raff.edward@gmail.com</email>
-            <url>edwardraff.com</url>
+            <name>Cesar Guzman Alvarez</name>
+            <email>cesar.guzman@visionspace.com</email>
+            <url>cguz.org</url>
         </developer>
     </developers>
     <scm>
-        <connection>scm:git:git@github.com:EdwardRaff/JSAT.git</connection>
-        <developerConnection>scm:git:git@github.com:EdwardRaff/JSAT.git</developerConnection>
-        <url>git@github.com:EdwardRaff/JSAT.git</url>
+        <connection>scm:git:git@github.com/visionspacetec/opssat-saasy-ml.git</connection>
+        <developerConnection>scm:git:git@github.com/visionspacetec/opssat-saasy-ml.git</developerConnection>
+        <url>git@github.com/visionspacetec/opssat-saasy-ml.git</url>
     </scm>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -35,16 +35,7 @@
     </properties>
     <build>
         <sourceDirectory>src</sourceDirectory>
-        <testSourceDirectory>test</testSourceDirectory>
         <plugins>
-            <plugin><!--Done to avoid running tests on every compile, but we still want to be able to run them when we ask!-->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.18.1</version>
-                <configuration>
-                    <skipTests>${skipTests}</skipTests>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
@@ -77,11 +68,10 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.10</version>
-            <scope>test</scope>
-            <type>jar</type>
+            <groupId>com.edwardraff</groupId>
+            <artifactId>JSAT</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>
