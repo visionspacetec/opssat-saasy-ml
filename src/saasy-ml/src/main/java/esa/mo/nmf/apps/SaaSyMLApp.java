@@ -46,7 +46,6 @@ public class SaaSyMLApp {
 
         MCAdapter adapter = new MCAdapter();
         connector = new NanoSatMOConnectorImpl();
-        adapter.setNMF(connector);
         connector.init(adapter);
 
     }
