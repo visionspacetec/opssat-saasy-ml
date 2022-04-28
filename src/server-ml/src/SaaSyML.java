@@ -13,9 +13,7 @@ import jsat.utils.random.RandomUtil;
 import saasyml.dataset.utils.GenerateDataset;
 import saasyml.factories.FactoryMLModels;
 
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 /**
  * SaaSy ML implementation of the service layer.
@@ -35,6 +33,15 @@ public class SaaSyML {
      * Empty constructor
      */
     public SaaSyML() { }
+
+    /**
+     * Constructor
+     *
+     * @param thread boolean variable that holds the activation of the thread
+     */
+    public SaaSyML(boolean thread) {
+        this.thread = thread;
+    }
 
     /**
      * PUT / subscribe an experimenter app specifying the name of the model
@@ -218,22 +225,91 @@ public class SaaSyML {
      */
     public static void main(String[] args) {
 
-        System.out.println("************* Testing Classifier **************");
-        testClassifier();
+        String howToUse = "$ java -jar saasyml-server-0.1.0-SNAPSHOT.jar -thread [1 | true] -tests [1 2 3 | Classifier Cluster Outlier]";
 
-        System.out.println("************* Testing Clustering **************");
-        testClustering();
+        boolean thread = false;
 
-        System.out.println("************* Testing Regression **************");
-        testOutlier();
+        List<String> options = null;
+
+        if (args.length < 1) {
+
+            System.out.println("************* ************************************ ************ **************");
+            System.out.println("************* Executing all the three tests with thread = false **************");
+            System.out.println("************* ************************************ ************ **************");
+
+            options =  new ArrayList<String>() {
+                {
+                    add("1");
+                    add("2");
+                    add("3");
+                }
+            };
+
+        } else {
+
+            final Map<String, List<String>> params = new HashMap<>();
+
+            for (int index = 0; index < args.length; index++) {
+
+                final String a = args[index];
+
+                if (a.charAt(0) == '-') {
+                    if (a.length() < 2) {
+                        System.err.println("Error at argument " + a);
+                        return;
+                    }
+
+                    options = new ArrayList<>();
+                    params.put(a.substring(1), options);
+
+                } else {
+                    if (options != null) {
+                        options.add(a);
+                    } else {
+                        System.err.println("Illegal parameter usage");
+                    }
+                }
+            }
+
+            if (params.isEmpty() || !params.containsKey("tests")) {
+                System.err.println("Error at argument ");
+                return;
+            }
+
+            if (params.containsKey("thread")) {
+                thread = Boolean.parseBoolean(params.get("thread").get(0));
+            }
+
+            options = params.get("tests");
+        }
+
+        for (String s : options){
+
+            if (s.equals("1") || s.equals("Classifier")) {
+                System.out.println("************* Testing Classifier **************");
+                testClassifier(thread);
+            }
+
+            if (s.equals("2") || s.equals("Cluster")) {
+                System.out.println("************* Testing Clustering **************");
+                testClustering(thread);
+            }
+
+            if (s.equals("3") || s.equals("Outlier")) {
+                System.out.println("************* Testing Outlier **************");
+                testOutlier(thread);
+            }
+        }
+
+        System.out.println("\nHelp of use:\n" + howToUse);
     }
 
     /**
      * test the classifier ML model
      */
-    private static void testClassifier() {
+    private static void testClassifier(boolean thread) {
         // instantiate the class
-        SaaSyML saasyml = new SaaSyML();
+        SaaSyML saasyml = new SaaSyML(thread);
 
         // subscribe to the service
         saasyml.subscribe(1, "LogisticRegressionDCD");
@@ -254,9 +330,9 @@ public class SaaSyML {
     /**
      * test the clustering ML model
      */
-    private static void testClustering() {
+    private static void testClustering(boolean thread) {
         // instantiate the class
-        SaaSyML saasyml = new SaaSyML();
+        SaaSyML saasyml = new SaaSyML(thread);
 
         // subscribe to the service
         saasyml.subscribe(2, "FLAME");
@@ -279,9 +355,9 @@ public class SaaSyML {
     /**
      * test the Outlier ML model
      */
-    private static void testOutlier() {
+    private static void testOutlier(boolean thread) {
         // instantiate the class
-        SaaSyML saasyml = new SaaSyML();
+        SaaSyML saasyml = new SaaSyML(thread);
 
         // subscribe to the service
         saasyml.subscribe(1, "IsolationForest");
