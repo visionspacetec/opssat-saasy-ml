@@ -13,6 +13,10 @@ import jsat.utils.random.RandomUtil;
 import saasyml.dataset.utils.GenerateDataset;
 import saasyml.factories.FactoryMLModels;
 
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -23,11 +27,18 @@ import java.util.*;
 public class SaaSyML {
 
     private boolean thread = false;
-    private String modelName = "";
+    private String modelNameToExecute = "";
 
     private DataSet train = null;
     private DataSet test = null;
     private FactoryMLModels.TypeModel typeModel = FactoryMLModels.TypeModel.Unknown;
+
+
+    // Attributes for serialize the model
+    private boolean serialize = false;
+    private String modelPath = "./model/";
+    private String modelFileName = "'"+modelPath+"'yyyy-MM-dd hh-mm-ss'.model'";
+
 
     /**
      * Empty constructor
@@ -44,13 +55,32 @@ public class SaaSyML {
     }
 
     /**
+     * Constructor
+     *
+     * @param thread boolean variable that holds the activation of the thread
+     * @param serialize boolean variable that holds if we should serialize the model or not
+     */
+    public SaaSyML(boolean thread, boolean serialize) {
+        this.thread = thread;
+        this.serialize = serialize;
+
+        if (serialize){
+            try{
+                Files.createDirectories(Paths.get(modelPath));
+            }catch (Exception ex){
+                System.err.println("Error creating the folder model");
+            }
+        }
+    }
+
+    /**
      * PUT / subscribe an experimenter app specifying the name of the model
      *
      * @param id_user id of the user
      * @param modelName name of the model
      */
     public void subscribe(int id_user, String modelName) {
-        this.modelName = modelName;
+        this.modelNameToExecute = modelName;
         this.typeModel = FactoryMLModels.getTypeModel(modelName);
     }
 
@@ -117,15 +147,55 @@ public class SaaSyML {
      */
     private void classier() {
         // build the model
-        Classifier model = FactoryMLModels.buildClassifier(modelName);
+        Classifier model = FactoryMLModels.buildClassifier(modelNameToExecute);
 
         // train the model
         model.train((ClassificationDataSet) train, thread);
+
+        if (serialize){
+            // serialize the model
+            String pathToSerializedModel = serializeModel(model);
+
+            // deserialize the model
+            model = deserializeClassifier(pathToSerializedModel);
+        }
 
         // test the model
         for(DataPointPair<Integer> dpp : ((ClassificationDataSet)test).getAsDPPList()){
             System.out.println(dpp.getPair().longValue()+ " vs " + model.classify(dpp.getDataPoint()).mostLikely());
         }
+    }
+
+    /**
+     * Function to serialize the model in a file
+     *
+     * @param model that holds the model to serialize
+     * @return full path name of the model
+     */
+    private String serializeModel(Object model) {
+        String pathToSerializedModel = new SimpleDateFormat(this.modelFileName).format(new Date());
+
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(pathToSerializedModel));) {
+            oos.writeObject(model);
+        }catch (Exception e){ System.err.println("Error serializing the model"); }
+
+        return pathToSerializedModel;
+    }
+
+    /**
+     * Function to deserialize a model
+     * @param pathToSerializedModel full path name of the model
+     * @return the model
+     */
+    private Classifier deserializeClassifier(String pathToSerializedModel) {
+
+        Classifier model = null;
+
+        try (ObjectInputStream objectinputstream = new ObjectInputStream(new FileInputStream(pathToSerializedModel));) {
+            model = (Classifier) objectinputstream.readObject();
+        } catch (Exception e){ System.err.println("Error deserializing the model"); }
+
+        return model;
     }
 
     /**
@@ -135,7 +205,15 @@ public class SaaSyML {
      */
     private void cluster() {
         // build the model
-        Clusterer model = FactoryMLModels.buildCluster(modelName);
+        Clusterer model = FactoryMLModels.buildCluster(modelNameToExecute);
+
+        if (serialize){
+            // serialize the model
+            String pathToSerializedModel = serializeModel(model);
+
+            // deserialize the model
+            model = deserializeCluster(pathToSerializedModel);
+        }
 
         // train the model
         List<List<DataPoint>> clusters = model.cluster(train);
@@ -155,16 +233,40 @@ public class SaaSyML {
     }
 
     /**
+     * Function to deserialize a model
+     * @param pathToSerializedModel full path name of the model
+     * @return the model
+     */
+    private Clusterer deserializeCluster(String pathToSerializedModel) {
+
+        Clusterer model = null;
+
+        try (ObjectInputStream objectinputstream = new ObjectInputStream(new FileInputStream(pathToSerializedModel));) {
+            model = (Clusterer) objectinputstream.readObject();
+        } catch (Exception e){ System.err.println("Error deserializing the model"); }
+
+        return model;
+    }
+
+    /**
      * Execute ML classifier
      *
      * Train and test the model
      */
     private void outlier() {
         // build the model
-        Outlier model = FactoryMLModels.buildOutlier(modelName);
+        Outlier model = FactoryMLModels.buildOutlier(modelNameToExecute);
 
         // train the model
         model.fit((SimpleDataSet) train, thread);
+
+        if (serialize){
+            // serialize the model
+            String pathToSerializedModel = serializeModel(model);
+
+            // deserialize the model
+            model = deserializeOutlier(pathToSerializedModel);
+        }
 
         // test the model
         double numOutliersInTrain = ((SimpleDataSet)train).getDataPoints().stream().mapToDouble(model::score).filter(x -> x < 0).count();
@@ -173,6 +275,22 @@ public class SaaSyML {
         double numOutliersInOutliers = ((SimpleDataSet)test).getDataPoints().stream().mapToDouble(model::score).filter(x -> x < 0).count();
         System.out.println((numOutliersInOutliers / test.size()) + " vs " + 0.1);//Better say 90% are outliers!
 
+    }
+
+    /**
+     * Function to deserialize a model
+     * @param pathToSerializedModel full path name of the model
+     * @return the model
+     */
+    private Outlier deserializeOutlier(String pathToSerializedModel) {
+
+        Outlier model = null;
+
+        try (ObjectInputStream objectinputstream = new ObjectInputStream(new FileInputStream(pathToSerializedModel));) {
+            model = (Outlier) objectinputstream.readObject();
+        } catch (Exception e){ System.err.println("Error deserializing the model"); }
+
+        return model;
     }
 
     /**
@@ -226,20 +344,19 @@ public class SaaSyML {
     public static void main(String[] args) {
 
         // how to use information
-        String howToUse = "$ java -jar saasyml-server-0.1.0-SNAPSHOT.jar -thread [1 | true] -tests [1 2 3 | Classifier Cluster Outlier]";
+        String howToUse = "$ java -jar saasyml-server-0.1.0-SNAPSHOT.jar -thread [1 | true] -s [1 | true] -tests [1 2 3 | Classifier Cluster Outlier]";
 
         // if the thread is available or not
         boolean thread = false;
+
+        // if the serialize is available or not
+        boolean serialize = false;
 
         // set of tests to execute
         List<String> tests_list = null;
 
         // if there is no arguments, we add by default three tests
         if (args.length < 1) {
-
-            System.out.println("************* ************************************ ************ **************");
-            System.out.println("************* Executing all the three tests with thread = false **************");
-            System.out.println("************* ************************************ ************ **************");
 
             tests_list =  new ArrayList<String>() {
                 {
@@ -280,35 +397,56 @@ public class SaaSyML {
 
             // if it is empty or id does not contain tests option, we stop
             if (params.isEmpty() || !params.containsKey("tests")) {
-                System.err.println("Error at argument ");
-                return;
+                tests_list =  new ArrayList<String>() {
+                    {
+                        add("1");
+                        add("2");
+                        add("3");
+                    }
+                };
+            }else{
+                // get the tests list
+                tests_list = params.get("tests");
             }
 
-            // if it contains the thread option, we added it. By Default it is false
+            // if it contains the thread option, we added it. By Default, it is false
             if (params.containsKey("thread")) {
-                thread = Boolean.parseBoolean(params.get("thread").get(0));
+                String option = params.get("thread").get(0);
+                if ("1".equalsIgnoreCase(option) || "true".equalsIgnoreCase(option))
+                    thread = true;
             }
 
-            // get the tests list
-            tests_list = params.get("tests");
+            // if it contains the serialize (s) option, we added it. By Default, it is false
+            if (params.containsKey("s")) {
+                String option = params.get("s").get(0);
+                if ("1".equalsIgnoreCase(option) || "true".equalsIgnoreCase(option))
+                   serialize = true;
+            }
         }
+
+        System.out.println("************* ************************************ ****");
+        System.out.println("************* Configuration of Execution **************");
+        System.out.println("- thread: "+thread);
+        System.out.println("- serialize: "+ serialize);
+        System.out.println("- tests: "+ tests_list.toString());
+        System.out.println("************* ************************************ ****\n");
 
         // for each test, we execute it
         for (String s : tests_list) {
 
             if (s.equals("1") || s.equals("Classifier")) {
                 System.out.println("************* Testing Classifier **************");
-                testClassifier(thread);
+                testClassifier(thread, serialize);
             }
 
             if (s.equals("2") || s.equals("Cluster")) {
                 System.out.println("************* Testing Clustering **************");
-                testClustering(thread);
+                testClustering(thread, serialize);
             }
 
             if (s.equals("3") || s.equals("Outlier")) {
                 System.out.println("************* Testing Outlier **************");
-                testOutlier(thread);
+                testOutlier(thread, serialize);
             }
         }
 
@@ -317,10 +455,13 @@ public class SaaSyML {
 
     /**
      * test the classifier ML model
+     *
+     * @param thread boolean variable that holds the activation of the thread
+     * @param serialize boolean variable that holds if we should serialize the model or not
      */
-    private static void testClassifier(boolean thread) {
+    private static void testClassifier(boolean thread, boolean serialize) {
         // instantiate the class
-        SaaSyML saasyml = new SaaSyML(thread);
+        SaaSyML saasyml = new SaaSyML(thread, serialize);
 
         // subscribe to the service
         saasyml.subscribe(1, "LogisticRegressionDCD");
@@ -340,10 +481,13 @@ public class SaaSyML {
 
     /**
      * test the clustering ML model
+     *
+     * @param thread boolean variable that holds the activation of the thread
+     * @param serialize boolean variable that holds if we should serialize the model or not
      */
-    private static void testClustering(boolean thread) {
+    private static void testClustering(boolean thread, boolean serialize) {
         // instantiate the class
-        SaaSyML saasyml = new SaaSyML(thread);
+        SaaSyML saasyml = new SaaSyML(thread, serialize);
 
         // subscribe to the service
         saasyml.subscribe(2, "FLAME");
@@ -365,10 +509,13 @@ public class SaaSyML {
 
     /**
      * test the Outlier ML model
+     *
+     * @param thread boolean variable that holds the activation of the thread
+     * @param serialize boolean variable that holds if we should serialize the model or not
      */
-    private static void testOutlier(boolean thread) {
+    private static void testOutlier(boolean thread, boolean serialize) {
         // instantiate the class
-        SaaSyML saasyml = new SaaSyML(thread);
+        SaaSyML saasyml = new SaaSyML(thread, serialize);
 
         // subscribe to the service
         saasyml.subscribe(1, "IsolationForest");
