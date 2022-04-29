@@ -225,19 +225,23 @@ public class SaaSyML {
      */
     public static void main(String[] args) {
 
+        // how to use information
         String howToUse = "$ java -jar saasyml-server-0.1.0-SNAPSHOT.jar -thread [1 | true] -tests [1 2 3 | Classifier Cluster Outlier]";
 
+        // if the thread is available or not
         boolean thread = false;
 
-        List<String> options = null;
+        // set of tests to execute
+        List<String> tests_list = null;
 
+        // if there is no arguments, we add by default three tests
         if (args.length < 1) {
 
             System.out.println("************* ************************************ ************ **************");
             System.out.println("************* Executing all the three tests with thread = false **************");
             System.out.println("************* ************************************ ************ **************");
 
-            options =  new ArrayList<String>() {
+            tests_list =  new ArrayList<String>() {
                 {
                     add("1");
                     add("2");
@@ -246,44 +250,51 @@ public class SaaSyML {
             };
 
         } else {
+            // otherwise, we get the tests by command line
 
+            // we stored all in a tuple <o, v>, where o is an option and v is a set or values (tests)
             final Map<String, List<String>> params = new HashMap<>();
 
+            // for each argument, we take the values
             for (int index = 0; index < args.length; index++) {
 
-                final String a = args[index];
+                final String arg = args[index];
 
-                if (a.charAt(0) == '-') {
-                    if (a.length() < 2) {
-                        System.err.println("Error at argument " + a);
+                if (arg.charAt(0) == '-') {
+                    if (arg.length() < 2) {
+                        System.err.println("Error at argument " + arg);
                         return;
                     }
 
-                    options = new ArrayList<>();
-                    params.put(a.substring(1), options);
+                    tests_list = new ArrayList<>();
+                    params.put(arg.substring(1), tests_list);
 
                 } else {
-                    if (options != null) {
-                        options.add(a);
+                    if (tests_list != null) {
+                        tests_list.add(arg);
                     } else {
                         System.err.println("Illegal parameter usage");
                     }
                 }
             }
 
+            // if it is empty or id does not contain tests option, we stop
             if (params.isEmpty() || !params.containsKey("tests")) {
                 System.err.println("Error at argument ");
                 return;
             }
 
+            // if it contains the thread option, we added it. By Default it is false
             if (params.containsKey("thread")) {
                 thread = Boolean.parseBoolean(params.get("thread").get(0));
             }
 
-            options = params.get("tests");
+            // get the tests list
+            tests_list = params.get("tests");
         }
 
-        for (String s : options){
+        // for each test, we execute it
+        for (String s : tests_list) {
 
             if (s.equals("1") || s.equals("Classifier")) {
                 System.out.println("************* Testing Classifier **************");
@@ -314,7 +325,7 @@ public class SaaSyML {
         // subscribe to the service
         saasyml.subscribe(1, "LogisticRegressionDCD");
 
-        System.out.println("Generate the training dataset: ");
+        System.out.println("Generate training dataset...");
         ClassificationDataSet train = GenerateDataset.get2ClassLinear(200, RandomUtil.getRandom());
 
         // upload the train dataset
@@ -337,7 +348,7 @@ public class SaaSyML {
         // subscribe to the service
         saasyml.subscribe(2, "FLAME");
 
-        System.out.println("Generate training dataset: ");
+        System.out.println("Generate training dataset...");
         GridDataGenerator gdg = new GridDataGenerator(new Normal(0, 0.05), new Random(12), 2, 5);
         SimpleDataSet train = gdg.generateData(100);
 
@@ -362,7 +373,7 @@ public class SaaSyML {
         // subscribe to the service
         saasyml.subscribe(1, "IsolationForest");
 
-        System.out.println("Generate the training dataset: ");
+        System.out.println("Generate training dataset...");
         int N = 5000;
         SimpleDataSet train = new GridDataGenerator(new Normal(), 1,1,1).generateData(N);
 
