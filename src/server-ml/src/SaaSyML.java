@@ -37,7 +37,8 @@ public class SaaSyML {
     // Attributes for serialize the model
     private boolean serialize = false;
     private String modelPath = "./model/";
-    private String modelFileName = "'"+modelPath+"'yyyy-MM-dd hh-mm-ss'.model'";
+    private String formatDate = "yyyy-MM-dd hh-mm-ss";
+    private String modelFileName = modelPath+"{MODEL_NAME}-{THREAD}-{DATE}.model";
 
 
     /**
@@ -173,7 +174,11 @@ public class SaaSyML {
      * @return full path name of the model
      */
     private String serializeModel(Object model) {
-        String pathToSerializedModel = new SimpleDateFormat(this.modelFileName).format(new Date());
+
+        String date = new SimpleDateFormat(this.formatDate).format(new Date());
+        String pathToSerializedModel = this.modelFileName.replace("{MODEL_NAME}", this.modelNameToExecute);
+        pathToSerializedModel = pathToSerializedModel.replace("{DATE}", date);
+        pathToSerializedModel = pathToSerializedModel.replace("{THREAD}", (this.thread)?"1":"0");
 
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(pathToSerializedModel));) {
             oos.writeObject(model);
