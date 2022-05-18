@@ -24,7 +24,7 @@ import java.util.*;
  *
  * @author Dr. Cesar Guzman
  */
-public class SaaSyML {
+public class ServiceLayer {
 
     private boolean thread = false;
     private String modelNameToExecute = "";
@@ -44,14 +44,14 @@ public class SaaSyML {
     /**
      * Empty constructor
      */
-    public SaaSyML() { }
+    public ServiceLayer() { }
 
     /**
      * Constructor
      *
      * @param thread boolean variable that holds the activation of the thread
      */
-    public SaaSyML(boolean thread) {
+    public ServiceLayer(boolean thread) {
         this.thread = thread;
     }
 
@@ -61,7 +61,7 @@ public class SaaSyML {
      * @param thread boolean variable that holds the activation of the thread
      * @param serialize boolean variable that holds if we should serialize the model or not
      */
-    public SaaSyML(boolean thread, boolean serialize) {
+    public ServiceLayer(boolean thread, boolean serialize) {
         this.thread = thread;
         this.serialize = serialize;
 
@@ -349,7 +349,7 @@ public class SaaSyML {
     public static void main(String[] args) {
 
         // how to use information
-        String howToUse = "$ java -jar saasyml-server-0.1.0-SNAPSHOT.jar -thread [1 | true] -s [1 | true] -tests [1 2 3 | Classifier Cluster Outlier]";
+        String howToUse = "$ java -jar saasyml-service-layer-0.1.0-SNAPSHOT.jar -thread [1 | true] -s [1 | true] -tests [1 2 3 | Classifier Cluster Outlier]";
 
         // if the thread is available or not
         boolean thread = false;
@@ -466,7 +466,7 @@ public class SaaSyML {
      */
     private static void testClassifier(boolean thread, boolean serialize) {
         // instantiate the class
-        SaaSyML saasyml = new SaaSyML(thread, serialize);
+        ServiceLayer saasyml = new ServiceLayer(thread, serialize);
 
         // subscribe to the service
         saasyml.subscribe(1, "LogisticRegressionDCD");
@@ -492,7 +492,7 @@ public class SaaSyML {
      */
     private static void testClustering(boolean thread, boolean serialize) {
         // instantiate the class
-        SaaSyML saasyml = new SaaSyML(thread, serialize);
+        ServiceLayer saasyml = new ServiceLayer(thread, serialize);
 
         // subscribe to the service
         saasyml.subscribe(2, "FLAME");
@@ -520,7 +520,7 @@ public class SaaSyML {
      */
     private static void testOutlier(boolean thread, boolean serialize) {
         // instantiate the class
-        SaaSyML saasyml = new SaaSyML(thread, serialize);
+        ServiceLayer saasyml = new ServiceLayer(thread, serialize);
 
         // subscribe to the service
         saasyml.subscribe(1, "IsolationForest");

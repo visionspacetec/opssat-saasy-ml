@@ -21,6 +21,14 @@
 
 # Install
 
+## Service Layer
+
+Inside the folder "src/service-layer/" execute:
+
+    $ mvn install
+
+It will generate a jar executable in the folder "target"
+
 # References
 
 [1] Edward Raff. 2017. JSAT: Java statistical analysis tool, a library for machine learning. J. Mach. Learn. Res. 18, 1 (January 2017), 792–796. Url: https://github.com/EdwardRaff/JSAT
