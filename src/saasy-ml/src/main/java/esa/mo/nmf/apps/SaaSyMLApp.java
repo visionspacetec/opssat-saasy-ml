@@ -36,16 +36,20 @@ import org.ccsds.moims.mo.mc.structures.AttributeValueList;
  */
 public class SaaSyMLApp {
 
-    // Handle communication with NMF
-    // Used to request services from the NMF ( camera ) and push results to NMF, so they are forwarded to the ground
     private final NanoSatMOConnectorImpl connector;
 
     public SaaSyMLApp() {
 
         System.out.println("SaaSyML is running !");
 
+        // handle the responses coming from the connector and pushing of requests and results to the connector.
         MCAdapter adapter = new MCAdapter();
+
+        // handle communication with NMF, request services from the NMF ( camera )
+        // and push results to NMF, so they are forwarded to the ground
         connector = new NanoSatMOConnectorImpl();
+
+        // supply the adapter to the connector
         connector.init(adapter);
 
     }

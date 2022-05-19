@@ -19,16 +19,18 @@
     <relativePath>../../../../parent/pom.xml</relativePath>
   </parent>
   <groupId>int.esa.nmf.sdk.space.saasyml</groupId>
-  <artifactId>saasyml</artifactId>
+  <artifactId>saasy-ml</artifactId>
   <packaging>jar</packaging>
 
   <name>On-board Machine Learning Software as a Service</name>
-  <description>A blank app</description>
+  <description>Hello world example application</description>
   <url>http://www.esa.int</url>
+
   <organization>
     <name>ESA</name>
     <url>http://www.esa.int</url>
   </organization>
+
   <licenses>
     <license>
       <name>European Space Agency Public License (ESA-PL) Weak Copyleft – v2.4</name>
@@ -36,11 +38,13 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+
   <scm>
     <connection>scm:git:git@github.com:esa/nanosat-mo-framework.git</connection>
     <developerConnection>scm:git:git@github.com:esa/nanosat-mo-framework.git</developerConnection>
     <url>https://github.com/esa/nanosat-mo-framework</url>
   </scm>
+
   <developers>
     <developer>
       <name>Cesar Guzman Alvarez</name>
@@ -48,17 +52,20 @@
       <url>cguz.org</url>
     </developer>
   </developers>
+
   <properties>
-    <assembly.mainClass>esa.mo.nmf.apps.BlankApp</assembly.mainClass>
-    <maven.deploy.skip>true</maven.deploy.skip>
-    <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
+    <assembly.mainClass>esa.mo.nmf.apps.SaaSyMLApp</assembly.mainClass>
+    <!--<maven.deploy.skip>true</maven.deploy.skip>
+    <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>-->
   </properties>
+
   <dependencies>
     <dependency>
       <groupId>int.esa.nmf.core</groupId>
       <artifactId>nanosat-mo-connector</artifactId>
     </dependency>
   </dependencies>
+
   <build>
     <resources>
     </resources>
