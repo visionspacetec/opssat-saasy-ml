@@ -1,4 +1,4 @@
-package saasyml.dataset.utils;
+package esa.mo.nmf.apps.saasyml.dataset.utils;
 
 import jsat.classifiers.CategoricalData;
 import jsat.classifiers.ClassificationDataSet;

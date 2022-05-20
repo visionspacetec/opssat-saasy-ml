@@ -1,4 +1,6 @@
-This folder contains SaaSy ML as NMF App
+This folder contains SaaSy ML as NMF App. 
+
+We should copy it in the folder **sdk/examples/space/**
 
 # Deploying NMF app in the SDK
 

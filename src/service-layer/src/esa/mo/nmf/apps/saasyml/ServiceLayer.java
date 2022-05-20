@@ -1,3 +1,6 @@
+package esa.mo.nmf.apps.saasyml;
+
+import esa.mo.nmf.apps.saasyml.test.ServiceLayerTest;
 import jsat.DataSet;
 import jsat.SimpleDataSet;
 import jsat.classifiers.ClassificationDataSet;
@@ -10,8 +13,8 @@ import jsat.outlier.Outlier;
 import jsat.utils.GridDataGenerator;
 import jsat.utils.IntSet;
 import jsat.utils.random.RandomUtil;
-import saasyml.dataset.utils.GenerateDataset;
-import saasyml.factories.FactoryMLModels;
+import esa.mo.nmf.apps.saasyml.dataset.utils.GenerateDataset;
+import esa.mo.nmf.apps.saasyml.factories.FactoryMLModels;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -441,101 +444,23 @@ public class ServiceLayer {
 
             if (s.equals("1") || s.equals("Classifier")) {
                 System.out.println("************* Testing Classifier **************");
-                testClassifier(thread, serialize);
+                ServiceLayerTest.testClassifier(thread, serialize);
             }
 
             if (s.equals("2") || s.equals("Cluster")) {
                 System.out.println("************* Testing Clustering **************");
-                testClustering(thread, serialize);
+                ServiceLayerTest.testClustering(thread, serialize);
             }
 
             if (s.equals("3") || s.equals("Outlier")) {
                 System.out.println("************* Testing Outlier **************");
-                testOutlier(thread, serialize);
+                ServiceLayerTest.testOutlier(thread, serialize);
             }
         }
 
         System.out.println("\nHelp of use:\n" + howToUse);
+
+        // ServiceLayerTest.testSettings();
     }
 
-    /**
-     * test the classifier ML model
-     *
-     * @param thread boolean variable that holds the activation of the thread
-     * @param serialize boolean variable that holds if we should serialize the model or not
-     */
-    private static void testClassifier(boolean thread, boolean serialize) {
-        // instantiate the class
-        ServiceLayer saasyml = new ServiceLayer(thread, serialize);
-
-        // subscribe to the service
-        saasyml.subscribe(1, "LogisticRegressionDCD");
-
-        System.out.println("Generate training dataset...");
-        ClassificationDataSet train = GenerateDataset.get2ClassLinear(200, RandomUtil.getRandom());
-
-        // upload the train dataset
-        saasyml.upload(train);
-
-        // deactivate the thread
-        saasyml.setThread(false);
-
-        // start training and testing the model
-        saasyml.execute();
-    }
-
-    /**
-     * test the clustering ML model
-     *
-     * @param thread boolean variable that holds the activation of the thread
-     * @param serialize boolean variable that holds if we should serialize the model or not
-     */
-    private static void testClustering(boolean thread, boolean serialize) {
-        // instantiate the class
-        ServiceLayer saasyml = new ServiceLayer(thread, serialize);
-
-        // subscribe to the service
-        saasyml.subscribe(2, "FLAME");
-
-        System.out.println("Generate training dataset...");
-        GridDataGenerator gdg = new GridDataGenerator(new Normal(0, 0.05), new Random(12), 2, 5);
-        SimpleDataSet train = gdg.generateData(100);
-
-        // upload the train dataset
-        saasyml.upload(train);
-
-        // deactivate the thread
-        saasyml.setThread(false);
-
-        // start training and testing the model
-        saasyml.execute();
-
-    }
-
-    /**
-     * test the Outlier ML model
-     *
-     * @param thread boolean variable that holds the activation of the thread
-     * @param serialize boolean variable that holds if we should serialize the model or not
-     */
-    private static void testOutlier(boolean thread, boolean serialize) {
-        // instantiate the class
-        ServiceLayer saasyml = new ServiceLayer(thread, serialize);
-
-        // subscribe to the service
-        saasyml.subscribe(1, "IsolationForest");
-
-        System.out.println("Generate training dataset...");
-        int N = 5000;
-        SimpleDataSet train = new GridDataGenerator(new Normal(), 1,1,1).generateData(N);
-
-        // upload the train dataset
-        saasyml.upload(train);
-
-        // deactivate the thread
-        saasyml.setThread(false);
-
-        // start training and testing the model
-        saasyml.execute();
-    }
 }

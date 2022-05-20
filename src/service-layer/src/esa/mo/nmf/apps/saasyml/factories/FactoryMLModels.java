@@ -1,4 +1,4 @@
-package saasyml.factories;
+package esa.mo.nmf.apps.saasyml.factories;
 
 import jsat.classifiers.Classifier;
 import jsat.classifiers.linear.LogisticRegressionDCD;
