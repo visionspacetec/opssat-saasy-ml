@@ -20,6 +20,8 @@
  */
 package esa.mo.nmf.apps;
 
+import esa.mo.nmf.apps.saasyml.ServiceLayer;
+import esa.mo.nmf.apps.saasyml.test.ServiceLayerTest;
 import esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl;
 import esa.mo.nmf.MonitorAndControlNMFAdapter;
 import esa.mo.nmf.MCRegistration;
@@ -31,8 +33,10 @@ import org.ccsds.moims.mo.mal.structures.UInteger;
 import org.ccsds.moims.mo.mc.parameter.structures.ParameterRawValueList;
 import org.ccsds.moims.mo.mc.structures.AttributeValueList;
 
+import java.util.*;
+
 /**
- * Blank App
+ * SaaSy ML App
  */
 public class SaaSyMLApp {
 
@@ -41,6 +45,10 @@ public class SaaSyMLApp {
     public SaaSyMLApp() {
 
         System.out.println("SaaSyML is running !");
+
+        // testing the ML models
+        ServiceLayerTest.testSettings();
+
 
         // handle the responses coming from the connector and pushing of requests and results to the connector.
         MCAdapter adapter = new MCAdapter();
