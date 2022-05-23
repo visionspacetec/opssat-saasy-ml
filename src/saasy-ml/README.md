@@ -2,6 +2,24 @@ This folder contains SaaSy ML as NMF App.
 
 We should copy it in the folder **sdk/examples/space/**
 
+# Compiling dependencies
+
+## JSAT
+
+$ cd src/lib-sat/
+
+$ git submodule init
+
+$ git submodule update
+
+$ mvn install -Dmaven.test.skip
+
+## Service-layer
+
+$ cd src/service-layer/
+
+$ mvn install
+
 # Deploying NMF app in the SDK
 
 ## 1. Update the SDK Package POM
@@ -65,7 +83,7 @@ Add the subtarget to the dependencies:
 
 ## 3. Deploy
 
-First, go into its root folder and call 
+First, go into the root folder "sdk/examples/space/saasy-ml/" and call 
 
     $ mvn install 
 

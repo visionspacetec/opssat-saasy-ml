@@ -20,7 +20,6 @@
  */
 package esa.mo.nmf.apps;
 
-import esa.mo.nmf.apps.saasyml.ServiceLayer;
 import esa.mo.nmf.apps.saasyml.test.ServiceLayerTest;
 import esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl;
 import esa.mo.nmf.MonitorAndControlNMFAdapter;
