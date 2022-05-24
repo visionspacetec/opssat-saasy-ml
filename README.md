@@ -17,17 +17,40 @@
 
 # Requirements
 
+- Java 8
 - JSAT library: Fork of the original one. Use Java 8.
 
 # Install
 
+## Java 8
+
+- Windows 11: Please, follows the instructions [here](https://www.techruzz.com/blog/how-to-download-and-install-java-jdk-8-on-windows-11)
+
+## JSAT 
+
+    $ cd src/lib-sat/
+    
+    $ git submodule init
+    
+    $ git submodule update
+    
+    $ mvn install
+
+You can skip the test of maven with the following command:
+
+    $ mvn install -Dmaven.test.skip
+
 ## Service Layer
 
-Inside the folder "src/service-layer/" execute:
+Inside the folder **src/service-layer/** execute:
 
     $ mvn install
 
-It will generate a jar executable in the folder "target"
+It will generate a jar executable in the folder **target**
+
+## SaaSy-ML
+
+Follow the instructions on the [Readme](src/saasy-ml/README.md)
 
 # References
 

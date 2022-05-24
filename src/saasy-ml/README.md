@@ -4,21 +4,7 @@ We should copy it in the folder **sdk/examples/space/**
 
 # Compiling dependencies
 
-## JSAT
-
-$ cd src/lib-sat/
-
-$ git submodule init
-
-$ git submodule update
-
-$ mvn install -Dmaven.test.skip
-
-## Service-layer
-
-$ cd src/service-layer/
-
-$ mvn install
+Please, be sure you meet the dependencies specified in [Readme](../../README.md)
 
 # Deploying NMF app in the SDK
 
@@ -83,7 +69,7 @@ Add the subtarget to the dependencies:
 
 ## 3. Deploy
 
-First, go into the root folder "sdk/examples/space/saasy-ml/" and call 
+First, go into the root folder **sdk/examples/space/saasy-ml/** and call 
 
     $ mvn install 
 
@@ -101,13 +87,13 @@ We can start the NMF supervisor with simulator,
 
 [Source](https://nanosat-mo-framework.readthedocs.io/en/latest/sdk.html#id6)
 
-## 1. Run the supervisor. 
+## 1. Run the supervisor
 
     $ cd sdk/sdk-package/target/nmf-sdk-2.1.0-SNAPSHOT/home/nmf/nanosat-mo-supervisor-sim/ 
 
     $ ./nanosat-mo-supervisor-sim.bat
 
-## 2. Run CTT.
+## 2. Run CTT
 
     $ cd sdk/sdk-package/target/nmf-sdk-2.1.0-SNAPSHOT/home/nmf/consumer-test-tool/ 
 
@@ -130,3 +116,97 @@ The table on the right side should list some services.
 Now click the button Connect to Selected Provider which results in a new tab appearing next to the Communication Settings. 
 You now have a working connection to the supervisor and are able to start apps and check messages.
 
+# Packing and deployment
+
+1. Clone [NMF Core](https://github.com/esa/nanosat-mo-framework.git)
+2. Checkout last commit on **dev** branch
+3. mvn install in repo's base dir
+4. Clone [NMF Mission Ops-Sat](https://github.com/esa/nmf-mission-ops-sat.git)
+5. Checkout last commit on **dev** branch
+6. mvn install in repo's base dir
+7. Open the pom.xml file in the opssat-package directory. 
+
+   In the "exp profile", edit your experimenter ID expId, expApid (typically equals to sum of expId + 1024), and the Maven information for your app. Make sure that expVersion matches the version defined in your app’s POM.
+
+        <profile>
+         <id>exp</id>
+         <properties>
+          <isExp>true</isExp>
+          <expId>213</expId>
+          <expApid>1237</expApid>
+          <expVersion>2.1.0-SNAPSHOT</expVersion>
+         </properties>
+         <dependencies>
+          <dependency>
+           <groupId>int.esa.nmf.sdk.space.saasyml</groupId>
+           <artifactId>saasy-ml</artifactId>
+           <version>${expVersion}</version>
+          </dependency>
+         </dependencies>
+
+
+   8. In the **artifactItems** configuration of the **expLib** execution of the maven-dependency-plugin. 
+   Add the following. We also add an **artifactItem** for each external dependency that the app has.
+
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <!-- Change the following 3 properties to match the information of your app -->
+                  <groupId>int.esa.nmf.sdk.space.saasyml</groupId>
+                  <artifactId>saasy-ml</artifactId>
+                  <!-- The declared version is arbitrary and does not have to match the NMF version -->
+                  <version>2.1.0-SNAPSHOT</version>
+                  <!-- Do not change this -->
+                  <type>jar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${esa.nmf.mission.opssat.assembly.outputdir}/experimenter-package/home/exp${expId}/lib/</outputDirectory>
+                </artifactItem>
+    
+            <artifactItem>
+              <groupId>int.esa.nmf.sdk.space.saasyml</groupId>
+              <artifactId>saasyml-service-layer</artifactId>
+              <version>0.1.0-SNAPSHOT</version>
+              <type>jar</type>
+              <overWrite>true</overWrite>
+              <outputDirectory>${esa.nmf.mission.opssat.assembly.outputdir}/experimenter-package/home/exp${expId}/lib/</outputDirectory>
+            </artifactItem>
+    
+            <artifactItem>
+              <groupId>com.edwardraff</groupId>
+              <artifactId>JSAT</artifactId>
+              <version>0.1.0-SNAPSHOT</version>
+              <type>jar</type>
+              <overWrite>true</overWrite>
+              <outputDirectory>${esa.nmf.mission.opssat.assembly.outputdir}/experimenter-package/home/exp${expId}/lib/</outputDirectory>
+            </artifactItem>
+    
+          </artifactItems>
+          </configuration>
+
+   9. Open the file **copy.xml** in the **opssat-package** folder. In the target **copyExp** edit the filter for **MAIN_CLASS_NAME**.
+    
+           <target name="copyExp">
+            <copy todir="${esa.nmf.mission.opssat.assembly.outputdir}/experimenter-package/home/exp${expId}/">
+              <fileset dir="${basedir}/src/main/resources/space-common"/>
+              <fileset dir="${basedir}/src/main/resources/space-app-root"/>
+              <filterset>
+                <filter token="MAIN_CLASS_NAME" value="esa.mo.nmf.apps.SaaSyMLApp"/>
+                <filter token="APID" value="${expApid}"/>
+                <filter token="NMF_HOME" value="`cd ../nmf > /dev/null; pwd`"/>
+                <filter token="NMF_LIB" value="`cd ../nmf/lib > /dev/null; pwd`"/>
+                <filter token="USER" value="exp${expId}"/>
+                <filter token="MAX_HEAP" value="128m"/>
+              </filterset>
+              <firstmatchmapper>
+                <globmapper from="startscript.sh" to="start_exp${expId}.sh"/>
+                <globmapper from="*" to="*"/>
+              </firstmatchmapper>
+            </copy>
+            <chmod dir="${esa.nmf.mission.opssat.assembly.outputdir}" perm="ugo+rx" includes="**/*.sh"/>
+          </target>
+
+   10. Invoke mvn clean install -Pexp in the **opssat-package** directory. 
+   11. Go to the folder **target/nmf-ops-sat-VERSION/experimenter-package/** and you will find the directory structure to package your app as an IPK for OPS-SAT.
+   12. Zip the **home** folder and submitted **/home/exp213/toESOC/sepp_packages** in your home folder on OSDRS.
+   
+       Follow the naming convention: exp213_2.0.1_CesarGuzman.zip
