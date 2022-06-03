@@ -14,12 +14,17 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * SaaSy ML service layer test
  *
  * @author Dr. Cesar Guzman
  */
 public class ServiceLayerTest {
+
+    private static Logger logger = LoggerFactory.getLogger(ServiceLayerTest.class);
 
     /**
      * test the classifier ML model
@@ -34,7 +39,7 @@ public class ServiceLayerTest {
         // subscribe to the service
         saasyml.subscribe(1, "LogisticRegressionDCD");
 
-        System.out.println("Generate training dataset...");
+        logger.info("Generate training dataset...");
         ClassificationDataSet train = GenerateDataset.get2ClassLinear(200, RandomUtil.getRandom());
 
         // upload the train dataset
@@ -60,7 +65,7 @@ public class ServiceLayerTest {
         // subscribe to the service
         saasyml.subscribe(2, "FLAME");
 
-        System.out.println("Generate training dataset...");
+        logger.info("Generate training dataset...");
         GridDataGenerator gdg = new GridDataGenerator(new Normal(0, 0.05), new Random(12), 2, 5);
         SimpleDataSet train = gdg.generateData(100);
 
@@ -88,7 +93,7 @@ public class ServiceLayerTest {
         // subscribe to the service
         saasyml.subscribe(1, "IsolationForest");
 
-        System.out.println("Generate training dataset...");
+        logger.info("Generate training dataset...");
         int N = 5000;
         SimpleDataSet train = new GridDataGenerator(new Normal(), 1,1,1).generateData(N);
 
@@ -143,17 +148,17 @@ public class ServiceLayerTest {
             for (String s : list_test.get(index)) {
 
                 if (s.equals("1")) {
-                    System.out.println("************* Testing Classifier **************");
+                    logger.info("************* Testing Classifier **************");
                     ServiceLayerTest.testClassifier(thread, serialize);
                 }
 
                 if (s.equals("2")) {
-                    System.out.println("************* Testing Clustering **************");
+                    logger.info("************* Testing Clustering **************");
                     ServiceLayerTest.testClustering(thread, serialize);
                 }
 
                 if (s.equals("3")) {
-                    System.out.println("************* Testing Outlier **************");
+                    logger.info("************* Testing Outlier **************");
                     ServiceLayerTest.testOutlier(thread, serialize);
                 }
             }
@@ -162,13 +167,13 @@ public class ServiceLayerTest {
             time_execution[index] = (System.nanoTime() - time_execution[index]);
         }
 
-        System.out.println("\n************* Final time execution of settings **************");
+        logger.info("\n************* Final time execution of settings **************");
         // for each setting to test
         for (int index = 0; index < length; index++) {
             double convert = (double) time_execution[index] / 1_000_000_000;
             // long convert = TimeUnit.SECONDS.convert(time_execution[index], TimeUnit.NANOSECONDS);
 
-            System.out.println((index+1)+ " : " + convert + " sec");
+            logger.info((index+1)+ " : " + convert + " sec");
         }
     }
 }

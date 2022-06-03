@@ -1,5 +1,7 @@
 package esa.mo.nmf.apps.saasyml;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import esa.mo.nmf.apps.saasyml.test.ServiceLayerTest;
 import jsat.DataSet;
 import jsat.SimpleDataSet;
@@ -22,12 +24,18 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+// import org.apache.logging.log4j.Logger;
+// import org.apache.logging.log4j.LogManager;
+
 /**
  * SaaSy ML implementation of the service layer.
  *
  * @author Dr. Cesar Guzman
  */
 public class ServiceLayer {
+
+    // private static Logger logger = LogManager.getLogger(esa.mo.nmf.apps.saasyml.ServiceLayer.class);
+    private static Logger logger = LoggerFactory.getLogger(ServiceLayer.class);
 
     private boolean thread = false;
     private String modelNameToExecute = "";
@@ -39,7 +47,7 @@ public class ServiceLayer {
 
     // Attributes for serialize the model
     private boolean serialize = false;
-    private String modelPath = "./model/";
+    private String modelPath = "./models/";
     private String formatDate = "yyyy-MM-dd hh-mm-ss";
     private String modelFileName = modelPath+"{MODEL_NAME}-{THREAD}-{DATE}.model";
 
@@ -47,7 +55,9 @@ public class ServiceLayer {
     /**
      * Empty constructor
      */
-    public ServiceLayer() { }
+    public ServiceLayer() {
+        initLog();
+    }
 
     /**
      * Constructor
@@ -56,6 +66,7 @@ public class ServiceLayer {
      */
     public ServiceLayer(boolean thread) {
         this.thread = thread;
+        initLog();
     }
 
     /**
@@ -72,9 +83,21 @@ public class ServiceLayer {
             try{
                 Files.createDirectories(Paths.get(modelPath));
             }catch (Exception ex){
-                System.err.println("Error creating the folder model");
+                logger.debug("Error creating the folder model");
             }
         }
+
+        initLog();
+    }
+
+    private void initLog(){
+        /*FileHandler fileHandler = null;
+        try {
+            fileHandler = new FileHandler("status.log");
+            logger.addHandler(fileHandler);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }*/
     }
 
     /**
@@ -166,7 +189,7 @@ public class ServiceLayer {
 
         // test the model
         for(DataPointPair<Integer> dpp : ((ClassificationDataSet)test).getAsDPPList()){
-            System.out.println(dpp.getPair().longValue()+ " vs " + model.classify(dpp.getDataPoint()).mostLikely());
+            logger.info(dpp.getPair().longValue()+ " vs " + model.classify(dpp.getDataPoint()).mostLikely());
         }
     }
 
@@ -185,7 +208,7 @@ public class ServiceLayer {
 
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(pathToSerializedModel));) {
             oos.writeObject(model);
-        }catch (Exception e){ System.err.println("Error serializing the model"); }
+        }catch (Exception e){ logger.debug("Error serializing the model"); }
 
         return pathToSerializedModel;
     }
@@ -201,7 +224,7 @@ public class ServiceLayer {
 
         try (ObjectInputStream objectinputstream = new ObjectInputStream(new FileInputStream(pathToSerializedModel));) {
             model = (Classifier) objectinputstream.readObject();
-        } catch (Exception e){ System.err.println("Error deserializing the model"); }
+        } catch (Exception e){ logger.debug("Error deserializing the model"); }
 
         return model;
     }
@@ -234,7 +257,7 @@ public class ServiceLayer {
 
             if (!seenBefore.contains(thisClass)) {
                 for(DataPoint dp : cluster) {
-                    System.out.println(thisClass + " vs " + dp.getCategoricalValue(0));
+                    logger.info(thisClass + " vs " + dp.getCategoricalValue(0));
                 }
             }
         }
@@ -251,7 +274,7 @@ public class ServiceLayer {
 
         try (ObjectInputStream objectinputstream = new ObjectInputStream(new FileInputStream(pathToSerializedModel));) {
             model = (Clusterer) objectinputstream.readObject();
-        } catch (Exception e){ System.err.println("Error deserializing the model"); }
+        } catch (Exception e){ logger.debug("Error deserializing the model"); }
 
         return model;
     }
@@ -278,10 +301,10 @@ public class ServiceLayer {
 
         // test the model
         double numOutliersInTrain = ((SimpleDataSet)train).getDataPoints().stream().mapToDouble(model::score).filter(x -> x < 0).count();
-        System.out.println((numOutliersInTrain / train.size()) + " vs " + 0.05);//Better say something like 95% are inlines!
+        logger.info((numOutliersInTrain / train.size()) + " vs " + 0.05);//Better say something like 95% are inlines!
 
         double numOutliersInOutliers = ((SimpleDataSet)test).getDataPoints().stream().mapToDouble(model::score).filter(x -> x < 0).count();
-        System.out.println((numOutliersInOutliers / test.size()) + " vs " + 0.1);//Better say 90% are outliers!
+        logger.info((numOutliersInOutliers / test.size()) + " vs " + 0.1);//Better say 90% are outliers!
 
     }
 
@@ -296,7 +319,7 @@ public class ServiceLayer {
 
         try (ObjectInputStream objectinputstream = new ObjectInputStream(new FileInputStream(pathToSerializedModel));) {
             model = (Outlier) objectinputstream.readObject();
-        } catch (Exception e){ System.err.println("Error deserializing the model"); }
+        } catch (Exception e){ logger.debug("Error deserializing the model"); }
 
         return model;
     }
@@ -311,19 +334,19 @@ public class ServiceLayer {
         switch (typeModel){
             case Classifier:
                 if (train == null) {
-                    System.out.println("Generate train dataset: ");
+                    logger.info("Generate train dataset: ");
                     train = GenerateDataset.get2ClassLinear(200, RandomUtil.getRandom());
                 }
 
                 if (test == null) {
-                    System.out.println("Generate test dataset: ");
+                    logger.info("Generate test dataset: ");
                     test = GenerateDataset.get2ClassLinear(10, RandomUtil.getRandom());
                 }
                 break;
 
             case Cluster:
                 if (train == null) {
-                    System.out.println("Generate train dataset: ");
+                    logger.info("Generate train dataset: ");
                     GridDataGenerator gdg = new GridDataGenerator(new Normal(0, 0.05), new Random(12), 2, 5);
                     train = gdg.generateData(100);
                 }
@@ -332,12 +355,12 @@ public class ServiceLayer {
             case Outlier:
                 int N = 5000;
                 if (train == null) {
-                    System.out.println("Generate train dataset: ");
+                    logger.info("Generate train dataset: ");
                     train = new GridDataGenerator(new Normal(), 1,1,1).generateData(N);
                 }
 
                 if (test == null) {
-                    System.out.println("Generate test dataset: ");
+                    logger.info("Generate test dataset: ");
                     test = new GridDataGenerator(new Normal(10, 1.0), 1,1,1).generateData(N);
                 }
                 break;
@@ -432,28 +455,28 @@ public class ServiceLayer {
             }
         }
 
-        System.out.println("************* ************************************ ****");
-        System.out.println("************* Configuration of Execution **************");
-        System.out.println("- thread: "+thread);
-        System.out.println("- serialize: "+ serialize);
-        System.out.println("- tests: "+ tests_list.toString());
-        System.out.println("************* ************************************ ****\n");
+        logger.info("************* ************************************ ****");
+        logger.info("************* Configuration of Execution **************");
+        logger.info("- thread: "+thread);
+        logger.info("- serialize: "+ serialize);
+        logger.info("- tests: "+ tests_list.toString());
+        logger.info("************* ************************************ ****\n");
 
         // for each test, we execute it
         for (String s : tests_list) {
 
             if (s.equals("1") || s.equals("Classifier")) {
-                System.out.println("************* Testing Classifier **************");
+                logger.info("************* Testing Classifier **************");
                 ServiceLayerTest.testClassifier(thread, serialize);
             }
 
             if (s.equals("2") || s.equals("Cluster")) {
-                System.out.println("************* Testing Clustering **************");
+                logger.info("************* Testing Clustering **************");
                 ServiceLayerTest.testClustering(thread, serialize);
             }
 
             if (s.equals("3") || s.equals("Outlier")) {
-                System.out.println("************* Testing Outlier **************");
+                logger.info("************* Testing Outlier **************");
                 ServiceLayerTest.testOutlier(thread, serialize);
             }
         }
