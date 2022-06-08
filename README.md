@@ -50,7 +50,7 @@ It will generate a jar executable in the folder **target**
 
 ## SaaSy-ML
 
-Follow the instructions on the [Readme](src/saasy-ml/README.md)
+Follow the instructions on the [Readme](src/saasy-ml-sepp/README.md)
 
 # References
 
