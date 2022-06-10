@@ -72,7 +72,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>esa.mo.nmf.apps.saasyml.SaaSyML</mainClass>
+                            <mainClass>esa.mo.nmf.apps.saasyml.ServiceLayer</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -82,7 +82,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>esa.mo.nmf.apps.saasyml.SaaSyML</mainClass>
+                            <mainClass>esa.mo.nmf.apps.saasyml.ServiceLayer</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
@@ -102,6 +102,12 @@
         </plugins>
     </build>
     <dependencies>
+        <dependency>
+            <groupId>com.edwardraff</groupId>
+            <artifactId>JSAT</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
