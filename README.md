@@ -40,15 +40,15 @@ You can skip the test of maven with the following command:
 
     $ mvn install -Dmaven.test.skip
 
-## Service Layer
+## SaaSy-ML Start Point
 
-Inside the folder **src/service-layer/** execute:
+Inside the folder **src/saasy-ml/** execute:
 
     $ mvn install
 
 It will generate a jar executable in the folder **target**
 
-## SaaSy-ML
+## SaaSy-ML SEPP
 
 Follow the instructions on the [Readme](src/saasy-ml-sepp/README.md)
 

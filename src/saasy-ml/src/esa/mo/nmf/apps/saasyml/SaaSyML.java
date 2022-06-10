@@ -24,7 +24,10 @@ public class SaaSyML implements IServiceLayer {
     /************ ATTRIBUTES **********/
     /**********************************/
 
+    // to use the thread JVM
     private boolean thread = false;
+
+    // to serialize the model
     private boolean serialize = false;
 
     private ControlLayer control = null;
@@ -80,9 +83,7 @@ public class SaaSyML implements IServiceLayer {
      * @param id_user id of the user
      */
     public void subscribe(int id_user) {
-
         control = new ControlLayer(this.thread, this.serialize);
-
     }
 
     /**
@@ -92,10 +93,8 @@ public class SaaSyML implements IServiceLayer {
      * @param modelName name of the model
      */
     public void subscribe(int id_user, String modelName) {
-
         control = new ControlLayer(this.thread, this.serialize);
         control.build(modelName);
-
     }
 
     /**
