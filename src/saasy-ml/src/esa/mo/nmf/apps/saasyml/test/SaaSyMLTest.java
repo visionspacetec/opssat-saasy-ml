@@ -1,6 +1,6 @@
 package esa.mo.nmf.apps.saasyml.test;
 
-import esa.mo.nmf.apps.saasyml.ServiceLayer;
+import esa.mo.nmf.apps.saasyml.SaaSyML;
 import esa.mo.nmf.apps.saasyml.dataset.utils.GenerateDataset;
 import jsat.SimpleDataSet;
 import jsat.classifiers.ClassificationDataSet;
@@ -18,13 +18,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * SaaSy ML service layer test
+ * SaaSy ML test
  *
  * @author Dr. Cesar Guzman
  */
-public class ServiceLayerTest {
+public class SaaSyMLTest {
 
-    private static Logger logger = LoggerFactory.getLogger(ServiceLayerTest.class);
+    private static Logger logger = LoggerFactory.getLogger(SaaSyMLTest.class);
 
     /**
      * test the classifier ML model
@@ -34,7 +34,7 @@ public class ServiceLayerTest {
      */
     public static void testClassifier(boolean thread, boolean serialize) {
         // instantiate the class
-        ServiceLayer saasyml = new ServiceLayer(thread, serialize);
+        SaaSyML saasyml = new SaaSyML(thread, serialize);
 
         // subscribe to the service
         saasyml.subscribe(1, "LogisticRegressionDCD");
@@ -60,7 +60,7 @@ public class ServiceLayerTest {
      */
     public static void testClustering(boolean thread, boolean serialize) {
         // instantiate the class
-        ServiceLayer saasyml = new ServiceLayer(thread, serialize);
+        SaaSyML saasyml = new SaaSyML(thread, serialize);
 
         // subscribe to the service
         saasyml.subscribe(2, "FLAME");
@@ -88,7 +88,7 @@ public class ServiceLayerTest {
      */
     public static void testOutlier(boolean thread, boolean serialize) {
         // instantiate the class
-        ServiceLayer saasyml = new ServiceLayer(thread, serialize);
+        SaaSyML saasyml = new SaaSyML(thread, serialize);
 
         // subscribe to the service
         saasyml.subscribe(1, "IsolationForest");
@@ -149,17 +149,17 @@ public class ServiceLayerTest {
 
                 if (s.equals("1")) {
                     logger.info("************* Testing Classifier **************");
-                    ServiceLayerTest.testClassifier(thread, serialize);
+                    SaaSyMLTest.testClassifier(thread, serialize);
                 }
 
                 if (s.equals("2")) {
                     logger.info("************* Testing Clustering **************");
-                    ServiceLayerTest.testClustering(thread, serialize);
+                    SaaSyMLTest.testClustering(thread, serialize);
                 }
 
                 if (s.equals("3")) {
                     logger.info("************* Testing Outlier **************");
-                    ServiceLayerTest.testOutlier(thread, serialize);
+                    SaaSyMLTest.testOutlier(thread, serialize);
                 }
             }
 

@@ -2,7 +2,6 @@ package esa.mo.nmf.apps.saasyml;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import esa.mo.nmf.apps.saasyml.test.ServiceLayerTest;
 import jsat.DataSet;
 import jsat.SimpleDataSet;
 import jsat.classifiers.ClassificationDataSet;
@@ -15,6 +14,9 @@ import jsat.outlier.Outlier;
 import jsat.utils.GridDataGenerator;
 import jsat.utils.IntSet;
 import jsat.utils.random.RandomUtil;
+
+import esa.mo.nmf.apps.saasyml.common.IServiceLayer;
+import esa.mo.nmf.apps.saasyml.test.SaaSyMLTest;
 import esa.mo.nmf.apps.saasyml.dataset.utils.GenerateDataset;
 import esa.mo.nmf.apps.saasyml.factories.FactoryMLModels;
 
@@ -24,18 +26,14 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-// import org.apache.logging.log4j.Logger;
-// import org.apache.logging.log4j.LogManager;
-
 /**
  * SaaSy ML implementation of the SaaSy ML entry point.
  *
  * @author Dr. Cesar Guzman
  */
-public class SaaSyML {
+public class SaaSyML implements IServiceLayer {
 
-    // private static Logger logger = LogManager.getLogger(esa.mo.nmf.apps.saasyml.ServiceLayer.class);
-    private static Logger logger = LoggerFactory.getLogger(ServiceLayer.class);
+    private static Logger logger = LoggerFactory.getLogger(SaaSyML.class);
 
     private boolean thread = false;
     private String modelNameToExecute = "";
@@ -87,6 +85,14 @@ public class SaaSyML {
     }
 
     /**
+     * PUT / subscribe an experimenter app
+     *
+     * @param id_user id of the user
+     */
+    public void subscribe(int id_user) {
+    }
+
+    /**
      * PUT / subscribe an experimenter app specifying the name of the model
      *
      * @param id_user id of the user
@@ -123,6 +129,14 @@ public class SaaSyML {
         // generate random dataset
         generateRandomDataset();
 
+    }
+
+    /**
+     * TODO: Fix to do it correctly
+     */
+    public void train(String type, String[] parameters){
+        this.modelNameToExecute = type;
+        this.typeModel = FactoryMLModels.getTypeModel(type);
     }
 
     /**
@@ -453,23 +467,23 @@ public class SaaSyML {
 
             if (s.equals("1") || s.equals("Classifier")) {
                 logger.info("************* Testing Classifier **************");
-                ServiceLayerTest.testClassifier(thread, serialize);
+                SaaSyMLTest.testClassifier(thread, serialize);
             }
 
             if (s.equals("2") || s.equals("Cluster")) {
                 logger.info("************* Testing Clustering **************");
-                ServiceLayerTest.testClustering(thread, serialize);
+                SaaSyMLTest.testClustering(thread, serialize);
             }
 
             if (s.equals("3") || s.equals("Outlier")) {
                 logger.info("************* Testing Outlier **************");
-                ServiceLayerTest.testOutlier(thread, serialize);
+                SaaSyMLTest.testOutlier(thread, serialize);
             }
         }
 
         System.out.println("\nHelp of use:\n" + howToUse);
 
-        // ServiceLayerTest.testSettings();
+        // SaaSyMLTest.testSettings();
     }
 
 }
