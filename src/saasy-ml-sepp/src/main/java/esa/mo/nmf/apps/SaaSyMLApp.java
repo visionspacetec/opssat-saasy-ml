@@ -20,7 +20,8 @@
  */
 package esa.mo.nmf.apps;
 
-import esa.mo.nmf.apps.saasyml.test.ServiceLayerTest;
+import esa.mo.nmf.apps.saasyml.test.SaaSyMLTest;
+
 import esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl;
 import esa.mo.nmf.MonitorAndControlNMFAdapter;
 import esa.mo.nmf.MCRegistration;
@@ -46,7 +47,7 @@ public class SaaSyMLApp {
         System.out.println("SaaSyML is running !");
 
         // testing the ML models
-        ServiceLayerTest.testSettings();
+        SaaSyMLTest.testSettings();
 
 
         // handle the responses coming from the connector and pushing of requests and results to the connector.

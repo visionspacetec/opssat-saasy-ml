@@ -67,7 +67,7 @@
 
     <dependency>
       <groupId>int.esa.nmf.sdk.space.saasyml</groupId>
-      <artifactId>saasyml-service-layer</artifactId>
+      <artifactId>saasyml</artifactId>
       <version>0.1.0-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
