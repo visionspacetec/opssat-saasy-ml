@@ -12,7 +12,7 @@ import java.util.*;
 import jsat.DataSet;
 
 import esa.mo.nmf.apps.saasyml.common.IPipeLineLayer;
-import esa.mo.nmf.apps.saasyml.service.PipeLineJSAT;
+import esa.mo.nmf.apps.saasyml.service.PipeLineAbstractJSAT;
 
 
 
@@ -43,7 +43,7 @@ public class ControlLayer {
      * @param serialize boolean variable that holds if we should serialize the model or not
      */
     public ControlLayer(boolean thread, boolean serialize) {
-        pipeline = new PipeLineJSAT(thread, serialize);
+        pipeline = new PipeLineAbstractJSAT(thread, serialize);
     }
 
 

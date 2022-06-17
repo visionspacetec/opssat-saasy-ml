@@ -31,9 +31,9 @@ import java.text.SimpleDateFormat;
  *
  * @author Dr. Cesar Guzman
  */
-public class PipeLineJSAT implements IPipeLineLayer{
+public class PipeLineAbstractJSAT implements IPipeLineLayer{
 
-    private static Logger logger = LoggerFactory.getLogger(PipeLineJSAT.class);
+    private static Logger logger = LoggerFactory.getLogger(PipeLineAbstractJSAT.class);
 
     /**********************************/
     /************ ATTRIBUTES **********/
@@ -67,7 +67,7 @@ public class PipeLineJSAT implements IPipeLineLayer{
      * @param thread boolean variable that holds the activation of the thread
      * @param serialize boolean variable that holds if we should serialize the model or not
      */
-    public PipeLineJSAT(boolean thread, boolean serialize){
+    public PipeLineAbstractJSAT(boolean thread, boolean serialize){
 
         this.serialize = serialize;
         this.thread = thread;
