@@ -16,14 +16,13 @@
     <groupId>int.esa.nmf</groupId>
     <artifactId>parent</artifactId>
     <version>2.1.0-SNAPSHOT</version>
-    <relativePath>../../../../parent/pom.xml</relativePath>
   </parent>
-  <groupId>int.esa.nmf.sdk.space.saasyml</groupId>
-  <artifactId>saasy-ml</artifactId>
+  <groupId>int.esa.nmf.apps</groupId>
+  <artifactId>saasy-ml-sepp</artifactId>
   <packaging>jar</packaging>
 
   <name>On-board Machine Learning Software as a Service App</name>
-  <description>Hello world example application</description>
+  <description>An NMF App for the OPS-SAT spacecraft that provides ML service to the experimenters</description>
   <url>http://www.esa.int</url>
 
   <organization>
@@ -49,7 +48,7 @@
     <developer>
       <name>Cesar Guzman Alvarez</name>
       <email>cesar.guzman@visionspace.com</email>
-      <url>cguz.org</url>
+      <url>https://github.com/cguz</url>
     </developer>
   </developers>
 
@@ -58,13 +57,15 @@
     <!--<maven.deploy.skip>true</maven.deploy.skip>
     <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>-->
   </properties>
-
   <dependencies>
     <dependency>
       <groupId>int.esa.nmf.core</groupId>
       <artifactId>nanosat-mo-connector</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>int.esa.nmf.core</groupId>
+      <artifactId>space-mo-adapter</artifactId>
+    </dependency>
     <dependency>
       <groupId>int.esa.nmf.sdk.space.saasyml</groupId>
       <artifactId>saasyml</artifactId>
@@ -72,9 +73,14 @@
       <scope>compile</scope>
     </dependency>
   </dependencies>
-
   <build>
     <resources>
+      <resource>
+        <directory>${basedir}/..</directory>
+        <includes>
+          <include>LICENCE.md</include>
+        </includes>
+      </resource>
     </resources>
     <plugins>
       <plugin>
