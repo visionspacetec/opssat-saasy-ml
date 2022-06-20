@@ -73,18 +73,18 @@ public class SaaSyML implements IServiceLayer {
      *
      * @param thread true if the JSAT library can execute in parallel
      */
-    public void setThread(boolean thread) {
-        this.thread = thread;
-    }
+    //public void setThread(boolean thread) {
+    //    this.thread = thread;
+    //}
 
     /**
      * PUT / subscribe an experimenter app
      *
      * @param id_user id of the user
      */
-    public void subscribe(int id_user) {
-        control = new ControlLayer(this.thread, this.serialize);
-    }
+    //public void subscribe(int id_user) {
+    //    control = new ControlLayer(this.thread, this.serialize);
+    //}
 
     /**
      * PUT / subscribe an experimenter app specifying the name of the model
@@ -93,7 +93,7 @@ public class SaaSyML implements IServiceLayer {
      * @param modelName name of the model
      */
     public void subscribe(int id_user, String modelName) {
-        control = new ControlLayer(this.thread, this.serialize);
+        control = new ControlLayer(this.thread, this.serialize, modelName);
         control.build(modelName);
     }
 
@@ -119,8 +119,7 @@ public class SaaSyML implements IServiceLayer {
     /**
      * TODO: Fix to do it correctly
      */
-    public void train(String type, String[] parameters){
-        control.build(type);
+    public void train(){
         control.train();
     }
 

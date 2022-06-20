@@ -1,5 +1,10 @@
 package esa.mo.nmf.apps.saasyml.factories;
 
+import esa.mo.nmf.apps.saasyml.common.IPipeLineLayer;
+import esa.mo.nmf.apps.saasyml.service.PipeLineClassifierJSAT;
+import esa.mo.nmf.apps.saasyml.service.PipeLineClusterJSAT;
+import esa.mo.nmf.apps.saasyml.service.PipeLineOutlierJSAT;
+
 import jsat.classifiers.Classifier;
 import jsat.classifiers.linear.LogisticRegressionDCD;
 import jsat.clustering.Clusterer;
@@ -25,6 +30,22 @@ public class FactoryMLModels {
         Cluster,
         Outlier,
         Unknown,
+    }
+
+    public static IPipeLineLayer createPipeLine(boolean thread, boolean serialize, String modelName){
+
+        TypeModel typeModel = FactoryMLModels.getTypeModel(modelName);
+
+        switch(typeModel){
+            case Classifier:
+                return new PipeLineClassifierJSAT(thread, serialize, modelName, typeModel);
+            case Cluster:
+                return new PipeLineClusterJSAT(thread, serialize, modelName, typeModel);
+            case Outlier:
+                return new PipeLineOutlierJSAT(thread, serialize, modelName, typeModel);
+            default:
+                return new PipeLineClassifierJSAT(thread, serialize, modelName, typeModel);
+        }
     }
 
     /**

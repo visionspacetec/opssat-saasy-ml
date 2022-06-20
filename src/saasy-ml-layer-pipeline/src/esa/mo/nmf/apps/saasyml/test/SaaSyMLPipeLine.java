@@ -1,8 +1,7 @@
-package esa.mo.nmf.apps.saasyml;
+package esa.mo.nmf.apps.saasyml.test;
 
 import esa.mo.nmf.apps.saasyml.common.IPipeLineLayer;
 import esa.mo.nmf.apps.saasyml.service.PipeLineAbstractJSAT;
-import esa.mo.nmf.apps.saasyml.test.SaaSyMLPipeLineTest;
 
 import jsat.DataSet;
 
@@ -25,10 +24,6 @@ public class SaaSyMLPipeLine {
     /************ ATTRIBUTES **********/
     /**********************************/
 
-    private IPipeLineLayer pipeline = null;
-
-
-
     /***********************************/
     /************ CONSTRUCTOR **********/
     /***********************************/
@@ -39,39 +34,13 @@ public class SaaSyMLPipeLine {
      * @param thread boolean variable that holds the activation of the thread
      * @param serialize boolean variable that holds if we should serialize the model or not
      */
-    public SaaSyMLPipeLine(boolean thread, boolean serialize) {
-        pipeline = new PipeLineAbstractJSAT(thread, serialize);
+    public SaaSyMLPipeLine() {
     }
 
 
     /**************************************/
     /************ PUBLIC METHODS **********/
     /**************************************/
-
-    public void setDataSet(DataSet train, DataSet test){
-        pipeline.setDataSet(train, test);
-    }
-
-    /**
-     * TODO: Fix to do it correctly
-     */
-    public void build(String type, String[] parameters){
-        pipeline.build(type);
-    }
-
-    /**
-     * Start training the model
-     */
-    public void train() {
-        pipeline.train();
-    }
-
-    /**
-     * Start testing the model
-     */
-    public void inference(){
-        pipeline.inference();
-    }
 
     /**
      * Main function

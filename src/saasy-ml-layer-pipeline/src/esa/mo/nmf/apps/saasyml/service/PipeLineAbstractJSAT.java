@@ -31,7 +31,7 @@ import java.text.SimpleDateFormat;
  *
  * @author Dr. Cesar Guzman
  */
-public class PipeLineAbstractJSAT implements IPipeLineLayer{
+public abstract class PipeLineAbstractJSAT implements IPipeLineLayer{
 
     private static Logger logger = LoggerFactory.getLogger(PipeLineAbstractJSAT.class);
 
@@ -40,21 +40,21 @@ public class PipeLineAbstractJSAT implements IPipeLineLayer{
     /**********************************/
 
     // to use the thread JVM
-    private boolean thread = false;
+    protected boolean thread = false;
 
     // to serialize the model
-    private boolean serialize = false;
+    protected boolean serialize = false;
     private String modelPath = "./models/";
     private String formatDate = "yyyy-MM-dd hh-mm-ss";
     private String modelFileName = modelPath+"{MODEL_NAME}-{THREAD}-{DATE}.model";
 
     // data set to train and test
-    private DataSet train = null;
-    private DataSet test = null;
+    protected DataSet train = null;
+    protected DataSet test = null;
 
     // name and type of the model
-    private String modelNameToExecute = "";
-    private FactoryMLModels.TypeModel typeModel = FactoryMLModels.TypeModel.Unknown;
+    protected String modelName = "";
+    protected FactoryMLModels.TypeModel typeModel = FactoryMLModels.TypeModel.Unknown;
 
 
     /***********************************/
@@ -67,10 +67,12 @@ public class PipeLineAbstractJSAT implements IPipeLineLayer{
      * @param thread boolean variable that holds the activation of the thread
      * @param serialize boolean variable that holds if we should serialize the model or not
      */
-    public PipeLineAbstractJSAT(boolean thread, boolean serialize){
+    public PipeLineAbstractJSAT(boolean thread, boolean serialize, String modelName, FactoryMLModels.TypeModel typeModel){
 
         this.serialize = serialize;
         this.thread = thread;
+        this.modelName = modelName;
+        this.typeModel = typeModel;
 
         if (serialize){
             try{
@@ -96,32 +98,21 @@ public class PipeLineAbstractJSAT implements IPipeLineLayer{
         generateRandomDataset();
     }
 
-    public void build(String modelName){
-        this.modelNameToExecute = modelName;
-        this.typeModel = FactoryMLModels.getTypeModel(modelName);
-    }
+    public abstract void build(String modelName);
 
     public void build(String type, String[] parameters){
         this.build(type);
     }
 
-    public void train(){
+    public abstract void train();
 
-    }
+    public abstract void inference();
 
-    public void inference(){
-        switch (typeModel) {
-            case Classifier:
-                classier();
-                break;
-            case Cluster:
-                cluster();
-                break;
-            case Outlier:
-                outlier();
-                break;
-        }
-    }
+    /*****************************************/
+    /************ PROTECTED METHODS **********/
+    /*****************************************/
+
+    // protected abstract void deserializeModel(String path);
 
 
     /***************************************/
@@ -173,41 +164,15 @@ public class PipeLineAbstractJSAT implements IPipeLineLayer{
     }
 
     /**
-     * Execute ML classifier
-     *
-     * Train and test the model
-     */
-    private void classier() {
-        // build the model
-        Classifier model = FactoryMLModels.buildClassifier(modelNameToExecute);
-
-        // train the model
-        model.train((ClassificationDataSet) train, thread);
-
-        if (serialize){
-            // serialize the model
-            String pathToSerializedModel = serializeModel(model);
-
-            // deserialize the model
-            model = deserializeClassifier(pathToSerializedModel);
-        }
-
-        // test the model
-        for(DataPointPair<Integer> dpp : ((ClassificationDataSet)test).getAsDPPList()){
-            logger.info(dpp.getPair().longValue()+ " vs " + model.classify(dpp.getDataPoint()).mostLikely());
-        }
-    }
-
-    /**
      * Function to serialize the model in a file
      *
      * @param model that holds the model to serialize
      * @return full path name of the model
      */
-    private String serializeModel(Object model) {
+    protected String serializeModel(Object model) {
 
         String date = new SimpleDateFormat(this.formatDate).format(new Date());
-        String pathToSerializedModel = this.modelFileName.replace("{MODEL_NAME}", this.modelNameToExecute);
+        String pathToSerializedModel = this.modelFileName.replace("{MODEL_NAME}", this.modelName);
         pathToSerializedModel = pathToSerializedModel.replace("{DATE}", date);
         pathToSerializedModel = pathToSerializedModel.replace("{THREAD}", (this.thread)?"1":"0");
 
@@ -216,117 +181,6 @@ public class PipeLineAbstractJSAT implements IPipeLineLayer{
         }catch (Exception e){ logger.debug("Error serializing the model"); }
 
         return pathToSerializedModel;
-    }
-
-    /**
-     * Function to deserialize a model
-     * @param pathToSerializedModel full path name of the model
-     * @return the model
-     */
-    private Classifier deserializeClassifier(String pathToSerializedModel) {
-
-        Classifier model = null;
-
-        try (ObjectInputStream objectinputstream = new ObjectInputStream(new FileInputStream(pathToSerializedModel));) {
-            model = (Classifier) objectinputstream.readObject();
-        } catch (Exception e){ logger.debug("Error deserializing the model"); }
-
-        return model;
-    }
-
-    /**
-     * Execute ML cluster
-     *
-     * Train and test the model
-     */
-    private void cluster() {
-        // build the model
-        Clusterer model = FactoryMLModels.buildCluster(modelNameToExecute);
-
-        if (serialize){
-            // serialize the model
-            String pathToSerializedModel = serializeModel(model);
-
-            // deserialize the model
-            model = deserializeCluster(pathToSerializedModel);
-        }
-
-        // train the model
-        List<List<DataPoint>> clusters = model.cluster(train);
-
-        // test the model
-        Set<Integer> seenBefore = new IntSet();
-        for(List<DataPoint> cluster :  clusters)
-        {
-            int thisClass = cluster.get(0).getCategoricalValue(0);
-
-            if (!seenBefore.contains(thisClass)) {
-                for(DataPoint dp : cluster) {
-                    logger.info(thisClass + " vs " + dp.getCategoricalValue(0));
-                }
-            }
-        }
-    }
-
-    /**
-     * Function to deserialize a model
-     * @param pathToSerializedModel full path name of the model
-     * @return the model
-     */
-    private Clusterer deserializeCluster(String pathToSerializedModel) {
-
-        Clusterer model = null;
-
-        try (ObjectInputStream objectinputstream = new ObjectInputStream(new FileInputStream(pathToSerializedModel));) {
-            model = (Clusterer) objectinputstream.readObject();
-        } catch (Exception e){ logger.debug("Error deserializing the model"); }
-
-        return model;
-    }
-
-    /**
-     * Execute ML classifier
-     *
-     * Train and test the model
-     */
-    private void outlier() {
-        // build the model
-        Outlier model = FactoryMLModels.buildOutlier(modelNameToExecute);
-
-        // train the model
-        model.fit((SimpleDataSet) train, thread);
-
-        if (serialize){
-            // serialize the model
-            String pathToSerializedModel = serializeModel(model);
-
-            // deserialize the model
-            model = deserializeOutlier(pathToSerializedModel);
-        }
-
-        // test the model
-        double numOutliersInTrain = ((SimpleDataSet)train).getDataPoints().stream().mapToDouble(model::score).filter(x -> x < 0).count();
-        logger.info((numOutliersInTrain / train.size()) + " vs " + 0.05);//Better say something like 95% are inlines!
-
-        double numOutliersInOutliers = ((SimpleDataSet)test).getDataPoints().stream().mapToDouble(model::score).filter(x -> x < 0).count();
-        logger.info((numOutliersInOutliers / test.size()) + " vs " + 0.1);//Better say 90% are outliers!
-
-    }
-
-    /**
-     * Function to deserialize a model
-     * @param pathToSerializedModel full path name of the model
-     * @return the model
-     */
-    private Outlier deserializeOutlier(String pathToSerializedModel) {
-
-        Outlier model = null;
-
-        try (ObjectInputStream objectinputstream = new ObjectInputStream(new FileInputStream(pathToSerializedModel));) {
-            model = (Outlier) objectinputstream.readObject();
-        } catch (Exception e){ logger.debug("Error deserializing the model"); }
-
-        return model;
     }
 
 }

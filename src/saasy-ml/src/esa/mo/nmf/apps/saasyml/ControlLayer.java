@@ -13,6 +13,7 @@ import jsat.DataSet;
 
 import esa.mo.nmf.apps.saasyml.common.IPipeLineLayer;
 import esa.mo.nmf.apps.saasyml.service.PipeLineAbstractJSAT;
+import esa.mo.nmf.apps.saasyml.factories.FactoryMLModels;
 
 
 
@@ -42,8 +43,8 @@ public class ControlLayer {
      * @param thread boolean variable that holds the activation of the thread
      * @param serialize boolean variable that holds if we should serialize the model or not
      */
-    public ControlLayer(boolean thread, boolean serialize) {
-        pipeline = new PipeLineAbstractJSAT(thread, serialize);
+    public ControlLayer(boolean thread, boolean serialize, String modelName) {
+        pipeline = FactoryMLModels.createPipeLine(thread, serialize, modelName);
     }
 
 

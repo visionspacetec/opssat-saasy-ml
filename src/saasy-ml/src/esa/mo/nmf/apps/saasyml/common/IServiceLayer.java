@@ -13,8 +13,10 @@ public interface IServiceLayer {
      * PUT / subscribe an experimenter app
      *
      * @param id_user id of the user
+     * @param String that holds the name of the model or
+     *        the type of inference to realize (e.g., classification, Outlier, etc)
      */
-    public void subscribe(int id);
+    public void subscribe(int id, String modelName);
 
     /**
      * PUT / upload the train dataset adding the test dataset as null
@@ -34,10 +36,8 @@ public interface IServiceLayer {
     /**
      * PUT / change the type of train and the parameters (e.g., group and name of the algorithm)
      *
-     * @param type of inference to realize (e.g., classification, Outlier, etc)
-     * @param set of parameters
      */
-    public void train(String type, String[] parameters);
+    public void train();
 
     /**
      * Start training and testing (inference) the model

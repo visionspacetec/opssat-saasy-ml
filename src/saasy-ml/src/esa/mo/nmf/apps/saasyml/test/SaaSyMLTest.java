@@ -2,6 +2,9 @@ package esa.mo.nmf.apps.saasyml.test;
 
 import esa.mo.nmf.apps.saasyml.SaaSyML;
 import esa.mo.nmf.apps.saasyml.dataset.utils.GenerateDataset;
+
+
+import jsat.DataSet;
 import jsat.SimpleDataSet;
 import jsat.classifiers.ClassificationDataSet;
 import jsat.distributions.Normal;
@@ -33,22 +36,25 @@ public class SaaSyMLTest {
      * @param serialize boolean variable that holds if we should serialize the model or not
      */
     public static void testClassifier(boolean thread, boolean serialize) {
+
+        String modelName = "LogisticRegressionDCD";
+
         // instantiate the class
         SaaSyML saasyml = new SaaSyML(thread, serialize);
 
         // subscribe to the service
-        saasyml.subscribe(1, "LogisticRegressionDCD");
+        saasyml.subscribe(1, modelName);
 
         logger.info("Generate training dataset...");
-        ClassificationDataSet train = GenerateDataset.get2ClassLinear(200, RandomUtil.getRandom());
+        DataSet train = GenerateDataset.get2ClassLinear(200, RandomUtil.getRandom());
 
         // upload the train dataset
         saasyml.upload(train);
 
-        // deactivate the thread
-        saasyml.setThread(false);
+        // start training
+        saasyml.train();
 
-        // start training and testing the model
+        // and testing the model
         saasyml.execute();
     }
 
@@ -59,11 +65,14 @@ public class SaaSyMLTest {
      * @param serialize boolean variable that holds if we should serialize the model or not
      */
     public static void testClustering(boolean thread, boolean serialize) {
+
+        String modelName = "FLAME";
+
         // instantiate the class
         SaaSyML saasyml = new SaaSyML(thread, serialize);
 
         // subscribe to the service
-        saasyml.subscribe(2, "FLAME");
+        saasyml.subscribe(2, modelName);
 
         logger.info("Generate training dataset...");
         GridDataGenerator gdg = new GridDataGenerator(new Normal(0, 0.05), new Random(12), 2, 5);
@@ -72,10 +81,10 @@ public class SaaSyMLTest {
         // upload the train dataset
         saasyml.upload(train);
 
-        // deactivate the thread
-        saasyml.setThread(false);
+        // start training
+        saasyml.train();
 
-        // start training and testing the model
+        // and testing the model
         saasyml.execute();
 
     }
@@ -87,11 +96,14 @@ public class SaaSyMLTest {
      * @param serialize boolean variable that holds if we should serialize the model or not
      */
     public static void testOutlier(boolean thread, boolean serialize) {
+
+        String modelName = "IsolationForest";
+
         // instantiate the class
         SaaSyML saasyml = new SaaSyML(thread, serialize);
 
         // subscribe to the service
-        saasyml.subscribe(1, "IsolationForest");
+        saasyml.subscribe(1, modelName);
 
         logger.info("Generate training dataset...");
         int N = 5000;
@@ -100,10 +112,10 @@ public class SaaSyMLTest {
         // upload the train dataset
         saasyml.upload(train);
 
-        // deactivate the thread
-        saasyml.setThread(false);
+        // start training
+        saasyml.train();
 
-        // start training and testing the model
+        // and testing the model
         saasyml.execute();
     }
 

@@ -1,7 +1,8 @@
 package esa.mo.nmf.apps.saasyml.test;
 
-import esa.mo.nmf.apps.saasyml.service.PipeLineAbstractJSAT;
 import esa.mo.nmf.apps.saasyml.common.IPipeLineLayer;
+import esa.mo.nmf.apps.saasyml.service.PipeLineAbstractJSAT;
+import esa.mo.nmf.apps.saasyml.factories.FactoryMLModels;
 import esa.mo.nmf.apps.saasyml.dataset.utils.GenerateDataset;
 
 import jsat.DataSet;
@@ -36,14 +37,16 @@ public class SaaSyMLPipeLineTest {
      * @param serialize boolean variable that holds if we should serialize the model or not
      */
     public static void testClassifier(boolean thread, boolean serialize) {
+        String modelName = "LogisticRegressionDCD";
+
         // instantiate the class
-        IPipeLineLayer saasyml = new PipeLineAbstractJSAT(thread, serialize);
+        IPipeLineLayer saasyml = FactoryMLModels.createPipeLine(thread, serialize, modelName);
 
         logger.info("Generate training dataset...");
         DataSet train = GenerateDataset.get2ClassLinear(200, RandomUtil.getRandom());
 
         // build the model
-        saasyml.build("LogisticRegressionDCD");
+        saasyml.build(modelName);
 
         // upload the train dataset
         saasyml.setDataSet(train, null);
@@ -62,15 +65,17 @@ public class SaaSyMLPipeLineTest {
      * @param serialize boolean variable that holds if we should serialize the model or not
      */
     public static void testClustering(boolean thread, boolean serialize) {
+        String modelName = "FLAME";
+
         // instantiate the class
-        IPipeLineLayer saasyml = new PipeLineAbstractJSAT(thread, serialize);
+        IPipeLineLayer saasyml = FactoryMLModels.createPipeLine(thread, serialize, modelName);
 
         logger.info("Generate training dataset...");
         GridDataGenerator gdg = new GridDataGenerator(new Normal(0, 0.05), new Random(12), 2, 5);
         DataSet train = gdg.generateData(100);
 
         // build the model
-        saasyml.build("FLAME");
+        saasyml.build(modelName);
 
         // upload the train dataset
         saasyml.setDataSet(train, null);
@@ -90,15 +95,17 @@ public class SaaSyMLPipeLineTest {
      * @param serialize boolean variable that holds if we should serialize the model or not
      */
     public static void testOutlier(boolean thread, boolean serialize) {
+        String modelName = "IsolationForest";
+
         // instantiate the class
-        IPipeLineLayer saasyml = new PipeLineAbstractJSAT(thread, serialize);
+        IPipeLineLayer saasyml = FactoryMLModels.createPipeLine(thread, serialize, modelName);
 
         logger.info("Generate training dataset...");
         int N = 5000;
         DataSet train = new GridDataGenerator(new Normal(), 1,1,1).generateData(N);
 
         // build the model
-        saasyml.build("IsolationForest");
+        saasyml.build(modelName);
 
         // upload the train dataset
         saasyml.setDataSet(train, null);
