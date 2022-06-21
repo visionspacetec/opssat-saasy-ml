@@ -14,7 +14,7 @@ import jsat.outlier.IsolationForest;
 import jsat.outlier.Outlier;
 
 /**
- * Factory to create ML models and identify the ML model type
+ * Factory to create ML models, identify the ML model type, and create ML Pipeline
  *
  * Used as a static class
  *
@@ -32,8 +32,16 @@ public class FactoryMLModels {
         Unknown,
     }
 
+    /**
+     * Factory Design Pattern to create PipeLine
+     * @param thread that holds a boolean to activate the use of threads in the PipeLine
+     * @param serialize that holds a boolean to activate the serialization of models
+     * @param modelName that holds a String with the name of the model
+     * @return
+     */
     public static IPipeLineLayer createPipeLine(boolean thread, boolean serialize, String modelName){
 
+        // detect the type of the model
         TypeModel typeModel = FactoryMLModels.getTypeModel(modelName);
 
         switch(typeModel){
@@ -49,8 +57,7 @@ public class FactoryMLModels {
     }
 
     /**
-     * generate classifier models
-     *
+     * Generate classifier models
      * @param modelName a string that holds name of the model to create
      * @return Classifier model
      */
@@ -63,8 +70,7 @@ public class FactoryMLModels {
     }
 
     /**
-     * generate cluster models
-     *
+     * Generate cluster models
      * @param modelName a string that holds the name of the model to create
      * @return Clusterer model
      */
@@ -77,8 +83,7 @@ public class FactoryMLModels {
     }
 
     /**
-     * generate Outlier models
-     *
+     * Generate Outlier models
      * @param modelName a string that holds the name of the model to create
      * @return Outlier model
      */

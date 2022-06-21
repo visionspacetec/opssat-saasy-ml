@@ -32,7 +32,7 @@ public interface IPipeLineLayer {
     public void train();
 
     /**
-     * Start inference the model
+     * Begin the inference process using the trained model
      */
     public void inference();
 

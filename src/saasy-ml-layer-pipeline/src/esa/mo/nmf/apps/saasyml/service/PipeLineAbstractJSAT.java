@@ -27,7 +27,9 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 
 /**
- * Class that uses the JSAT library inside the PipeLine
+ * Abstract Class that employs the JSAT library inside the IPipeLineLayer
+ *
+ * It contains general methods
  *
  * @author Dr. Cesar Guzman
  */
@@ -66,6 +68,8 @@ public abstract class PipeLineAbstractJSAT implements IPipeLineLayer{
      *
      * @param thread boolean variable that holds the activation of the thread
      * @param serialize boolean variable that holds if we should serialize the model or not
+     * @param modelName String that holds the name of the model
+     * @param typeModel TypeModel that holds the kind of model
      */
     public PipeLineAbstractJSAT(boolean thread, boolean serialize, String modelName, FactoryMLModels.TypeModel typeModel){
 

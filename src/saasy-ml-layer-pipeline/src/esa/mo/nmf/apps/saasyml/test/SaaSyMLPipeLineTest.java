@@ -37,6 +37,7 @@ public class SaaSyMLPipeLineTest {
      * @param serialize boolean variable that holds if we should serialize the model or not
      */
     public static void testClassifier(boolean thread, boolean serialize) {
+        // name of the model
         String modelName = "LogisticRegressionDCD";
 
         // instantiate the class
@@ -65,6 +66,7 @@ public class SaaSyMLPipeLineTest {
      * @param serialize boolean variable that holds if we should serialize the model or not
      */
     public static void testClustering(boolean thread, boolean serialize) {
+        // name of the model
         String modelName = "FLAME";
 
         // instantiate the class
@@ -95,6 +97,7 @@ public class SaaSyMLPipeLineTest {
      * @param serialize boolean variable that holds if we should serialize the model or not
      */
     public static void testOutlier(boolean thread, boolean serialize) {
+        // name of the model
         String modelName = "IsolationForest";
 
         // instantiate the class
