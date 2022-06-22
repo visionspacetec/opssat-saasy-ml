@@ -39,20 +39,6 @@ public class SaaSyML implements IServiceLayer {
     /***********************************/
 
     /**
-     * Empty constructor
-     */
-    public SaaSyML() { }
-
-    /**
-     * Constructor
-     *
-     * @param thread boolean variable that holds the activation of the thread
-     */
-    public SaaSyML(boolean thread) {
-        this.thread = thread;
-    }
-
-    /**
      * Constructor
      *
      * @param thread boolean variable that holds the activation of the thread
@@ -67,24 +53,6 @@ public class SaaSyML implements IServiceLayer {
     /**************************************/
     /************ PUBLIC METHODS **********/
     /**************************************/
-
-    /**
-     * PUT / set the thread
-     *
-     * @param thread true if the JSAT library can execute in parallel
-     */
-    //public void setThread(boolean thread) {
-    //    this.thread = thread;
-    //}
-
-    /**
-     * PUT / subscribe an experimenter app
-     *
-     * @param id_user id of the user
-     */
-    //public void subscribe(int id_user) {
-    //    control = new ControlLayer(this.thread, this.serialize);
-    //}
 
     /**
      * PUT / subscribe an experimenter app specifying the name of the model
