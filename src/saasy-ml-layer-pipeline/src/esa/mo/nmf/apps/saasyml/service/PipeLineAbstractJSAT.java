@@ -1,7 +1,7 @@
 package esa.mo.nmf.apps.saasyml.service;
 
 import esa.mo.nmf.apps.saasyml.common.IPipeLineLayer;
-import esa.mo.nmf.apps.saasyml.factories.FactoryMLModels;
+import esa.mo.nmf.apps.saasyml.factories.MLPipeLineFactory;
 import esa.mo.nmf.apps.saasyml.dataset.utils.GenerateDataset;
 
 import jsat.DataSet;
@@ -56,7 +56,7 @@ public abstract class PipeLineAbstractJSAT implements IPipeLineLayer{
 
     // name and type of the model
     protected String modelName = "";
-    protected FactoryMLModels.TypeModel typeModel = FactoryMLModels.TypeModel.Unknown;
+    protected MLPipeLineFactory.TypeModel typeModel = MLPipeLineFactory.TypeModel.Unknown;
 
 
     /***********************************/
@@ -71,7 +71,7 @@ public abstract class PipeLineAbstractJSAT implements IPipeLineLayer{
      * @param modelName String that holds the name of the model
      * @param typeModel TypeModel that holds the kind of model
      */
-    public PipeLineAbstractJSAT(boolean thread, boolean serialize, String modelName, FactoryMLModels.TypeModel typeModel){
+    public PipeLineAbstractJSAT(boolean thread, boolean serialize, String modelName, MLPipeLineFactory.TypeModel typeModel){
 
         this.serialize = serialize;
         this.thread = thread;

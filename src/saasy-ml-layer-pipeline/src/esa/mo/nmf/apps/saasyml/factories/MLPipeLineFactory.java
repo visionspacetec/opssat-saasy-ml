@@ -14,13 +14,13 @@ import jsat.outlier.IsolationForest;
 import jsat.outlier.Outlier;
 
 /**
- * Factory to create ML models, identify the ML model type, and create ML Pipeline
+ * Factory to create ML Pipeline, build ML models, identify the ML model type
  *
  * Used as a static class
  *
  * @author Dr. Cesar Guzman
  */
-public class FactoryMLModels {
+public class MLPipeLineFactory {
 
     /**
      * Define the type of models
@@ -42,7 +42,7 @@ public class FactoryMLModels {
     public static IPipeLineLayer createPipeLine(boolean thread, boolean serialize, String modelName){
 
         // detect the type of the model
-        TypeModel typeModel = FactoryMLModels.getTypeModel(modelName);
+        TypeModel typeModel = MLPipeLineFactory.getTypeModel(modelName);
 
         switch(typeModel){
             case Classifier:
@@ -56,12 +56,13 @@ public class FactoryMLModels {
         }
     }
 
+
     /**
      * Generate classifier models
      * @param modelName a string that holds name of the model to create
      * @return Classifier model
      */
-    public static Classifier buildClassifier(String modelName) {
+    public static Classifier buildModelClassifier(String modelName) {
 
         switch (modelName){
             default:
@@ -74,7 +75,7 @@ public class FactoryMLModels {
      * @param modelName a string that holds the name of the model to create
      * @return Clusterer model
      */
-    public static Clusterer buildCluster(String modelName) {
+    public static Clusterer buildModelCluster(String modelName) {
 
         switch (modelName){
             default:
@@ -87,7 +88,7 @@ public class FactoryMLModels {
      * @param modelName a string that holds the name of the model to create
      * @return Outlier model
      */
-    public static Outlier buildOutlier(String modelName) {
+    public static Outlier buildModelOutlier(String modelName) {
 
         switch (modelName){
             default:

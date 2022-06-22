@@ -20,10 +20,6 @@ public class SaaSyMLPipeLine {
 
     private static Logger logger = LoggerFactory.getLogger(SaaSyMLPipeLine.class);
 
-    /**********************************/
-    /************ ATTRIBUTES **********/
-    /**********************************/
-
     /***********************************/
     /************ CONSTRUCTOR **********/
     /***********************************/

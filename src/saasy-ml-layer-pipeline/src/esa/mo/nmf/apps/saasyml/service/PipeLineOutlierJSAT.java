@@ -1,6 +1,6 @@
 package esa.mo.nmf.apps.saasyml.service;
 
-import esa.mo.nmf.apps.saasyml.factories.FactoryMLModels;
+import esa.mo.nmf.apps.saasyml.factories.MLPipeLineFactory;
 import esa.mo.nmf.apps.saasyml.dataset.utils.GenerateDataset;
 
 import jsat.DataSet;
@@ -44,8 +44,10 @@ public class PipeLineOutlierJSAT extends PipeLineAbstractJSAT{
      *
      * @param thread boolean variable that holds the activation of the thread
      * @param serialize boolean variable that holds if we should serialize the model or not
+     * @param modelName String that holds the name of the model
+     * @param typeModel TypeModel that holds the kind of model
      */
-    public PipeLineOutlierJSAT(boolean thread, boolean serialize, String modelName, FactoryMLModels.TypeModel typeModel){
+    public PipeLineOutlierJSAT(boolean thread, boolean serialize, String modelName, MLPipeLineFactory.TypeModel typeModel){
         super(thread, serialize, modelName, typeModel);
     }
 
@@ -55,7 +57,7 @@ public class PipeLineOutlierJSAT extends PipeLineAbstractJSAT{
 
     public void build(String modelName){
         // build the model
-        this.model = FactoryMLModels.buildOutlier(this.modelName);
+        this.model = MLPipeLineFactory.buildOutlier(this.modelName);
     }
 
     public void build(String type, String[] parameters){
@@ -75,7 +77,6 @@ public class PipeLineOutlierJSAT extends PipeLineAbstractJSAT{
 
             // deserialize the model
             this.model = deserializeOutlier(pathToSerializedModel);
-            //deserializeModel(pathToSerializedModel);
         }
 
         // test the model
@@ -86,14 +87,6 @@ public class PipeLineOutlierJSAT extends PipeLineAbstractJSAT{
         logger.info((numOutliersInOutliers / test.size()) + " vs " + 0.1);//Better say 90% are outliers!
 
     }
-
-    /*****************************************/
-    /************ PROTECTED METHODS **********/
-    /*****************************************/
-
-    // protected void deserializeModel(String path){
-    //    this.model = deserializeOutlier(path);
-    //}
 
 
     /***************************************/
