@@ -61,7 +61,7 @@ public class PipeLineClusterJSAT extends PipeLineAbstractJSAT{
 
     public void build(String modelName){
         // build the model
-        this.model = MLPipeLineFactory.buildCluster(this.modelName);
+        this.model = MLPipeLineFactory.buildModelCluster(this.modelName);
     }
 
     public void build(String type, String[] parameters){

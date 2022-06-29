@@ -62,7 +62,7 @@ public class PipeLineClassifierJSAT extends PipeLineAbstractJSAT {
 
     public void build(String modelName){
         // build the model using the factory pattern
-        this.model = MLPipeLineFactory.buildClassifier(this.modelName);
+        this.model = MLPipeLineFactory.buildModelClassifier(this.modelName);
     }
 
     public void build(String type, String[] parameters){
