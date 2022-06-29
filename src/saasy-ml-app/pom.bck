@@ -46,12 +46,17 @@
 
   <developers>
     <developer>
-      <name>Cesar Guzman Alvarez</name>
-      <email>cesar.guzman@visionspace.com</email>
+      <id>georgeslabreche</id>
+      <name>Georges Labrèche</name>
+      <url>https://github.com/georgeslabreche</url>
+    </developer>
+    <developer>
+      <id>cguz</id>
+      <name>Cesar Guzman</name>
       <url>https://github.com/cguz</url>
     </developer>
   </developers>
-
+  
   <properties>
     <assembly.mainClass>esa.mo.nmf.apps.SaaSyMLApp</assembly.mainClass>
     <!--<maven.deploy.skip>true</maven.deploy.skip>
