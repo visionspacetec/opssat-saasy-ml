@@ -5,16 +5,8 @@ import esa.mo.nmf.apps.saasyml.factories.MLPipeLineFactory;
 import esa.mo.nmf.apps.saasyml.dataset.utils.GenerateDataset;
 
 import jsat.DataSet;
-import jsat.SimpleDataSet;
-import jsat.classifiers.ClassificationDataSet;
-import jsat.classifiers.Classifier;
-import jsat.classifiers.DataPoint;
-import jsat.classifiers.DataPointPair;
-import jsat.clustering.Clusterer;
 import jsat.distributions.Normal;
-import jsat.outlier.Outlier;
 import jsat.utils.GridDataGenerator;
-import jsat.utils.IntSet;
 import jsat.utils.random.RandomUtil;
 
 import org.slf4j.Logger;

@@ -1,14 +1,8 @@
 package esa.mo.nmf.apps.saasyml.test;
 
-import esa.mo.nmf.apps.saasyml.common.IPipeLineLayer;
-import esa.mo.nmf.apps.saasyml.service.PipeLineAbstractJSAT;
-
-import jsat.DataSet;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
 import java.util.*;
 
 /**

@@ -1,13 +1,10 @@
 package esa.mo.nmf.apps.saasyml.test;
 
 import esa.mo.nmf.apps.saasyml.common.IPipeLineLayer;
-import esa.mo.nmf.apps.saasyml.service.PipeLineAbstractJSAT;
 import esa.mo.nmf.apps.saasyml.factories.MLPipeLineFactory;
 import esa.mo.nmf.apps.saasyml.dataset.utils.GenerateDataset;
 
 import jsat.DataSet;
-import jsat.SimpleDataSet;
-import jsat.classifiers.ClassificationDataSet;
 import jsat.distributions.Normal;
 import jsat.utils.GridDataGenerator;
 import jsat.utils.random.RandomUtil;
@@ -16,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

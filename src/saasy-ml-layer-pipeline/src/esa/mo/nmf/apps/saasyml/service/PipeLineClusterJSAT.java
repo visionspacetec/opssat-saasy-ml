@@ -1,25 +1,16 @@
 package esa.mo.nmf.apps.saasyml.service;
 
 import esa.mo.nmf.apps.saasyml.factories.MLPipeLineFactory;
-import esa.mo.nmf.apps.saasyml.dataset.utils.GenerateDataset;
 
-import jsat.DataSet;
-import jsat.SimpleDataSet;
 import jsat.classifiers.DataPoint;
 import jsat.clustering.Clusterer;
-import jsat.distributions.Normal;
-import jsat.utils.GridDataGenerator;
 import jsat.utils.IntSet;
-import jsat.utils.random.RandomUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 
 /**
  * Class that uses the JSAT library inside the PipeLine
