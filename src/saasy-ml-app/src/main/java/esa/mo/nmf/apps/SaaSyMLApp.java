@@ -7,6 +7,7 @@ import esa.mo.nmf.spacemoadapter.SpaceMOApdapterImpl;
 
 import esa.mo.nmf.apps.verticles.MainVerticle;
 
+
 /**
  * The main App class
  * 
@@ -30,9 +31,9 @@ public final class SaaSyMLApp {
         // once all initialized, pass them to the M&C interface that handles the application's logic
         AppMCAdapter.getInstance().setConnector(connector);
         AppMCAdapter.getInstance().setSupervisorSMA(supervisorSMA);
-        
-        // register data received listener
-        AppMCAdapter.getInstance().getSupervisorSMA().addDataReceivedListener(new AggregationWriter());
+
+        // add data received listener
+        AppMCAdapter.getInstance().addDataReceivedListener();
     }
    
     
@@ -43,7 +44,7 @@ public final class SaaSyMLApp {
         // logging
         LOGGER.log(Level.INFO, "Starting the app.");
 
-        LOGGER.log(Level.INFO, "Starting the Main Vertical.");
+        // start the main verticle
         MainVerticle mv = new MainVerticle();
         mv.start();
     }

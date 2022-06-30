@@ -52,11 +52,7 @@
   </developers>
   <properties>
     <assembly.mainClass>esa.mo.nmf.apps.SaaSyMLApp</assembly.mainClass>
-     <!--<maven.deploy.skip>true</maven.deploy.skip>
-    <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>-->
-
     <vertx.version>4.2.7</vertx.version>
-    <!--main.verticle>esa.mo.nmf.apps.verticles.MainVerticle</main.verticle-->
   </properties>
 
   <dependencyManagement>
@@ -108,8 +104,14 @@
       <artifactId>vertx-web-validation</artifactId>
     </dependency>
 
-    <!-- Layers dependencies
-    
+    <!-- sqlite -->
+    <dependency>
+      <groupId>org.xerial</groupId>
+      <artifactId>sqlite-jdbc</artifactId>
+      <version>3.32.3.2</version>
+    </dependency>
+
+    <!-- Layers dependencies    
     <dependency>
       <groupId>int.esa.nmf.sdk.space.saasyml</groupId>
       <artifactId>saasyml</artifactId>
