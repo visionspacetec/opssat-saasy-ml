@@ -47,6 +47,10 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
 
             try {
 
+                // keep track of param names
+                // we need this because the response object received in the onReceivedData listener does not reference the parameter names
+                ApplicationManager.getInstance().addParamNames(expId, datasetId, paramNameList);
+
                 // create aggregation handler and subscribe the parameter feed
                 ApplicationManager.getInstance().createAggregationHandler(expId, datasetId, interval, paramNameList, true);
 

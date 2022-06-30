@@ -73,10 +73,11 @@ public class PropertiesManager {
      * Searches for the property with the specified key in the application's properties.
      *
      * @param key The property key
+     * @param default The default value
      * @return The property or null if the property is not found
      */
-    public String getProperty(String key) {
-        String property = this.properties.getProperty(key);
+    public String getProperty(String key, String defaultValue) {
+        String property = this.properties.getProperty(key, defaultValue);
         if (property == null) {
             LOGGER.log(Level.SEVERE,
             String.format("Couldn't find property with key %s, returning null", key));
@@ -84,11 +85,23 @@ public class PropertiesManager {
         return property;
     }
 
-    public int getPort(){
-        return Integer.parseInt(getProperty("port"));
+    public String getProperty(String key) {
+        return getProperty(key,  null);
     }
 
-    public int getVerticalInstanceCount(String verticalClassName){
-        return Integer.parseInt(getProperty("vertical.instance.count." + verticalClassName));
+    public int getPort( ){
+        return Integer.parseInt(getProperty("port", "9999"));
+    }
+
+    public int getVerticalInstanceCount(String verticalClassName) {
+        return Integer.parseInt(getProperty("vertical.instance.count." + verticalClassName, "1"));
+    }
+
+    public String getDatabaseDriver() {
+        return getProperty("db.driver", "org.sqlite.JDBC");
+    }
+
+    public String getDatabaseUrl() {
+        return getProperty("db.url");
     }
 }

@@ -15,6 +15,8 @@ public class AppMCAdapter extends MonitorAndControlNMFAdapter{
     private static volatile AppMCAdapter instance;
     private static Object mutex = new Object();
 
+    private AggregationWriter aggregationWriter;
+
     // private constructor to force singleton instance only
     private AppMCAdapter(){}
 
@@ -31,8 +33,9 @@ public class AppMCAdapter extends MonitorAndControlNMFAdapter{
         if (result == null) {
             synchronized (mutex) {
                 result = instance;
-                if (result == null)
+                if (result == null){
                     instance = result = new AppMCAdapter();
+                }  
             }
         }
         
@@ -87,10 +90,10 @@ public class AppMCAdapter extends MonitorAndControlNMFAdapter{
     public boolean onClose(boolean requestFromUser) {
         
         try {
-        
-            // signal the parameter subscription thread to exit their loops
-            //parameterSubscriptionHandler.stopParameterSubscriptionThreads();
             
+            // close the database connection if it's not already closed
+            DatabaseManager.getInstance().closeConnection();
+
             // close supervisor consumer connections
             supervisorSMA.closeConnections();
             
@@ -126,5 +129,12 @@ public class AppMCAdapter extends MonitorAndControlNMFAdapter{
      */
     public void setSupervisorSMA(SpaceMOApdapterImpl supervisorSMA) {
         this.supervisorSMA = supervisorSMA;
+    }
+
+    public void addDataReceivedListener() throws Exception{
+        // register data received listener
+        if(this.aggregationWriter  == null){
+            getSupervisorSMA().addDataReceivedListener(new AggregationWriter());
+        }
     }
 }
