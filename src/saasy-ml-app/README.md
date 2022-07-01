@@ -9,7 +9,7 @@ An NMF App for the OPS-SAT spacecraft. The app uses ML to train AI models with t
 - [Long Install](#long-install)
 - [Run App](#run-app)
 - [Make API Request](#make-api-request)
-- [Terminate App](#terminate-app)
+- [Related Issues](#related-issues)
 - [References](#references)
 
 ## Requirements
@@ -61,64 +61,64 @@ OS name: "linux", version: "5.10.16.3-microsoft-standard-wsl2", arch: "amd64", f
     </copy>
     ```
 
-4. Execute **./build.bat** to build all the Apps and **./build.bat 1** to build the Apps and execute the Supervisor and CTT.
+4. Execute **./build.bat** to build all the Apps or **./build.bat 1** to build the Apps and execute the Supervisor and CTT.
 
 
 ## Long Install
 
-### 1. Install the SaaSyML App
+1. Install the SaaSyML App
 
-```shell
-$ git clone https://github.com/visionspacetec/opssat-saasy-ml.git
-$ cd opssat-saasy-ml/src/saasy-ml-app
-$ mvn install
-$ cd .. && cd .. 
-```
+    ```shell
+    $ git clone https://github.com/visionspacetec/opssat-saasy-ml.git
+    $ cd opssat-saasy-ml/src/saasy-ml-app
+    $ mvn install
+    $ cd .. && cd .. 
+    ```
 
-### 2. Install NMF
+2. Install NMF
 
-```shell
-$ git clone https://github.com/visionspacetec/opssat-saasy-ml-nanosat-mo-framework.git
-$ cd opssat-saasy-ml-nanosat-mo-framework
-$ mvn install
-```
+    ```shell
+    $ git clone https://github.com/visionspacetec/opssat-saasy-ml-nanosat-mo-framework.git
+    $ cd opssat-saasy-ml-nanosat-mo-framework
+    $ mvn install
+    ```
 
-If in step 2 the app was cloned to a different folder name than the default **opssat-saasy-ml**, then the following copy configuration in **sdk/sdk-package/pom.xml** must be updated:
+    If in step 2 the app was cloned to a different folder name than the default **opssat-saasy-ml**, then the following copy configuration in **sdk/sdk-package/pom.xml** must be updated:
 
-```xml
-<copy todir="${esa.nmf.sdk.assembly.outputdir}/home/saasy-ml">
-<fileset dir="${basedir}/src/main/resources/space-common"/>
-<fileset dir="${basedir}/src/main/resources/space-app-root"/>
-<fileset dir="${basedir}/../../../opssat-saasy-ml/src/saasy-ml-app/conf"/>
-</copy>
-```
+    ```xml
+    <copy todir="${esa.nmf.sdk.assembly.outputdir}/home/saasy-ml">
+    <fileset dir="${basedir}/src/main/resources/space-common"/>
+    <fileset dir="${basedir}/src/main/resources/space-app-root"/>
+    <fileset dir="${basedir}/../../../opssat-saasy-ml/src/saasy-ml-app/conf"/>
+    </copy>
+    ```
 
-### 3. Deploy the SaaSyML App
+3. Deploy the SaaSyML App
 
-```shell
-$ cd sdk/sdk-package/
-$ mvn install
-```
+    ```shell
+    $ cd sdk/sdk-package/
+    $ mvn install
+    ```
 
-### 4. Supervisor and CTT
+4. Supervisor and CTT
 
-Open a second terminal window to run both the Supervisor and the Consumer Test Tool (CTT).
+    Open a second terminal window to run both the Supervisor and the Consumer Test Tool (CTT).
 
-The Supervisor:
+    The Supervisor:
 
-```shell
-$ cd target/nmf-sdk-2.1.0-SNAPSHOT/home/nmf/nanosat-mo-supervisor-sim
-$ ./nanosat-mo-supervisor-sim.sh 
-```
+    ```shell
+    $ cd target/nmf-sdk-2.1.0-SNAPSHOT/home/nmf/nanosat-mo-supervisor-sim
+    $ ./nanosat-mo-supervisor-sim.sh 
+    ```
 
-- The Supervisor outputs a URI on the console.
-- This URI follows the pattern `maltcp://<SUPERVISOR_HOST>:<SUPERVISOR_PORT>/nanosat-mo-supervisor-Directory`.
+    - The Supervisor outputs a URI on the console.
+    - This URI follows the pattern `maltcp://<SUPERVISOR_HOST>:<SUPERVISOR_PORT>/nanosat-mo-supervisor-Directory`.
 
-The CTT:
-```shell
-$ cd target/nmf-sdk-2.1.0-SNAPSHOT/home/nmf/consumer-test-tool
-$ ./consumer-test-tool.sh
-```
+    The CTT:
+    ```shell
+    $ cd target/nmf-sdk-2.1.0-SNAPSHOT/home/nmf/consumer-test-tool
+    $ ./consumer-test-tool.sh
+    ```
 
 ## Run App
 
@@ -131,78 +131,84 @@ $ ./consumer-test-tool.sh
 
 ## Make API request
 
-### 1. Subscribe to a training data feed
-Use an API platform like [Postman](https://www.postman.com/) to make an POST request to the following endpoint:
-```
-http://<SUPERVISOR_HOST>:9999/api/v1/training/data/subscribe
-```
+1. Subscribe to a training data feed
 
-With the payload:
-```json
-{
-    "expId": 123,
-    "datasetId": 1,
-    "iterations": 10,
-    "interval": 2,
-    "params": ["GNC_0005", "GNC_0011", "GNC_0007"]
-}
-```
+    Use an API platform like [Postman](https://www.postman.com/) to make an POST request to the following endpoint:
+    ```
+    http://<SUPERVISOR_HOST>:9999/api/v1/training/data/subscribe
+    ```
 
-To auto-trigger training the model as soon as the target dataset iterations has been met:
+    With the payload:
+    ```json
+    {
+        "expId": 123,
+        "datasetId": 1,
+        "iterations": 10,
+        "interval": 2,
+        "params": ["GNC_0005", "GNC_0011", "GNC_0007"]
+    }
+    ```
 
-```json
-{
-    "expId": 123,
-    "datasetId": 1,
-    "iterations": 10,
-    "interval": 2,
-    "params": ["GNC_0005", "GNC_0011", "GNC_0007"],
-    "training": [
-        {
-            "type": "classifier",
-            "group": "bayesian",
-            "algorithm": "aode"
-        },
-        {
-            "type": "classifier",
-            "group": "boosting",
-            "algorithm": "bagging"
-        }
-    ]
-}
-```
+    To auto-trigger training the model as soon as the target dataset iterations has been met:
 
-Make several of these requests with different values for `expId`, `datasetId`, `interval`, and `params`. The fetched values will appear as log outputs in the CTT's console.
+    ```json
+    {
+        "expId": 123,
+        "datasetId": 1,
+        "iterations": 10,
+        "interval": 2,
+        "params": ["GNC_0005", "GNC_0011", "GNC_0007"],
+        "training": [
+            {
+                "type": "classifier",
+                "group": "bayesian",
+                "algorithm": "aode"
+            },
+            {
+                "type": "classifier",
+                "group": "boosting",
+                "algorithm": "bagging"
+            }
+        ]
+    }
+    ```
 
-### 2. Unsubscribe to a training data feed
-Unsubscribe to the data feed with a POST request to the following endpoint:
-```
-http://<SUPERVISOR_HOST>:9999/api/v1/training/data/unsubscribe
-```
+    Make several of these requests with different values for `expId`, `datasetId`, `interval`, and `params`. The fetched values will appear as log outputs in the CTT's console.
 
-With the payload:
-```json
-{
-    "expId": 123,
-    "datasetId": 1
-}
-```
+2. Unsubscribe to a training data feed
 
-### 3. Train a model
-Make an POST request to the following endpoint:
-```
-http://<SUPERVISOR_HOST>:9999/api/v1/training/:type/:group/:algorithm
-```
+    Unsubscribe to the data feed with a POST request to the following endpoint:
+    ```
+    http://<SUPERVISOR_HOST>:9999/api/v1/training/data/unsubscribe
+    ```
 
-With the payload:
-```json
-{
-    "expId": 123,
-    "datasetId": 1
-}
-```
+    With the payload:
+    ```json
+    {
+        "expId": 123,
+        "datasetId": 1
+    }
+    ```
 
-## Terminate App
+3. Train a model
+
+    Make an POST request to the following endpoint:
+    ```
+    http://<SUPERVISOR_HOST>:9999/api/v1/training/:type/:group/:algorithm
+    ```
+
+    With the payload:
+    ```json
+    {
+        "expId": 123,
+        "datasetId": 1
+    }
+    ```
+
+## Related Issues
+
+### Terminate App
+
 Note: examples in this section are in PowerShell.
 
 Situation: The App did not shutdown gracefully despite terminating the Supervisor and the CTT. 
@@ -213,6 +219,7 @@ Problem: Attempting to repeat installation step #3 to redeploy the app will resu
 ```
 
 In this case, use the jps command to identify the process id of the culprit process (i.e. the SaaSyMLApp java process):
+
 ```powershell
 > jps
 55880 org.eclipse.equinox.launcher_1.6.400.v20210924-0641.jar
@@ -221,12 +228,14 @@ In this case, use the jps command to identify the process id of the culprit proc
 ```
 
 Force kill the process, e.g. in Windows Terminal:
+
 ```powershell
 > taskkill /F /PID 95404
 SUCCESS: The process with PID 95404 has been terminated.
 ```
 
 Check that the process was indeed killed:
+
 ```powershell
 > jps
 111924 Jps
@@ -236,10 +245,12 @@ Check that the process was indeed killed:
 Now the App can be redeployed.
 
 ## API
+
 TBD
 
 
 ## References
+
 - [The NMF quick start guide](https://nanosat-mo-framework.readthedocs.io/en/latest/quickstart.html)
 - [The NMF deployment guide](https://nanosat-mo-framework.readthedocs.io/en/latest/apps/packaging.html)
 - [Vert.x Core Manual](https://vertx.io/docs/vertx-core/java/)
