@@ -122,6 +122,30 @@ With the payload:
 }
 ```
 
+To auto-trigger training the model as soon as the target dataset iterations has been met:
+
+```json
+{
+    "expId": 123,
+    "datasetId": 1,
+    "iterations": 10,
+    "interval": 2,
+    "params": ["GNC_0005", "GNC_0011", "GNC_0007"],
+    "training": [
+        {
+            "type": "classifier",
+            "group": "bayesian",
+            "algorithm": "aode"
+        },
+        {
+            "type": "classifier",
+            "group": "boosting",
+            "algorithm": "bagging"
+        }
+    ]
+}
+```
+
 Make several of these requests with different values for `expId`, `datasetId`, `interval`, and `params`. The fetched values will appear as log outputs in the CTT's console.
 
 ##### 6.2. Unsubscribe to a training data feed
