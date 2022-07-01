@@ -1,6 +1,6 @@
 :: Set variables
-SET PROJECT_DIR=C:\Users\honeycrisp\Dev\Tanagra\ESA\opssat\saasy-ml\visionspace\opssat-saasy-ml\src\saasy-ml-app
-SET NMF_SDK_PACKAGE_DIR=C:\Users\honeycrisp\Dev\Tanagra\ESA\opssat\saasy-ml\opssat-saasy-ml-nmf\sdk\sdk-package
+SET PROJECT_DIR=C:\Users\VST\git\vspace\opssat\saasy-ml\opssat-saasy-ml\src\saasy-ml-app
+SET NMF_SDK_PACKAGE_DIR=C:\Users\VST\git\vspace\opssat\saasy-ml\opssat-saasy-ml-nanosat-mo-framework\sdk\sdk-package
 
 :: Set run flag variable in case we want to build and run
 SET RUN_FLAG=%1

@@ -40,17 +40,9 @@ You can skip the test of maven with the following command:
 
     $ mvn install -Dmaven.test.skip
 
-## SaaSy-ML Start Point
+## SaaSy-ML as NMF App
 
-Inside the folder **src/saasy-ml/** execute:
-
-    $ mvn install
-
-It will generate a jar executable in the folder **target**
-
-## SaaSy-ML SEPP
-
-Follow the instructions on the [Readme](src/saasy-ml-sepp/README.md)
+Follow the instructions on the [Readme](src/saasy-ml-app/README.md)
 
 # References
 

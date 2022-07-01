@@ -1,89 +1,114 @@
 # OPS-SAT SaaSyML App
+
 An NMF App for the OPS-SAT spacecraft. The app uses ML to train AI models with the spacecraft's OBSW datapool parameters as training data. 
 
-## References
-- [The NMF quick start guide](https://nanosat-mo-framework.readthedocs.io/en/latest/quickstart.html)
-- [The NMF deployment guide](https://nanosat-mo-framework.readthedocs.io/en/latest/apps/packaging.html)
-- [Vert.x Core Manual](https://vertx.io/docs/vertx-core/java/)
+# Table of Content
 
-## Installing
+- [Requirements](#requirements)
+- [Quick Install](#quick-install)
+- [Long Install](#long-install)
+- [Run App](#run-app)
+- [Make API Request](#make-api-request)
+- [Terminate App](#terminate-app)
+- [References](#references)
 
-### Requirements
+## Requirements
+
 - Java 8
 - Maven 3.X.X
 
 Tested environment on Windows 10:
 ```powershell
-Apache Maven 3.8.1 (05c21c65bdfed0f71a2f2ada8b84da59348c4c5d)
-Maven home: C:\Users\Georges\Development\Tools\apache-maven-3.8.1\bin\..
-Java version: 1.8.0_291, vendor: Oracle Corporation, runtime: C:\Program Files\Java\jdk1.8.0_291\jre
+Apache Maven 3.8.1 
+Java version: 1.8.0_291, vendor: Oracle Corporation
 Default locale: en_US, platform encoding: Cp1252
 OS name: "windows 10", version: "10.0", arch: "amd64", family: "windows"
 ```
 
-Tested environment on Ubuntu 18.04.5 on Windows:
-```shell
-Apache Maven 3.8.4 (9b656c72d54e5bacbed989b64718c159fe39b537)
-Maven home: /mnt/c/Users/honeycrisp/Tools/apache-maven-3.8.4
-Java version: 1.8.0_312, vendor: Private Build, runtime: /usr/lib/jvm/java-8-openjdk-amd64/jre
+Tested environment on Ubuntu 18.04.5 on Windows WSL:
+```sh
+Apache Maven 3.8.4 
+Java version: 1.8.0_312, vendor: Private Build
 Default locale: en, platform encoding: UTF-8
 OS name: "linux", version: "5.10.16.3-microsoft-standard-wsl2", arch: "amd64", family: "unix"
 ```
 
-### Steps
+## Quick Install
 
-#### 1. Install the SaaSyML App
+1. Clone the SaaSyML App and NMF repositories
+
+    ```shell
+    $ git clone https://github.com/visionspacetec/opssat-saasy-ml.git
+    $ git clone https://github.com/visionspacetec/opssat-saasy-ml-nanosat-mo-framework.git
+    $ cd opssat-saasy-ml/src/saasy-ml-app
+    ```
+
+2. Modify the <FULL_PATH> in the **build.bat** to match the environment
+
+    ```powershell
+    :: Set variables
+    SET PROJECT_DIR=<FULL_PATH>\opssat-saasy-ml\src\saasy-ml-app
+    SET NMF_SDK_PACKAGE_DIR=<FULL_PATH>\opssat-saasy-ml-nmf\sdk\sdk-package
+    ```
+
+3. Modify the **sdk/sdk-package/pom.xml** copy instruction to match the environment's location
+
+    ```xml
+    <copy todir="${esa.nmf.sdk.assembly.outputdir}/home/saasy-ml">
+    <fileset dir="${basedir}/src/main/resources/space-common"/>
+    <fileset dir="${basedir}/src/main/resources/space-app-root"/>
+    <fileset dir="${basedir}/../../../opssat-saasy-ml/src/saasy-ml-app/conf"/>
+    </copy>
+    ```
+
+4. Execute **./build.bat** to build all the Apps and **./build.bat 1** to build the Apps and execute the Supervisor and CTT.
+
+
+## Long Install
+
+### 1. Install the SaaSyML App
+
 ```shell
-$ git clone https://github.com/tanagraspace/opssat-saasy-ml
-$ cd opssat-saasy-ml
+$ git clone https://github.com/visionspacetec/opssat-saasy-ml.git
+$ cd opssat-saasy-ml/src/saasy-ml-app
 $ mvn install
-$ cd ..
+$ cd .. && cd .. 
 ```
 
+### 2. Install NMF
 
-
-#### 2. Install NMF
 ```shell
-$ git clone https://github.com/tanagraspace/opssat-saasy-ml-nmf.git
-$ cd opssat-saasy-ml-nmf
+$ git clone https://github.com/visionspacetec/opssat-saasy-ml-nanosat-mo-framework.git
+$ cd opssat-saasy-ml-nanosat-mo-framework
 $ mvn install
 ```
 
-If in step 2 the app was cloned to a different folder name than the default `opssat-saasy-ml`, then the following copy configuration in `sdk/sdk-package/pom.xml` must be updated:
+If in step 2 the app was cloned to a different folder name than the default **opssat-saasy-ml**, then the following copy configuration in **sdk/sdk-package/pom.xml** must be updated:
 
 ```xml
 <copy todir="${esa.nmf.sdk.assembly.outputdir}/home/saasy-ml">
-    <fileset dir="${basedir}/src/main/resources/space-common"/>
-    <fileset dir="${basedir}/src/main/resources/space-app-root"/>
-    <fileset dir="${basedir}/../../../opssat-saasy-ml/conf"/>
+<fileset dir="${basedir}/src/main/resources/space-common"/>
+<fileset dir="${basedir}/src/main/resources/space-app-root"/>
+<fileset dir="${basedir}/../../../opssat-saasy-ml/src/saasy-ml-app/conf"/>
 </copy>
 ```
 
-Specifically, the following line:
+### 3. Deploy the SaaSyML App
 
-```xml
-<fileset dir="${basedir}/../../../opssat-saasy-ml/conf"/>
-```
-
-must be update to:
-
-```xml
-<fileset dir="${basedir}/../../../<the_app_folder_name>/conf"/>
-```
-
-#### 3. Deploy the SaaSyML App
 ```shell
 $ cd sdk/sdk-package/
 $ mvn install
 ```
 
-#### 4. Supervisor and CTT
+### 4. Supervisor and CTT
+
 Open a second terminal window to run both the Supervisor and the Consumer Test Tool (CTT).
 
 The Supervisor:
+
 ```shell
-cd target/nmf-sdk-2.1.0-SNAPSHOT/home/nmf/nanosat-mo-supervisor-sim
-./nanosat-mo-supervisor-sim.sh 
+$ cd target/nmf-sdk-2.1.0-SNAPSHOT/home/nmf/nanosat-mo-supervisor-sim
+$ ./nanosat-mo-supervisor-sim.sh 
 ```
 
 - The Supervisor outputs a URI on the console.
@@ -91,11 +116,12 @@ cd target/nmf-sdk-2.1.0-SNAPSHOT/home/nmf/nanosat-mo-supervisor-sim
 
 The CTT:
 ```shell
-cd target/nmf-sdk-2.1.0-SNAPSHOT/home/nmf/consumer-test-tool
-./consumer-test-tool.sh
+$ cd target/nmf-sdk-2.1.0-SNAPSHOT/home/nmf/consumer-test-tool
+$ ./consumer-test-tool.sh
 ```
 
-#### 5. Start the SaaSyML App
+## Run App
+
 - Paste the URI given by the Supervisor into the **Communication Settings** field of the CTT.
 - Click the **Fetch information** button.
 - Click the **Connect to Selected Provider** button.
@@ -103,9 +129,9 @@ cd target/nmf-sdk-2.1.0-SNAPSHOT/home/nmf/consumer-test-tool
 - Select the **saasy-ml** app under the **Apps Launcher Servce" table.
 - Click the **runApp** button.
 
-#### 6. Make an API request
+## Make API request
 
-##### 6.1. Subscribe to a training data feed
+### 1. Subscribe to a training data feed
 Use an API platform like [Postman](https://www.postman.com/) to make an POST request to the following endpoint:
 ```
 http://<SUPERVISOR_HOST>:9999/api/v1/training/data/subscribe
@@ -148,7 +174,7 @@ To auto-trigger training the model as soon as the target dataset iterations has 
 
 Make several of these requests with different values for `expId`, `datasetId`, `interval`, and `params`. The fetched values will appear as log outputs in the CTT's console.
 
-##### 6.2. Unsubscribe to a training data feed
+### 2. Unsubscribe to a training data feed
 Unsubscribe to the data feed with a POST request to the following endpoint:
 ```
 http://<SUPERVISOR_HOST>:9999/api/v1/training/data/unsubscribe
@@ -162,7 +188,7 @@ With the payload:
 }
 ```
 
-##### 6.3. Train a model
+### 3. Train a model
 Make an POST request to the following endpoint:
 ```
 http://<SUPERVISOR_HOST>:9999/api/v1/training/:type/:group/:algorithm
@@ -176,7 +202,7 @@ With the payload:
 }
 ```
 
-## Terminating the App
+## Terminate App
 Note: examples in this section are in PowerShell.
 
 Situation: The App did not shutdown gracefully despite terminating the Supervisor and the CTT. 
@@ -212,3 +238,8 @@ Now the App can be redeployed.
 ## API
 TBD
 
+
+## References
+- [The NMF quick start guide](https://nanosat-mo-framework.readthedocs.io/en/latest/quickstart.html)
+- [The NMF deployment guide](https://nanosat-mo-framework.readthedocs.io/en/latest/apps/packaging.html)
+- [Vert.x Core Manual](https://vertx.io/docs/vertx-core/java/)
