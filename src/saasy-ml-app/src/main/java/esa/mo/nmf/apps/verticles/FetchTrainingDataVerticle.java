@@ -75,6 +75,26 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
 
                                 // remove data received counter
                                 ApplicationManager.getInstance().removeReceivedDataCounter(expId, datasetId);
+
+                                // auto-trigger training if the payload is configured to do so
+                                if(payload.containsKey("training")) {
+
+                                    // the training parameters can be for more than one algorithm
+                                    final JsonArray trainings = payload.getJsonArray("training");
+
+                                    // trigger training for each request
+                                    for(int i = 0; i < trainings.size(); i++) {
+                                        final JsonObject t = trainings.getJsonObject(i);
+
+                                        // fetch training algorithm selection
+                                        String type = t.getString("type");
+                                        String group = t.getString("group");
+                                        String algorithm = t.getString("algorithm");
+
+                                        // trigger training
+                                        vertx.eventBus().send("saasyml.training." + type + "." + group + "." + algorithm, payload);
+                                    }
+                                }
                             }
     
                         } catch(Exception e) {

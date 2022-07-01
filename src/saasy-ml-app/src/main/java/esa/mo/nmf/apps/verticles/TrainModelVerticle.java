@@ -18,7 +18,7 @@ public class TrainModelVerticle extends AbstractVerticle {
 
         // the request payload (Json)
         JsonObject payload = (JsonObject)(msg.body());
-        LOGGER.log(Level.INFO, "The POST request payload: " + payload.toString());
+        LOGGER.log(Level.INFO, "training.classifier.bayesian.aode: triggered by the following POST request: " + payload.toString());
 
         // parse the Json payload
         final int expId = payload.getInteger("expId").intValue();
@@ -38,14 +38,26 @@ public class TrainModelVerticle extends AbstractVerticle {
     });
 
     vertx.eventBus().consumer("saasyml.training.classifier.bayesian.bestclassdistribution", msg -> {
+        // the request payload (Json)
+        JsonObject payload = (JsonObject)(msg.body());
+        LOGGER.log(Level.INFO, "training.classifier.bayesian.bestclassdistribution: triggered by the following POST request: " + payload.toString());
+
         msg.reply("training: classifier.bayesian.aode");
     });
 
     vertx.eventBus().consumer("saasyml.training.classifier.boosting.bagging", msg -> {
+        // the request payload (Json)
+        JsonObject payload = (JsonObject)(msg.body());
+        LOGGER.log(Level.INFO, "training.classifier.boosting.bagging: triggered by the following POST request: " + payload.toString());
+
         msg.reply("training: classifier.boosting.bagging");
     });
 
     vertx.eventBus().consumer("saasyml.training.classifier.boosting.samme", msg -> {
+        // the request payload (Json)
+        JsonObject payload = (JsonObject)(msg.body());
+        LOGGER.log(Level.INFO, "training.classifier.boosting.samme: triggered by the following POST request: " + payload.toString());
+
         msg.reply("training: classifier.boosting.samme");
     });
 
