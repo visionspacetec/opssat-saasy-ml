@@ -154,7 +154,7 @@ public class DatabaseManager {
 
     public void insertTrainingData(int expId, int datasetId, List<String> paramNames, int receivedDataCounter, List<Pair<Integer, String>> paramValues, Long timestamp) throws Exception {
         // create the prepared statement
-        PreparedStatement prep = conn.prepareStatement(
+        PreparedStatement prep = this.conn.prepareStatement(
             "INSERT INTO training_data(exp_id, dataset_id, param_name, rank, data_type, value, timestamp) VALUES(?, ?, ?, ?, ?, ?, ?)"
         );
 
@@ -176,6 +176,20 @@ public class DatabaseManager {
 
         // execute the batch insert into the table
         prep.executeBatch();
+    }
+
+    public void deleteTrainingData(int expId, int datasetId) throws Exception {
+        // create the prepared statement
+        PreparedStatement ps = this.conn.prepareStatement(
+            "DELETE FROM training_data WHERE exp_id = ? AND dataset_id = ?"
+        );
+
+        // set satement parameters
+        ps.setInt(1, expId); // experiment id
+        ps.setInt(2, datasetId); // dataset id
+
+        // execute the delete statement
+        ps.executeUpdate();
     }
 
     public Connection getConnection() {

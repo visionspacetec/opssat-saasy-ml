@@ -6,7 +6,7 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
-
+import javafx.scene.chart.PieChart.Data;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 
@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import esa.mo.nmf.apps.DatabaseManager;
 import esa.mo.nmf.apps.PropertiesManager;
 
 
@@ -67,12 +68,22 @@ public class MainVerticle extends AbstractVerticle {
       .handler(BodyHandler.create())
       .handler(this::unsubscribeFromTrainingDataFeed);
 
+    // route for training data feed unsubscription
+    router.post("/api/v1/training/data/delete")
+      // todo: validate json payload against schema, see
+      // https://vertx.io/docs/vertx-web-validation/java/
+      .handler(BodyHandler.create())
+      .handler(this::deleteTrainingData);
+
     // route to train model using given algorithm
     router.post("/api/v1/training/:type/:group/:algorithm")
       // todo: validate json payload against schema, see
       // https://vertx.io/docs/vertx-web-validation/java/
       .handler(BodyHandler.create())
       .handler(this::trainModel);
+
+
+    
 
     // todo
     // route: inference
@@ -94,17 +105,14 @@ public class MainVerticle extends AbstractVerticle {
     JsonObject payload = ctx.getBodyAsJson();
 
     try {
-      // forward request to event bus to be handled in the Training Data Polling
-      // Verticle
+      // forward request to event bus to be handled in the appropriate Verticle
       vertx.eventBus().request("saasyml.training.data.subscribe", payload, reply -> {
-
         // return response from the verticle
         ctx.request().response().end((String) reply.result().body());
       });
     } catch (Exception e) {
-      // error object
-      responseMap.put("request", "error");
-      responseMap.put("message", "unsupported or invalid training data request");
+      // error response message
+      responseMap.put("message", "error occurred while subscribing to a training data feed.");
 
       // error response
       ctx.request().response()
@@ -126,17 +134,14 @@ public class MainVerticle extends AbstractVerticle {
     JsonObject payload = ctx.getBodyAsJson();
 
     try {
-      // forward request to event bus to be handled in the Training Data Polling
-      // Verticle
+      // forward request to event bus to be handled in the appropriate Verticle
       vertx.eventBus().request("saasyml.training.data.unsubscribe", payload, reply -> {
-
         // return response from the verticle
         ctx.request().response().end((String) reply.result().body());
       });
     } catch (Exception e) {
-      // error object
-      responseMap.put("request", "error");
-      responseMap.put("message", "unsupported or invalid training data request");
+      // error response message
+      responseMap.put("message", "error occurred while unsubscribing to a training data feed.");
 
       // error response
       ctx.request().response()
@@ -145,6 +150,41 @@ public class MainVerticle extends AbstractVerticle {
     }
   }
 
+  /**
+   * delete training data
+   * @param ctx
+   */
+  void deleteTrainingData(RoutingContext ctx) {
+    // response map
+    Map<String, String> responseMap = new HashMap<String, String>();
+
+    // payload
+    JsonObject payload = ctx.getBodyAsJson();
+
+    // get ids
+    int expId = payload.getInteger("expId");
+    int datasetId = payload.getInteger("datasetId");
+    
+    try {
+
+      // connect to database and delete training data
+      DatabaseManager.getInstance().connect();
+      DatabaseManager.getInstance().deleteTrainingData(expId, datasetId);
+
+      // success response message
+      responseMap.put("message", "deleted training data.");
+
+    } catch (Exception e) {
+      // error response message
+      responseMap.put("message", "error occurred while deleting training data.");
+    }
+
+    // error response
+    ctx.request().response()
+    .putHeader("content-type", "application/json; charset=utf-8")
+    .end(Json.encodePrettily(responseMap));
+    
+  }
 
   /**
    * train a model
