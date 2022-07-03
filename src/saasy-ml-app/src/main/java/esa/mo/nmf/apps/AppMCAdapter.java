@@ -7,6 +7,7 @@ import esa.mo.nmf.CloseAppListener;
 import esa.mo.nmf.MonitorAndControlNMFAdapter;
 import esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl;
 import esa.mo.nmf.spacemoadapter.SpaceMOApdapterImpl;
+import io.vertx.core.Vertx;
 
 public class AppMCAdapter extends MonitorAndControlNMFAdapter{
     private static final Logger LOGGER = Logger.getLogger(AppMCAdapter.class.getName());
@@ -74,10 +75,10 @@ public class AppMCAdapter extends MonitorAndControlNMFAdapter{
         
          // define application behavior when closed
          this.connector.setCloseAppListener(new CloseAppListener() {
-             @Override
-             public Boolean onClose() {
-                 return AppMCAdapter.this.onClose(true);
-             }
+            @Override
+            public Boolean onClose() {
+                return AppMCAdapter.this.onClose(true);
+            }
         });
     }
     
@@ -88,12 +89,7 @@ public class AppMCAdapter extends MonitorAndControlNMFAdapter{
      * @return true in case of success, false otherwise
      */
     public boolean onClose(boolean requestFromUser) {
-        
         try {
-            
-            // close the database connection if it's not already closed
-            DatabaseManager.getInstance().closeConnection();
-
             // close supervisor consumer connections
             supervisorSMA.closeConnections();
             
@@ -131,10 +127,11 @@ public class AppMCAdapter extends MonitorAndControlNMFAdapter{
         this.supervisorSMA = supervisorSMA;
     }
 
-    public void addDataReceivedListener() throws Exception{
+    public void addDataReceivedListener(Vertx vertx) throws Exception{
         // register data received listener
         if(this.aggregationWriter  == null){
-            getSupervisorSMA().addDataReceivedListener(new AggregationWriter());
+            this.aggregationWriter = new AggregationWriter(vertx);
+            getSupervisorSMA().addDataReceivedListener(this.aggregationWriter);
         }
     }
 }

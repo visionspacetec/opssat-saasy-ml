@@ -43,7 +43,7 @@ OS name: "linux", version: "5.10.16.3-microsoft-standard-wsl2", arch: "amd64", f
     $ cd opssat-saasy-ml/src/saasy-ml-app
     ```
 
-2. Modify the <FULL_PATH> in the **build.bat** to match the environment
+2. Copy **build.bat.template** to a new **build.bat** file and modify the <FULL_PATH> to match the environment
 
     ```powershell
     :: Set variables
@@ -51,7 +51,9 @@ OS name: "linux", version: "5.10.16.3-microsoft-standard-wsl2", arch: "amd64", f
     SET NMF_SDK_PACKAGE_DIR=<FULL_PATH>\opssat-saasy-ml-nmf\sdk\sdk-package
     ```
 
-3. Modify the **sdk/sdk-package/pom.xml** copy instruction to match the environment's location
+3. Modify the con/config.properties file to set the desired app configurations.
+
+4. Modify the **sdk/sdk-package/pom.xml** copy instruction to match the environment's location
 
     ```xml
     <copy todir="${esa.nmf.sdk.assembly.outputdir}/home/saasy-ml">
@@ -61,7 +63,7 @@ OS name: "linux", version: "5.10.16.3-microsoft-standard-wsl2", arch: "amd64", f
     </copy>
     ```
 
-4. Execute **./build.bat** to build all the Apps or **./build.bat 1** to build the Apps and execute the Supervisor and CTT.
+5. Execute **./build.bat** to build all the Apps or **./build.bat 1** to build the Apps and execute the Supervisor and CTT.
 
 
 ## Long Install
@@ -129,16 +131,54 @@ OS name: "linux", version: "5.10.16.3-microsoft-standard-wsl2", arch: "amd64", f
 - Select the **saasy-ml** app under the **Apps Launcher Servce" table.
 - Click the **runApp** button.
 
-## Make API request
 
-1. Subscribe to a training data feed
+## Known Issue
+Note: examples in this section are in PowerShell.
 
-    Use an API platform like [Postman](https://www.postman.com/) to make an POST request to the following endpoint:
+Situation: The App did not shutdown gracefully despite terminating the Supervisor and the CTT. 
+Problem: Attempting to repeat installation step #3 to redeploy the app will result in a locked file error, e.g.:
+
+    ```powershell
+    Failed to execute goal org.apache.maven.plugins:maven-dependency-plugin:3.1.0:copy-dependencies (copy-dependencies) on project package: Error copying artifact from C:\Users\honeycrisp\.m2\repository\com\tanagraspace\nmf\apps\saasy-ml\2.1.0-SNAPSHOT\saasy-ml-2.1.0-SNAPSHOT.jar to C:\Users\honeycrisp\Dev\Tanagra\ESA\opssat\saasy-ml\opssat-saasy-ml-nmf\sdk\sdk-package\target\nmf-sdk-2.1.0-SNAPSHOT\home\nmf\lib\saasy-ml-2.1.0-SNAPSHOT.jar: C:\Users\honeycrisp\Dev\Tanagra\ESA\opssat\saasy-ml\opssat-saasy-ml-nmf\sdk\sdk-package\target\nmf-sdk-2.1.0-SNAPSHOT\home\nmf\lib\saasy-ml-2.1.0-SNAPSHOT.jar: The process cannot access the file because it is being used by another process. -> [Help 1]
     ```
-    http://<SUPERVISOR_HOST>:9999/api/v1/training/data/subscribe
+
+In this case, use the jps command to identify the process id of the culprit process (i.e. the SaaSyMLApp java process):
+
+    ```powershell
+    > jps
+    55880 org.eclipse.equinox.launcher_1.6.400.v20210924-0641.jar
+    95404 SaaSyMLApp
+    150140 Jps
     ```
 
-    With the payload:
+Force kill the process, e.g. in Windows Terminal:
+
+    ```powershell
+    > taskkill /F /PID 95404
+    SUCCESS: The process with PID 95404 has been terminated.
+    ```
+
+Check that the process was indeed killed:
+
+    ```powershell
+    > jps
+    111924 Jps
+    55880 org.eclipse.equinox.launcher_1.6.400.v20210924-0641.jar
+    ```
+
+Now the App can be redeployed.
+
+## API
+Ad-hoc documentation of the app's API endpoints.
+
+### Subscribe to a training data feed
+
+Use an API platform like [Postman](https://www.postman.com/) to make an POST request to the following endpoint:
+    ```
+    http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/data/subscribe
+    ```
+
+Sample payload:
     ```json
     {
         "expId": 123,
@@ -149,7 +189,7 @@ OS name: "linux", version: "5.10.16.3-microsoft-standard-wsl2", arch: "amd64", f
     }
     ```
 
-    To auto-trigger training the model as soon as the target dataset iterations has been met:
+Make several of these requests with different values for `expId`, `datasetId`, `interval`, and `params`. The fetched values will persist in a sqlite database file configured in the config.properties file. To auto-trigger training the model(s) as soon as the target dataset iterations has been met:
 
     ```json
     {
@@ -173,16 +213,15 @@ OS name: "linux", version: "5.10.16.3-microsoft-standard-wsl2", arch: "amd64", f
     }
     ```
 
-    Make several of these requests with different values for `expId`, `datasetId`, `interval`, and `params`. The fetched values will appear as log outputs in the CTT's console.
 
-2. Unsubscribe to a training data feed
+### Unsubscribe to a training data feed
 
-    Unsubscribe to the data feed with a POST request to the following endpoint:
+Unsubscribe to the data feed with a POST request to the following endpoint:
     ```
-    http://<SUPERVISOR_HOST>:9999/api/v1/training/data/unsubscribe
+    http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/data/unsubscribe
     ```
 
-    With the payload:
+Sample payload:
     ```json
     {
         "expId": 123,
@@ -190,14 +229,105 @@ OS name: "linux", version: "5.10.16.3-microsoft-standard-wsl2", arch: "amd64", f
     }
     ```
 
-3. Train a model
 
-    Make an POST request to the following endpoint:
+### Send training data
+In some cases, clients generate their own training data to send to the app to train a model:
     ```
-    http://<SUPERVISOR_HOST>:9999/api/v1/training/:type/:group/:algorithm
+    http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/data/save
     ```
 
-    With the payload:
+Sample payload:
+    ```json
+    {
+        "expId": 123,
+        "datasetId": 1,
+        "data": [
+            [
+                {
+                    "name": "PARAM_10",
+                    "value": "1001",
+                    "dataType": 1,
+                    "timestamp": 1656803525000
+                },
+                {
+                    "name": "PARAM_20",
+                    "value": "2001",
+                    "dataType": 1,
+                    "timestamp": 1656803525000
+                },
+                {
+                    "name": "PARAM_30",
+                    "value": "3001",
+                    "dataType": 1,
+                    "timestamp": 1656803525000
+                }
+            ],
+            [
+                {
+                    "name": "PARAM_10",
+                    "value": "1002",
+                    "dataType": 1,
+                    "timestamp": 1656804525000
+                },
+                {
+                    "name": "PARAM_20",
+                    "value": "2002",
+                    "dataType": 1,
+                    "timestamp": 1656804525000
+                },
+                {
+                    "name": "PARAM_30",
+                    "value": "3002",
+                    "dataType": 1,
+                    "timestamp": 1656804525000
+                }
+            ],
+            [
+                {
+                    "name": "PARAM_10",
+                    "value": "1003",
+                    "dataType": 1,
+                    "timestamp": 1656805525000
+                },
+                {
+                    "name": "PARAM_20",
+                    "value": "2003",
+                    "dataType": 1,
+                    "timestamp": 1656805525000
+                },
+                {
+                    "name": "PARAM_30",
+                    "value": "3003",
+                    "dataType": 1,
+                    "timestamp": 1656805525000
+                }
+            ]
+        ],
+        "training": [
+            {
+                "type": "classifier",
+                "group": "bayesian",
+                "algorithm": "aode"
+            },
+            {
+                "type": "classifier",
+                "group": "boosting",
+                "algorithm": "bagging"
+            }
+        ]
+    }
+    ```
+
+The training parameter is optional and used to auto-trigger training the model(s).
+
+### Delete data
+
+Make an POST request to the following endpoint:
+    ```
+    http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/data/delete
+    ```
+
+Sample payload:
     ```json
     {
         "expId": 123,
@@ -205,48 +335,20 @@ OS name: "linux", version: "5.10.16.3-microsoft-standard-wsl2", arch: "amd64", f
     }
     ```
 
-## Related Issues
+### Train a model
 
-### Terminate App
+Make an POST request to the following endpoint:
+    ```
+    http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/:type/:group/:algorithm
+    ```
 
-Note: examples in this section are in PowerShell.
-
-Situation: The App did not shutdown gracefully despite terminating the Supervisor and the CTT. 
-Problem: Attempting to repeat installation step #3 to redeploy the app will result in a locked file error, e.g.:
-
-```powershell
- Failed to execute goal org.apache.maven.plugins:maven-dependency-plugin:3.1.0:copy-dependencies (copy-dependencies) on project package: Error copying artifact from C:\Users\honeycrisp\.m2\repository\com\tanagraspace\nmf\apps\saasy-ml\2.1.0-SNAPSHOT\saasy-ml-2.1.0-SNAPSHOT.jar to C:\Users\honeycrisp\Dev\Tanagra\ESA\opssat\saasy-ml\opssat-saasy-ml-nmf\sdk\sdk-package\target\nmf-sdk-2.1.0-SNAPSHOT\home\nmf\lib\saasy-ml-2.1.0-SNAPSHOT.jar: C:\Users\honeycrisp\Dev\Tanagra\ESA\opssat\saasy-ml\opssat-saasy-ml-nmf\sdk\sdk-package\target\nmf-sdk-2.1.0-SNAPSHOT\home\nmf\lib\saasy-ml-2.1.0-SNAPSHOT.jar: The process cannot access the file because it is being used by another process. -> [Help 1]
-```
-
-In this case, use the jps command to identify the process id of the culprit process (i.e. the SaaSyMLApp java process):
-
-```powershell
-> jps
-55880 org.eclipse.equinox.launcher_1.6.400.v20210924-0641.jar
-95404 SaaSyMLApp
-150140 Jps
-```
-
-Force kill the process, e.g. in Windows Terminal:
-
-```powershell
-> taskkill /F /PID 95404
-SUCCESS: The process with PID 95404 has been terminated.
-```
-
-Check that the process was indeed killed:
-
-```powershell
-> jps
-111924 Jps
-55880 org.eclipse.equinox.launcher_1.6.400.v20210924-0641.jar
-```
-
-Now the App can be redeployed.
-
-## API
-
-TBD
+Sample payload payload:
+    ```json
+    {
+        "expId": 123,
+        "datasetId": 1
+    }
+    ```
 
 
 ## References

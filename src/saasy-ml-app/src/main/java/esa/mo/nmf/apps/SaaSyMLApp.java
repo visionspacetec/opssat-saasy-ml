@@ -31,9 +31,6 @@ public final class SaaSyMLApp {
         // once all initialized, pass them to the M&C interface that handles the application's logic
         AppMCAdapter.getInstance().setConnector(connector);
         AppMCAdapter.getInstance().setSupervisorSMA(supervisorSMA);
-
-        // add data received listener
-        AppMCAdapter.getInstance().addDataReceivedListener();
     }
    
     
