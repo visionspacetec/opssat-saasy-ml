@@ -8,8 +8,8 @@ An NMF App for the OPS-SAT spacecraft. The app uses ML to train AI models with t
 - [Quick Install](#quick-install)
 - [Long Install](#long-install)
 - [Run App](#run-app)
-- [Make API Request](#make-api-request)
-- [Related Issues](#related-issues)
+- [Known Issue](#known-issue)
+- [API](#api)
 - [References](#references)
 
 ## Requirements
@@ -51,15 +51,15 @@ OS name: "linux", version: "5.10.16.3-microsoft-standard-wsl2", arch: "amd64", f
     SET NMF_SDK_PACKAGE_DIR=<FULL_PATH>\opssat-saasy-ml-nmf\sdk\sdk-package
     ```
 
-3. Modify the con/config.properties file to set the desired app configurations.
+3. Modify the **con/config.properties** file to set the desired app configurations.
 
 4. Modify the **sdk/sdk-package/pom.xml** copy instruction to match the environment's location
 
     ```xml
     <copy todir="${esa.nmf.sdk.assembly.outputdir}/home/saasy-ml">
-    <fileset dir="${basedir}/src/main/resources/space-common"/>
-    <fileset dir="${basedir}/src/main/resources/space-app-root"/>
-    <fileset dir="${basedir}/../../../opssat-saasy-ml/src/saasy-ml-app/conf"/>
+      <fileset dir="${basedir}/src/main/resources/space-common"/>
+      <fileset dir="${basedir}/src/main/resources/space-app-root"/>
+      <fileset dir="${basedir}/../../../opssat-saasy-ml/src/saasy-ml-app/conf"/>
     </copy>
     ```
 
@@ -138,33 +138,33 @@ Note: examples in this section are in PowerShell.
 Situation: The App did not shutdown gracefully despite terminating the Supervisor and the CTT. 
 Problem: Attempting to repeat installation step #3 to redeploy the app will result in a locked file error, e.g.:
 
-    ```powershell
-    Failed to execute goal org.apache.maven.plugins:maven-dependency-plugin:3.1.0:copy-dependencies (copy-dependencies) on project package: Error copying artifact from C:\Users\honeycrisp\.m2\repository\com\tanagraspace\nmf\apps\saasy-ml\2.1.0-SNAPSHOT\saasy-ml-2.1.0-SNAPSHOT.jar to C:\Users\honeycrisp\Dev\Tanagra\ESA\opssat\saasy-ml\opssat-saasy-ml-nmf\sdk\sdk-package\target\nmf-sdk-2.1.0-SNAPSHOT\home\nmf\lib\saasy-ml-2.1.0-SNAPSHOT.jar: C:\Users\honeycrisp\Dev\Tanagra\ESA\opssat\saasy-ml\opssat-saasy-ml-nmf\sdk\sdk-package\target\nmf-sdk-2.1.0-SNAPSHOT\home\nmf\lib\saasy-ml-2.1.0-SNAPSHOT.jar: The process cannot access the file because it is being used by another process. -> [Help 1]
-    ```
+```powershell
+Failed to execute goal org.apache.maven.plugins:maven-dependency-plugin:3.1.0:copy-dependencies (copy-dependencies) on project package: Error copying artifact from C:\Users\honeycrisp\.m2\repository\com\tanagraspace\nmf\apps\saasy-ml\2.1.0-SNAPSHOT\saasy-ml-2.1.0-SNAPSHOT.jar to C:\Users\honeycrisp\Dev\Tanagra\ESA\opssat\saasy-ml\opssat-saasy-ml-nmf\sdk\sdk-package\target\nmf-sdk-2.1.0-SNAPSHOT\home\nmf\lib\saasy-ml-2.1.0-SNAPSHOT.jar: C:\Users\honeycrisp\Dev\Tanagra\ESA\opssat\saasy-ml\opssat-saasy-ml-nmf\sdk\sdk-package\target\nmf-sdk-2.1.0-SNAPSHOT\home\nmf\lib\saasy-ml-2.1.0-SNAPSHOT.jar: The process cannot access the file because it is being used by another process. -> [Help 1]
+```
 
 In this case, use the jps command to identify the process id of the culprit process (i.e. the SaaSyMLApp java process):
 
-    ```powershell
-    > jps
-    55880 org.eclipse.equinox.launcher_1.6.400.v20210924-0641.jar
-    95404 SaaSyMLApp
-    150140 Jps
-    ```
+```powershell
+> jps
+55880 org.eclipse.equinox.launcher_1.6.400.v20210924-0641.jar
+95404 SaaSyMLApp
+150140 Jps
+```
 
 Force kill the process, e.g. in Windows Terminal:
 
-    ```powershell
-    > taskkill /F /PID 95404
-    SUCCESS: The process with PID 95404 has been terminated.
-    ```
+```powershell
+> taskkill /F /PID 95404
+SUCCESS: The process with PID 95404 has been terminated.
+```
 
 Check that the process was indeed killed:
 
-    ```powershell
-    > jps
-    111924 Jps
-    55880 org.eclipse.equinox.launcher_1.6.400.v20210924-0641.jar
-    ```
+```powershell
+> jps
+111924 Jps
+55880 org.eclipse.equinox.launcher_1.6.400.v20210924-0641.jar
+```
 
 Now the App can be redeployed.
 
@@ -174,181 +174,189 @@ Ad-hoc documentation of the app's API endpoints.
 ### Subscribe to a training data feed
 
 Use an API platform like [Postman](https://www.postman.com/) to make an POST request to the following endpoint:
-    ```
-    http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/data/subscribe
-    ```
+
+```
+http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/data/subscribe
+```
 
 Sample payload:
-    ```json
-    {
-        "expId": 123,
-        "datasetId": 1,
-        "iterations": 10,
-        "interval": 2,
-        "params": ["GNC_0005", "GNC_0011", "GNC_0007"]
-    }
-    ```
+
+```json
+{
+    "expId": 123,
+    "datasetId": 1,
+    "iterations": 10,
+    "interval": 2,
+    "params": ["GNC_0005", "GNC_0011", "GNC_0007"]
+}
+```
 
 Make several of these requests with different values for `expId`, `datasetId`, `interval`, and `params`. The fetched values will persist in a sqlite database file configured in the config.properties file. To auto-trigger training the model(s) as soon as the target dataset iterations has been met:
 
-    ```json
-    {
-        "expId": 123,
-        "datasetId": 1,
-        "iterations": 10,
-        "interval": 2,
-        "params": ["GNC_0005", "GNC_0011", "GNC_0007"],
-        "training": [
-            {
-                "type": "classifier",
-                "group": "bayesian",
-                "algorithm": "aode"
-            },
-            {
-                "type": "classifier",
-                "group": "boosting",
-                "algorithm": "bagging"
-            }
-        ]
-    }
-    ```
-
+```json
+{
+    "expId": 123,
+    "datasetId": 1,
+    "iterations": 10,
+    "interval": 2,
+    "params": ["GNC_0005", "GNC_0011", "GNC_0007"],
+    "training": [
+        {
+            "type": "classifier",
+            "group": "bayesian",
+            "algorithm": "aode"
+        },
+        {
+            "type": "classifier",
+            "group": "boosting",
+            "algorithm": "bagging"
+        }
+    ]
+}
+```
 
 ### Unsubscribe to a training data feed
 
 Unsubscribe to the data feed with a POST request to the following endpoint:
-    ```
-    http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/data/unsubscribe
-    ```
+
+```
+http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/data/unsubscribe
+```
 
 Sample payload:
-    ```json
-    {
-        "expId": 123,
-        "datasetId": 1
-    }
-    ```
 
+```json
+{
+    "expId": 123,
+    "datasetId": 1
+}
+```
 
 ### Send training data
 In some cases, clients generate their own training data to send to the app to train a model:
-    ```
-    http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/data/save
-    ```
+
+```
+http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/data/save
+```
 
 Sample payload:
-    ```json
-    {
-        "expId": 123,
-        "datasetId": 1,
-        "data": [
-            [
-                {
-                    "name": "PARAM_10",
-                    "value": "1001",
-                    "dataType": 1,
-                    "timestamp": 1656803525000
-                },
-                {
-                    "name": "PARAM_20",
-                    "value": "2001",
-                    "dataType": 1,
-                    "timestamp": 1656803525000
-                },
-                {
-                    "name": "PARAM_30",
-                    "value": "3001",
-                    "dataType": 1,
-                    "timestamp": 1656803525000
-                }
-            ],
-            [
-                {
-                    "name": "PARAM_10",
-                    "value": "1002",
-                    "dataType": 1,
-                    "timestamp": 1656804525000
-                },
-                {
-                    "name": "PARAM_20",
-                    "value": "2002",
-                    "dataType": 1,
-                    "timestamp": 1656804525000
-                },
-                {
-                    "name": "PARAM_30",
-                    "value": "3002",
-                    "dataType": 1,
-                    "timestamp": 1656804525000
-                }
-            ],
-            [
-                {
-                    "name": "PARAM_10",
-                    "value": "1003",
-                    "dataType": 1,
-                    "timestamp": 1656805525000
-                },
-                {
-                    "name": "PARAM_20",
-                    "value": "2003",
-                    "dataType": 1,
-                    "timestamp": 1656805525000
-                },
-                {
-                    "name": "PARAM_30",
-                    "value": "3003",
-                    "dataType": 1,
-                    "timestamp": 1656805525000
-                }
-            ]
-        ],
-        "training": [
+
+```json
+{
+    "expId": 123,
+    "datasetId": 1,
+    "data": [
+        [
             {
-                "type": "classifier",
-                "group": "bayesian",
-                "algorithm": "aode"
+                "name": "PARAM_10",
+                "value": "1001",
+                "dataType": 1,
+                "timestamp": 1656803525000
             },
             {
-                "type": "classifier",
-                "group": "boosting",
-                "algorithm": "bagging"
+                "name": "PARAM_20",
+                "value": "2001",
+                "dataType": 1,
+                "timestamp": 1656803525000
+            },
+            {
+                "name": "PARAM_30",
+                "value": "3001",
+                "dataType": 1,
+                "timestamp": 1656803525000
+            }
+        ],
+        [
+            {
+                "name": "PARAM_10",
+                "value": "1002",
+                "dataType": 1,
+                "timestamp": 1656804525000
+            },
+            {
+                "name": "PARAM_20",
+                "value": "2002",
+                "dataType": 1,
+                "timestamp": 1656804525000
+            },
+            {
+                "name": "PARAM_30",
+                "value": "3002",
+                "dataType": 1,
+                "timestamp": 1656804525000
+            }
+        ],
+        [
+            {
+                "name": "PARAM_10",
+                "value": "1003",
+                "dataType": 1,
+                "timestamp": 1656805525000
+            },
+            {
+                "name": "PARAM_20",
+                "value": "2003",
+                "dataType": 1,
+                "timestamp": 1656805525000
+            },
+            {
+                "name": "PARAM_30",
+                "value": "3003",
+                "dataType": 1,
+                "timestamp": 1656805525000
             }
         ]
-    }
-    ```
+    ],
+    "training": [
+        {
+            "type": "classifier",
+            "group": "bayesian",
+            "algorithm": "aode"
+        },
+        {
+            "type": "classifier",
+            "group": "boosting",
+            "algorithm": "bagging"
+        }
+    ]
+}
+```
 
 The training parameter is optional and used to auto-trigger training the model(s).
 
 ### Delete data
 
 Make an POST request to the following endpoint:
-    ```
-    http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/data/delete
-    ```
+
+```
+http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/data/delete
+```
 
 Sample payload:
-    ```json
-    {
-        "expId": 123,
-        "datasetId": 1
-    }
-    ```
+
+```json
+{
+    "expId": 123,
+    "datasetId": 1
+}
+```
 
 ### Train a model
 
 Make an POST request to the following endpoint:
-    ```
-    http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/:type/:group/:algorithm
-    ```
 
-Sample payload payload:
-    ```json
-    {
-        "expId": 123,
-        "datasetId": 1
-    }
-    ```
+```
+http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/:type/:group/:algorithm
+```
+
+Sample payload:
+
+```json
+{
+    "expId": 123,
+    "datasetId": 1
+}
+```
 
 
 ## References
