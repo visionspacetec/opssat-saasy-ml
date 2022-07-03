@@ -45,6 +45,12 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
                 paramNameList.add(trainingDataParamNameJsonArray.getString(i));
             }
 
+            // build Json payload object with just expId and datasetId
+            // this will be used for the training data count request
+            JsonObject countPayload = new JsonObject();
+            countPayload.put("expId", expId);
+            countPayload.put("datasetId", datasetId);
+
             try {
 
                 // keep track of param names
@@ -59,48 +65,65 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
                 {
                     // register periodic timer
                     vertx.setPeriodic(500, id -> {
-                        try {
-                            // get data received counter value
-                            int counter = ApplicationManager.getInstance().getReceivedDataCounter(expId, datasetId);
+                        vertx.eventBus().request("saasyml.training.data.count", countPayload, reply -> {
+                            JsonObject response = (JsonObject)(reply.result().body());
 
-                            if(counter < 0){
+                            // response object is somehow does not contain the expected parameter (impossible?)
+                            // stop timer if this happens
+                            if(!response.containsKey("count")){    
                                 vertx.cancelTimer(id);
 
-                            }else if(counter >= iterations){
-                                // disable parameter feed
-                                ApplicationManager.getInstance().enableSupervisorParametersSubscription(expId, datasetId, false);
-    
-                                // remove from map
-                                ApplicationManager.getInstance().removeAggregationHandler(expId, datasetId);
+                            } else {
+                                // get training data row count
+                                // fixme: dividing by paramNameList.size() will break if the number of params change during from one data fetching session to another for
+                                // the same expId and datasetId
+                                int counter = response.getInteger("count").intValue() / paramNameList.size();
 
-                                // remove data received counter
-                                ApplicationManager.getInstance().removeReceivedDataCounter(expId, datasetId);
+                                // the counter is set to -1 if there was an error while attempting to query the database
+                                // stop timer if  this happens
+                                if(counter < 0) {
+                                    vertx.cancelTimer(id);
+                                }
+                                else if(counter >= iterations) {
 
-                                // auto-trigger training if the payload is configured to do so
-                                if(payload.containsKey("training")) {
+                                    // target number of training dataset has been achieved
+                                    // unsubscribe from the training data feed
+                                    try {
+                                        // disable parameter feed
+                                        ApplicationManager.getInstance().enableSupervisorParametersSubscription(expId, datasetId, false);
+            
+                                        // remove the aggregation handler from the map
+                                        ApplicationManager.getInstance().removeAggregationHandler(expId, datasetId);
 
-                                    // the training parameters can be for more than one algorithm
-                                    final JsonArray trainings = payload.getJsonArray("training");
+                                        // auto-trigger training if the payload is configured to do so
+                                        if(payload.containsKey("training")) {
 
-                                    // trigger training for each request
-                                    for(int i = 0; i < trainings.size(); i++) {
-                                        final JsonObject t = trainings.getJsonObject(i);
+                                            // the training parameters can be for more than one algorithm
+                                            final JsonArray trainings = payload.getJsonArray("training");
 
-                                        // fetch training algorithm selection
-                                        String type = t.getString("type");
-                                        String group = t.getString("group");
-                                        String algorithm = t.getString("algorithm");
+                                            // trigger training for each request
+                                            for(int i = 0; i < trainings.size(); i++) {
+                                                final JsonObject t = trainings.getJsonObject(i);
 
-                                        // trigger training
-                                        vertx.eventBus().send("saasyml.training." + type + "." + group + "." + algorithm, payload);
+                                                // fetch training algorithm selection
+                                                String type = t.getString("type");
+                                                String group = t.getString("group");
+                                                String algorithm = t.getString("algorithm");
+
+                                                // trigger training
+                                                vertx.eventBus().send("saasyml.training." + type + "." + group + "." + algorithm, payload);
+                                            }
+                                        }
+
+                                        // can now stop this periodic check
+                                        vertx.cancelTimer(id);
+
+                                    } catch(Exception e) {
+                                        LOGGER.log(Level.SEVERE, "Failed to unsubscribe from training data feed.", e);
                                     }
                                 }
                             }
-    
-                        } catch(Exception e) {
-                            LOGGER.log(Level.SEVERE, "Failed to unsubscribe from training data feed.", e);
-                        }
-                        
+                        });    
                     });
                 }
 
@@ -133,8 +156,6 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
                 // remove from map
                 ApplicationManager.getInstance().removeAggregationHandler(expId, datasetId);
 
-                // remove data received counter
-                ApplicationManager.getInstance().removeReceivedDataCounter(expId, datasetId);
 
                 // response: success
                 msg.reply("Successfully unsubscribed to training data feed.");

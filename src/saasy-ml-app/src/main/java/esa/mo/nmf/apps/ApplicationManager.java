@@ -18,15 +18,10 @@ public class ApplicationManager {
     // map that contains all instances of aggregation handlers
     private Map<Pair<Integer, Integer>, AggregationHandler> aggregationHandlerMap;
 
-    // map that counts how many times data was pulled
-    private Map<Pair<Integer, Integer>, Integer> receivedDataCounterMap;
-    
-
     // hide the constructor
     private ApplicationManager() {
         this.paramNamesMap = new ConcurrentHashMap<Pair<Integer, Integer>, List<String>>();
         this.aggregationHandlerMap = new ConcurrentHashMap<Pair<Integer, Integer>, AggregationHandler>();
-        this.receivedDataCounterMap = new ConcurrentHashMap<Pair<Integer, Integer>, Integer>();
     }
 
     public static ApplicationManager getInstance() {
@@ -57,39 +52,6 @@ public class ApplicationManager {
         return this.paramNamesMap.get(new Pair<Integer, Integer>(expId, datasetId));
     }
 
-    public void setReceivedDataCounter(int expId, int datasetId, int counter) {
-        Pair<Integer, Integer> id = new Pair<Integer, Integer>(expId, datasetId);
-        this.receivedDataCounterMap.put(id, counter);
-    }
-
-    public int getReceivedDataCounter(int expId, int datasetId) {
-        Pair<Integer, Integer> id = new Pair<Integer, Integer>(expId, datasetId);
-
-        if(this.receivedDataCounterMap.containsKey(id)){
-            return this.receivedDataCounterMap.get(id);
-        }
-
-        return -1;
-    }
-
-    public void removeReceivedDataCounter(int expId, int datasetId) {
-        this.receivedDataCounterMap.remove(new Pair<Integer, Integer>(expId, datasetId));
-    }
-
-    public int incrementReceivedDataCounter(int expId, int datasetId) {
-        Pair<Integer, Integer> id = new Pair<Integer, Integer>(expId, datasetId);
-
-        if(!this.receivedDataCounterMap.containsKey(id)){
-            this.receivedDataCounterMap.put(id, 1);
-        }else{
-            this.receivedDataCounterMap.put(
-                id, (this.receivedDataCounterMap.get(id)+1)
-            );
-        }
-
-        return this.receivedDataCounterMap.get(id);
-    }
-
     public void addAggregationHandler(int expId, int datasetId, AggregationHandler aggregationHandler) {
         this.aggregationHandlerMap.put(new Pair<Integer, Integer>(expId, datasetId), aggregationHandler);
     }
@@ -101,7 +63,6 @@ public class ApplicationManager {
     public AggregationHandler getAggregationHandler(int expId, int datasetId) {
         return this.aggregationHandlerMap.get(new Pair<Integer, Integer>(expId, datasetId));
     }
-
 
     public void enableSupervisorParametersSubscription(int expId, int datasetId, boolean enable) throws Exception {
         Pair<Integer, Integer> id = new Pair<Integer, Integer>(expId, datasetId);
