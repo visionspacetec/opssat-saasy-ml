@@ -38,74 +38,57 @@ public class MainVerticle extends AbstractVerticle {
         // deployment options for multi-core and multi-threded goodness
         // specify the number of verticle instances that you want to deploy
         // this is useful for scaling easily across multiple cores
-        DeploymentOptions fetchTrainingDataDeployOpts = new DeploymentOptions()
-                .setWorker(true)
-                .setInstances(PropertiesManager.getInstance()
-                        .getVerticalInstanceCount(FetchTrainingDataVerticle.class.getSimpleName()));
+        DeploymentOptions[] deployOpts = new DeploymentOptions[3];
+        String[] simpleNames = new String[] { FetchTrainingDataVerticle.class.getSimpleName(),
+                        TrainModelVerticle.class.getSimpleName(), DatabaseVerticle.class.getSimpleName() };
+        String[] classNames = new String[] { "esa.mo.nmf.apps.verticles.FetchTrainingDataVerticle",
+                        "esa.mo.nmf.apps.verticles.TrainModelVerticle", "esa.mo.nmf.apps.verticles.DatabaseVerticle"};
 
-        DeploymentOptions trainModelDeployOpts = new DeploymentOptions()
-                .setWorker(true)
-                .setInstances(PropertiesManager.getInstance()
-                        .getVerticalInstanceCount(TrainModelVerticle.class.getSimpleName()));
-
-        DeploymentOptions databaseDeployOpts = new DeploymentOptions()
-                .setWorker(true)
-                .setInstances(PropertiesManager.getInstance()
-                        .getVerticalInstanceCount(DatabaseVerticle.class.getSimpleName()));
-
-        // deplopy the verticles
+        // create and deploy the verticles
         LOGGER.log(Level.INFO, "Deploying Verticles for port "+ port);
-        vertx.deployVerticle("esa.mo.nmf.apps.verticles.FetchTrainingDataVerticle", fetchTrainingDataDeployOpts);
-        vertx.deployVerticle("esa.mo.nmf.apps.verticles.TrainModelVerticle", trainModelDeployOpts);
-        vertx.deployVerticle("esa.mo.nmf.apps.verticles.DatabaseVerticle", databaseDeployOpts);
+        for (int index = 0; index < 3; index++) {
+            deployOpts[index].setWorker(true).setInstances(PropertiesManager.getInstance().getVerticalInstanceCount(simpleNames[index]));
+            vertx.deployVerticle(classNames[index], deployOpts[index]);
+        }
 
         // define router and api paths
         Router router = Router.router(vertx);
 
+        // todo: validate json payload against schema, see
+        // https://vertx.io/docs/vertx-web-validation/java/
+
         // route for training data feed subscription
         router.post("/api/v1/training/data/subscribe")
-                // todo: validate json payload against schema, see
-                // https://vertx.io/docs/vertx-web-validation/java/
                 .handler(BodyHandler.create())
-                .handler(this::subscribeToTrainingDataFeed);
+                .handler(this::trainingDataSubscribe);
 
         // route for training data feed unsubscription
         router.post("/api/v1/training/data/unsubscribe")
-                // todo: validate json payload against schema, see
-                // https://vertx.io/docs/vertx-web-validation/java/
                 .handler(BodyHandler.create())
-                .handler(this::unsubscribeFromTrainingDataFeed);
+                .handler(this::trainingDataUnsubscribe);
 
-        // route for training data feed unsubscription
+        // route for uploading custom training data feed 
         router.post("/api/v1/training/data/save")
-                // todo: validate json payload against schema, see
-                // https://vertx.io/docs/vertx-web-validation/java/
                 .handler(BodyHandler.create())
-                .handler(this::saveTrainingData);
+                .handler(this::trainingDataSave);
 
-        // route for training data feed unsubscription
+        // route for deleting training data feed 
         router.post("/api/v1/training/data/delete")
-                // todo: validate json payload against schema, see
-                // https://vertx.io/docs/vertx-web-validation/java/
                 .handler(BodyHandler.create())
-                .handler(this::deleteTrainingData);
+                .handler(this::trainingDataDelete);
 
-        // route to train model using given algorithm
+        // route for train type model, the given algorithm is pass by parameter
         router.post("/api/v1/training/:type/")
-                // todo: validate json payload against schema, see
-                // https://vertx.io/docs/vertx-web-validation/java/
                 .handler(BodyHandler.create())
-                .handler(this::trainModel);
+                .handler(this::trainingModel);
 
-        // route to train model using given algorithm
+        // route for train model using given algorithm
         router.post("/api/v1/training/:type/:group/:algorithm/")
-                // todo: validate json payload against schema, see
-                // https://vertx.io/docs/vertx-web-validation/java/
                 .handler(BodyHandler.create())
-                .handler(this::trainModel);
+                .handler(this::trainingModel);
 
         // todo
-        // route: inference
+        // route for inference
         // router.get("/api/v1/inference").handler(this::inference);
 
         // listen
@@ -117,7 +100,7 @@ public class MainVerticle extends AbstractVerticle {
      * 
      * @param ctx
      */
-    void subscribeToTrainingDataFeed(RoutingContext ctx) {
+    void trainingDataSubscribe(RoutingContext ctx) {
 
         // payload
         JsonObject payload = ctx.getBodyAsJson();
@@ -145,7 +128,7 @@ public class MainVerticle extends AbstractVerticle {
      * 
      * @param ctx
      */
-    void unsubscribeFromTrainingDataFeed(RoutingContext ctx) {
+    void trainingDataUnsubscribe(RoutingContext ctx) {
 
         // payload
         JsonObject payload = ctx.getBodyAsJson();
@@ -173,7 +156,7 @@ public class MainVerticle extends AbstractVerticle {
      * 
      * @param ctx
      */
-    void saveTrainingData(RoutingContext ctx) {
+    void trainingDataSave(RoutingContext ctx) {
         // payload
         JsonObject payload = ctx.getBodyAsJson();
 
@@ -196,7 +179,7 @@ public class MainVerticle extends AbstractVerticle {
      * 
      * @param ctx
      */
-    void deleteTrainingData(RoutingContext ctx) {
+    void trainingDataDelete(RoutingContext ctx) {
         // payload
         JsonObject payload = ctx.getBodyAsJson();
 
@@ -219,7 +202,7 @@ public class MainVerticle extends AbstractVerticle {
      * 
      * @param ctx
      */
-    void trainModel(RoutingContext ctx) {
+    void trainingModel(RoutingContext ctx) {
 
         // response map
         Map<String, String> resMap = new HashMap<String, String>();
