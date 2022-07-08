@@ -54,7 +54,7 @@ public class MainVerticle extends AbstractVerticle {
                         .getVerticalInstanceCount(DatabaseVerticle.class.getSimpleName()));
 
         // deplopy the verticles
-        LOGGER.log(Level.INFO, "Deploying Verticles.");
+        LOGGER.log(Level.INFO, "Deploying Verticles for port "+ port);
         vertx.deployVerticle("esa.mo.nmf.apps.verticles.FetchTrainingDataVerticle", fetchTrainingDataDeployOpts);
         vertx.deployVerticle("esa.mo.nmf.apps.verticles.TrainModelVerticle", trainModelDeployOpts);
         vertx.deployVerticle("esa.mo.nmf.apps.verticles.DatabaseVerticle", databaseDeployOpts);
