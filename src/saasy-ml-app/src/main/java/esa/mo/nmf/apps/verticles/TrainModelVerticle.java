@@ -14,17 +14,19 @@ public class TrainModelVerticle extends AbstractVerticle {
     @Override
     public void start() throws Exception {
 
-        vertx.eventBus().consumer("saasyml.training.classifier.bayesian.aode", msg -> {
+        // train classifier
+        vertx.eventBus().consumer("saasyml.training.classifier", msg -> {
 
             // the request payload (Json)
             JsonObject payload = (JsonObject) (msg.body());
-            LOGGER.log(Level.INFO,
-                    "training.classifier.bayesian.aode: triggered by the following POST request: "
-                            + payload.toString());
+            LOGGER.log(Level.INFO, "training.classifier: triggered by the following POST request: " + payload.toString());
 
             // parse the Json payload
             final int expId = payload.getInteger("expId").intValue();
             final int datasetId = payload.getInteger("datasetId").intValue();
+            final String group = payload.getString("group");
+            final String algorithm = payload.getString("algorithm");
+
 
             // todo:
             // 1. execute the training using the expId and datasetId to fetch traning data
@@ -38,37 +40,38 @@ public class TrainModelVerticle extends AbstractVerticle {
             // 3. Return a message with unique identifiers of the serizalized model (or
             // maybe just a path to it?)
 
-            msg.reply("training: classifier.bayesian.aode");
+            msg.reply(String.format("training: classifier %s %s", group, algorithm));
         });
 
-        vertx.eventBus().consumer("saasyml.training.classifier.bayesian.bestclassdistribution", msg -> {
+        // train outlier
+        vertx.eventBus().consumer("saasyml.training.outlier", msg -> {
             // the request payload (Json)
             JsonObject payload = (JsonObject) (msg.body());
-            LOGGER.log(Level.INFO,
-                    "training.classifier.bayesian.bestclassdistribution: triggered by the following POST request: "
-                            + payload.toString());
+            LOGGER.log(Level.INFO, "training.outlier: triggered by the following POST request: " + payload.toString());
 
-            msg.reply("training: classifier.bayesian.aode");
+            // parse the Json payload
+            final int expId = payload.getInteger("expId").intValue();
+            final int datasetId = payload.getInteger("datasetId").intValue();
+            final String group = payload.getString("group");
+            final String algorithm = payload.getString("algorithm");
+
+            msg.reply(String.format("training: outlier %s %s", group, algorithm));
+            
         });
 
-        vertx.eventBus().consumer("saasyml.training.classifier.boosting.bagging", msg -> {
+        // train clustering
+        vertx.eventBus().consumer("saasyml.training.clustering", msg -> {
             // the request payload (Json)
             JsonObject payload = (JsonObject) (msg.body());
-            LOGGER.log(Level.INFO,
-                    "training.classifier.boosting.bagging: triggered by the following POST request: "
-                            + payload.toString());
+            LOGGER.log(Level.INFO,"training.clustering: triggered by the following POST request: " + payload.toString());
 
-            msg.reply("training: classifier.boosting.bagging");
-        });
+            // parse the Json payload
+            final int expId = payload.getInteger("expId").intValue();
+            final int datasetId = payload.getInteger("datasetId").intValue();
+            final String group = payload.getString("group");
+            final String algorithm = payload.getString("algorithm");
 
-        vertx.eventBus().consumer("saasyml.training.classifier.boosting.samme", msg -> {
-            // the request payload (Json)
-            JsonObject payload = (JsonObject) (msg.body());
-            LOGGER.log(Level.INFO,
-                    "training.classifier.boosting.samme: triggered by the following POST request: "
-                            + payload.toString());
-
-            msg.reply("training: classifier.boosting.samme");
+            msg.reply(String.format("training: clustering %s %s", group, algorithm));
         });
 
     }

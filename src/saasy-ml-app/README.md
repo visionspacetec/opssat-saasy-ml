@@ -343,7 +343,7 @@ Sample payload:
 
 ### Train a model
 
-Make an POST request to the following endpoint:
+Make an POST request to the following endpoints:
 
 ```
 http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/:type/:group/:algorithm
@@ -358,6 +358,21 @@ Sample payload:
 }
 ```
 
+
+```
+http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/:type/
+```
+
+Sample payload:
+
+```json
+{
+    "expId": 123,
+    "datasetId": 1,
+    "group": "baye", 
+    "algorithm": "RandomForest"
+}
+```
 
 ## References
 

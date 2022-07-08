@@ -65,8 +65,7 @@ public class DatabaseVerticle extends AbstractVerticle {
                     LOGGER.log(Level.INFO, "Database connection created successfully.");
     
                     // check if training data table exists and create it if it does not.
-                    boolean tableExists = this.trainingDataTableExists();
-                    if(!tableExists) {
+                    if(!this.trainingDataTableExists()) {
                         this.createTrainingDataTable();
                         LOGGER.log(Level.INFO, "Created the training data table.");
                     }else {
@@ -159,11 +158,9 @@ public class DatabaseVerticle extends AbstractVerticle {
 
                             // fetch training algorithm selection
                             String type = t.getString("type");
-                            String group = t.getString("group");
-                            String algorithm = t.getString("algorithm");
 
                             // trigger training
-                            vertx.eventBus().send("saasyml.training." + type + "." + group + "." + algorithm, payload);
+                            vertx.eventBus().send("saasyml.training." + type, payload);
                         }
                     }
 
@@ -204,6 +201,7 @@ public class DatabaseVerticle extends AbstractVerticle {
 
         // count training data
         vertx.eventBus().consumer("saasyml.training.data.count", msg -> {
+
             // the request payload (Json)
             JsonObject payload = (JsonObject) (msg.body());
 
@@ -223,6 +221,7 @@ public class DatabaseVerticle extends AbstractVerticle {
             JsonObject response = new JsonObject();
             response.put("count", counter);
             msg.reply(response);
+            
         });
     }
 

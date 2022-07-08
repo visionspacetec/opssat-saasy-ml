@@ -91,7 +91,14 @@ public class MainVerticle extends AbstractVerticle {
                 .handler(this::deleteTrainingData);
 
         // route to train model using given algorithm
-        router.post("/api/v1/training/:type/:group/:algorithm")
+        router.post("/api/v1/training/:type/")
+                // todo: validate json payload against schema, see
+                // https://vertx.io/docs/vertx-web-validation/java/
+                .handler(BodyHandler.create())
+                .handler(this::trainModel);
+
+        // route to train model using given algorithm
+        router.post("/api/v1/training/:type/:group/:algorithm/")
                 // todo: validate json payload against schema, see
                 // https://vertx.io/docs/vertx-web-validation/java/
                 .handler(BodyHandler.create())
@@ -229,10 +236,14 @@ public class MainVerticle extends AbstractVerticle {
         String type = ctx.pathParam("type");
         String group = ctx.pathParam("group");
         String algorithm = ctx.pathParam("algorithm");
+        if (group != null)
+            payload.put("group", group);
+        if (algorithm != null)
+            payload.put("algorithm", algorithm);
 
         // forward request to event bus
         try {
-            vertx.eventBus().request("saasyml.training." + type + "." + group + "." + algorithm, payload, reply -> {
+            vertx.eventBus().request("saasyml.training." + type, payload, reply -> {
                 ctx.request().response().end((String) reply.result().body());
             });
         } catch (Exception e) {
@@ -241,8 +252,7 @@ public class MainVerticle extends AbstractVerticle {
             resMap.put("message", "unsupported or invalid training request");
 
             // error response
-            ctx.request().response()
-                    .putHeader("content-type", "application/json; charset=utf-8")
+            ctx.request().response().putHeader("content-type", "application/json; charset=utf-8")
                     .end(Json.encodePrettily(resMap));
         }
     }
