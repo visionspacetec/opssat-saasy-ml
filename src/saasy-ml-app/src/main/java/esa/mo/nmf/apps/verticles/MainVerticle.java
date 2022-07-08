@@ -47,7 +47,7 @@ public class MainVerticle extends AbstractVerticle {
         // create and deploy the verticles
         LOGGER.log(Level.INFO, "Deploying Verticles for port "+ port);
         for (int index = 0; index < 3; index++) {
-            deployOpts[index].setWorker(true).setInstances(PropertiesManager.getInstance().getVerticalInstanceCount(simpleNames[index]));
+            deployOpts[index] = new DeploymentOptions().setWorker(true).setInstances(PropertiesManager.getInstance().getVerticalInstanceCount(simpleNames[index]));
             vertx.deployVerticle(classNames[index], deployOpts[index]);
         }
 
