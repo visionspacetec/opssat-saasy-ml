@@ -25,8 +25,7 @@ public final class SaaSyMLApp {
         connector.init(AppMCAdapter.getInstance());
 
         // initialize application's NMF consumer (consuming the supervisor)
-        SpaceMOApdapterImpl supervisorSMA =
-            SpaceMOApdapterImpl.forNMFSupervisor(connector.readCentralDirectoryServiceURI());
+        SpaceMOApdapterImpl supervisorSMA = SpaceMOApdapterImpl.forNMFSupervisor(connector.readCentralDirectoryServiceURI());
 
         // once all initialized, pass them to the M&C interface that handles the application's logic
         AppMCAdapter.getInstance().setConnector(connector);

@@ -41,8 +41,8 @@ public class MainVerticle extends AbstractVerticle {
         DeploymentOptions[] deployOpts = new DeploymentOptions[3];
         String[] simpleNames = new String[] { FetchTrainingDataVerticle.class.getSimpleName(),
                         TrainModelVerticle.class.getSimpleName(), DatabaseVerticle.class.getSimpleName() };
-        String[] classNames = new String[] { "esa.mo.nmf.apps.verticles.FetchTrainingDataVerticle",
-                        "esa.mo.nmf.apps.verticles.TrainModelVerticle", "esa.mo.nmf.apps.verticles.DatabaseVerticle"};
+        String[] classNames = new String[] { FetchTrainingDataVerticle.class.getCanonicalName(),
+                        TrainModelVerticle.class.getCanonicalName(), DatabaseVerticle.class.getCanonicalName()};
 
         // create and deploy the verticles
         LOGGER.log(Level.INFO, "Deploying Verticles for port "+ port);
