@@ -107,11 +107,16 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
 
                                                 // fetch training algorithm selection
                                                 String type = t.getString("type");
-                                                String group = t.getString("group");
-                                                String algorithm = t.getString("algorithm");
+
+                                                // build JSON payload object 
+                                                JsonObject trainPayload = new JsonObject();
+                                                trainPayload.put("expId", expId);
+                                                trainPayload.put("datasetId", datasetId);
+                                                trainPayload.put("group", t.getString("group"));
+                                                trainPayload.put("algorithm", t.getString("algorithm"));
 
                                                 // trigger training
-                                                vertx.eventBus().send("saasyml.training." + type + "." + group + "." + algorithm, payload);
+                                                vertx.eventBus().send("saasyml.training." + type, trainPayload);
                                             }
                                         }
 

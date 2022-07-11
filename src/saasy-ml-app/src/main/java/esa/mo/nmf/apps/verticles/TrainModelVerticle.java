@@ -27,12 +27,46 @@ public class TrainModelVerticle extends AbstractVerticle {
             final String group = payload.getString("group");
             final String algorithm = payload.getString("algorithm");
 
-
             // todo:
-            // 1. execute the training using the expId and datasetId to fetch traning data
+            
+            // 1. Train model using the expId and datasetId to fetch traning data
             // that was stored from AggregationWrite.
+
+            // 1.1. get data using expId and datasetId
+            try{
+
+                // build Json payload object with just expId and datasetId
+                JsonObject selectPayload = new JsonObject();
+                selectPayload.put("expId", expId);
+                selectPayload.put("datasetId", datasetId);
+                
+                vertx.eventBus().request("saasyml.training.data.select", selectPayload, reply -> {
+                    JsonObject response = (JsonObject) (reply.result().body());
+                    
+                    LOGGER.log(Level.INFO, "result "+ response.toString());
+    
+                    // response object is somehow does not contain the expected parameter (impossible?)
+                    // stop timer if this happens
+                    if(!response.containsKey("count")){    
+    
+                    } else {
+                        
+                    }
+                });
+            } catch(Exception e){
+                // log
+                LOGGER.log(Level.SEVERE, "Failed to start Aggregation Handler.", e);
+
+                // response: error
+                msg.reply("Failed to subscribe to training data feed.");
+            } 
+                
+            // 1.2. prepare data 
+
+            // 1.3. train model 
             // Here we enter ML pipeline for the given algorithm
-            //
+
+
             // 2. Serialize and save the resulting model.
             // Make sure it is uniquely identifiable with expId and datasetId, maybe as part
             // of the toGround folder file system:
