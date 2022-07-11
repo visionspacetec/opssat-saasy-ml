@@ -17,6 +17,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.sql.Timestamp;
 
@@ -35,7 +36,8 @@ public class DatabaseVerticle extends AbstractVerticle {
     // sql query strings
     private final String SQL_INSERT_TRAINING_DATA = "INSERT INTO training_data(exp_id, dataset_id, param_name, data_type, value, timestamp) VALUES(?, ?, ?, ?, ?, ?)";
     private final String SQL_DELETE_TRAINING_DATA = "DELETE FROM training_data WHERE exp_id = ? AND dataset_id = ?";
-    private final String SQL_COUNT_TRAINING_DATA =  "SELECT count(*) FROM  training_data WHERE exp_id = ? AND dataset_id = ?";
+    private final String SQL_COUNT_TRAINING_DATA = "SELECT count(*) FROM  training_data WHERE exp_id = ? AND dataset_id = ?";
+    private final String SQL_SELECT_TRAINING_DATA = "SELECT * FROM training_data WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp DESC";
     private final String SQL_CREATE_TABLE_TRAINING_DATA = 
         "CREATE TABLE IF NOT EXISTS training_data(" +
             "exp_id INTEGER NOT NULL, " +
@@ -65,8 +67,7 @@ public class DatabaseVerticle extends AbstractVerticle {
                     LOGGER.log(Level.INFO, "Database connection created successfully.");
     
                     // check if training data table exists and create it if it does not.
-                    boolean tableExists = this.trainingDataTableExists();
-                    if(!tableExists) {
+                    if(!this.trainingDataTableExists()) {
                         this.createTrainingDataTable();
                         LOGGER.log(Level.INFO, "Created the training data table.");
                     }else {
@@ -159,11 +160,9 @@ public class DatabaseVerticle extends AbstractVerticle {
 
                             // fetch training algorithm selection
                             String type = t.getString("type");
-                            String group = t.getString("group");
-                            String algorithm = t.getString("algorithm");
 
                             // trigger training
-                            vertx.eventBus().send("saasyml.training." + type + "." + group + "." + algorithm, payload);
+                            vertx.eventBus().send("saasyml.training." + type, payload);
                         }
                     }
 
@@ -204,6 +203,7 @@ public class DatabaseVerticle extends AbstractVerticle {
 
         // count training data
         vertx.eventBus().consumer("saasyml.training.data.count", msg -> {
+
             // the request payload (Json)
             JsonObject payload = (JsonObject) (msg.body());
 
@@ -223,6 +223,32 @@ public class DatabaseVerticle extends AbstractVerticle {
             JsonObject response = new JsonObject();
             response.put("count", counter);
             msg.reply(response);
+            
+        });
+
+        // select training data
+        vertx.eventBus().consumer("saasyml.training.data.select", msg -> {
+
+            // the request payload (JSON)
+            JsonObject payload = (JsonObject) (msg.body());
+
+            // parse the JSON payload
+            final int expId = payload.getInteger("expId").intValue();
+            final int datasetId = payload.getInteger("datasetId").intValue();
+
+            // select training data records
+            JsonArray data = null;
+            try {
+                data = this.selectTrainingData(expId, datasetId);
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Error while trying to get training data in the database", e);
+            }
+            
+            // response
+            JsonObject response = new JsonObject();
+            response.put("data", data);
+            msg.reply(response);
+
         });
     }
 
@@ -266,9 +292,7 @@ public class DatabaseVerticle extends AbstractVerticle {
 
     private void deleteTrainingData(int expId, int datasetId) throws Exception {
         // create the prepared statement
-        PreparedStatement ps = this.conn.prepareStatement(
-            SQL_DELETE_TRAINING_DATA
-        );
+        PreparedStatement ps = this.conn.prepareStatement(SQL_DELETE_TRAINING_DATA);
 
         // set satement parameters
         ps.setInt(1, expId); // experiment id
@@ -280,9 +304,7 @@ public class DatabaseVerticle extends AbstractVerticle {
 
     private int countTrainingData(int expId, int datasetId) throws Exception {
         // create the prepared statement
-        PreparedStatement ps = this.conn.prepareStatement(
-            SQL_COUNT_TRAINING_DATA
-        );
+        PreparedStatement ps = this.conn.prepareStatement(SQL_COUNT_TRAINING_DATA);
 
         // set satement parameters
         ps.setInt(1, expId); // experiment id
@@ -294,6 +316,46 @@ public class DatabaseVerticle extends AbstractVerticle {
         // return the result
         rs.next();
         return rs.getInt(1);
+    }
+    
+    private JsonArray selectTrainingData(int expId, int datasetId) throws Exception {
+        
+        // create the prepared statement
+        PreparedStatement ps = this.conn.prepareStatement(SQL_SELECT_TRAINING_DATA);
+
+        // set statement parameters
+        ps.setInt(1, expId);
+        ps.setInt(2, datasetId);
+
+        // execute the select statement
+        ResultSet rs = ps.executeQuery();
+
+        // return the result
+        return toJSON(rs);
+
+    }
+
+    private JsonArray toJSON(ResultSet rs) {
+        JsonArray json = new JsonArray();
+
+        try {
+
+            ResultSetMetaData rsmd = rs.getMetaData();
+            int numColumns = rsmd.getColumnCount();
+    
+            while (rs.next()) {
+                JsonObject obj = new JsonObject();
+    
+                for (int i = 1; i <= numColumns; i++) {
+                    obj.put(rsmd.getColumnName(i), rs.getObject(i));
+                }
+                json.add(obj);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error while trying to get training data in the database", e);
+        }
+        
+        return json;
     }
 
     private boolean trainingDataTableExists() throws Exception {
