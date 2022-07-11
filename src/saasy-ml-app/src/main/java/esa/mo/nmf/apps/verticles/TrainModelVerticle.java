@@ -43,28 +43,25 @@ public class TrainModelVerticle extends AbstractVerticle {
                 vertx.eventBus().request("saasyml.training.data.select", selectPayload, reply -> {
                     JsonObject response = (JsonObject) (reply.result().body());
                     
-                    LOGGER.log(Level.INFO, "result "+ response.toString());
-    
                     // response object is somehow does not contain the expected parameter (impossible?)
-                    // stop timer if this happens
-                    if(!response.containsKey("count")){    
+                    if(!response.containsKey("data")){    
     
                     } else {
                         
+                        // 1.2. prepare data 
+
+                        // 1.3. train model 
+                        // Here we enter ML pipeline for the given algorithm
+
                     }
                 });
             } catch(Exception e){
                 // log
-                LOGGER.log(Level.SEVERE, "Failed to start Aggregation Handler.", e);
+                LOGGER.log(Level.SEVERE, "Failed to get training data.", e);
 
                 // response: error
-                msg.reply("Failed to subscribe to training data feed.");
+                msg.reply("Failed to get training data.");
             } 
-                
-            // 1.2. prepare data 
-
-            // 1.3. train model 
-            // Here we enter ML pipeline for the given algorithm
 
 
             // 2. Serialize and save the resulting model.
