@@ -33,6 +33,10 @@ public abstract class PipeLineAbstractJSAT implements IPipeLineLayer{
     /************ ATTRIBUTES **********/
     /**********************************/
 
+    // information of the experimenter and dataset
+    private int expId;
+    private int datasetId;
+
     // to use the thread JVM
     protected boolean thread = false;
 
@@ -40,7 +44,7 @@ public abstract class PipeLineAbstractJSAT implements IPipeLineLayer{
     protected boolean serialize = false;
     private String modelPath = "./models/";
     private String formatDate = "yyyy-MM-dd hh-mm-ss";
-    private String modelFileName = modelPath+"{MODEL_NAME}-{THREAD}-{DATE}.model";
+    private String modelFileName = modelPath + "{EXPID}-{DATASETID}-{MODEL_NAME}-{THREAD}-{DATE}.model";
 
     // data set to train and test
     protected DataSet train = null;
@@ -63,8 +67,11 @@ public abstract class PipeLineAbstractJSAT implements IPipeLineLayer{
      * @param modelName String that holds the name of the model
      * @param typeModel TypeModel that holds the kind of model
      */
-    public PipeLineAbstractJSAT(boolean thread, boolean serialize, String modelName, MLPipeLineFactory.TypeModel typeModel){
+    public PipeLineAbstractJSAT(int expId, int datasetId, boolean thread, boolean serialize, String modelName,
+            MLPipeLineFactory.TypeModel typeModel) {
 
+        this.expId = expId;
+        this.datasetId = datasetId;
         this.serialize = serialize;
         this.thread = thread;
         this.modelName = modelName;
@@ -168,7 +175,9 @@ public abstract class PipeLineAbstractJSAT implements IPipeLineLayer{
     protected String serializeModel(Object model) {
 
         String date = new SimpleDateFormat(this.formatDate).format(new Date());
-        String pathToSerializedModel = this.modelFileName.replace("{MODEL_NAME}", this.modelName);
+        String pathToSerializedModel = this.modelFileName.replace("{EXPID}", Integer.toString(this.expId));
+        pathToSerializedModel = this.modelFileName.replace("{DATASETID}", Integer.toString(this.datasetId));
+        pathToSerializedModel = this.modelFileName.replace("{MODEL_NAME}", this.modelName);
         pathToSerializedModel = pathToSerializedModel.replace("{DATE}", date);
         pathToSerializedModel = pathToSerializedModel.replace("{THREAD}", (this.thread)?"1":"0");
 

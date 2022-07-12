@@ -3,8 +3,13 @@ package esa.mo.nmf.apps.verticles;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import esa.mo.nmf.apps.saasyml.common.IPipeLineLayer;
+import esa.mo.nmf.apps.saasyml.dataset.utils.GenerateDataset;
+import esa.mo.nmf.apps.saasyml.factories.MLPipeLineFactory;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.json.JsonObject;
+import jsat.DataSet;
+import jsat.utils.random.RandomUtil;
 
 public class TrainModelVerticle extends AbstractVerticle {
 
@@ -42,9 +47,11 @@ public class TrainModelVerticle extends AbstractVerticle {
                 
                 vertx.eventBus().request("saasyml.training.data.select", selectPayload, reply -> {
                     JsonObject response = (JsonObject) (reply.result().body());
+
+                    LOGGER.log(Level.INFO, "saasyml.training.classifier - response: " + response.toString());
                     
                     // response object contains the data
-                    if(response.containsKey("data")){    
+                    if(response.containsKey("data")) {
     
                         // 1.2. prepare data 
 
@@ -52,9 +59,11 @@ public class TrainModelVerticle extends AbstractVerticle {
                         String modelName = "LogisticRegressionDCD";
 
                         // instantiate the class
-                        IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(thread, serialize, modelName);
+                        boolean thread = true;
+                        boolean serialize = true;
+                        IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(expId, datasetId, thread, serialize, modelName);
 
-                        logger.info("Generate training dataset...");
+                        LOGGER.log(Level.INFO, "Generate training dataset... ");
                         DataSet train = GenerateDataset.get2ClassLinear(200, RandomUtil.getRandom());
 
                         // build the model

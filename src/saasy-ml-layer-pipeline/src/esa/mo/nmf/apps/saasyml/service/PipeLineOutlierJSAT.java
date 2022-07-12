@@ -25,20 +25,24 @@ public class PipeLineOutlierJSAT extends PipeLineAbstractJSAT{
 
     private Outlier model = null;
 
+    private String pathToSerializedModel;
+
     /***********************************/
     /************ CONSTRUCTOR **********/
     /***********************************/
 
     /**
      * Constructor
+     * @param datasetId
+     * @param expId
      *
      * @param thread boolean variable that holds the activation of the thread
      * @param serialize boolean variable that holds if we should serialize the model or not
      * @param modelName String that holds the name of the model
      * @param typeModel TypeModel that holds the kind of model
      */
-    public PipeLineOutlierJSAT(boolean thread, boolean serialize, String modelName, MLPipeLineFactory.TypeModel typeModel){
-        super(thread, serialize, modelName, typeModel);
+    public PipeLineOutlierJSAT(int expId, int datasetId, boolean thread, boolean serialize, String modelName, MLPipeLineFactory.TypeModel typeModel){
+        super(expId, datasetId, thread, serialize, modelName, typeModel);
     }
 
     /**************************************/
@@ -57,14 +61,16 @@ public class PipeLineOutlierJSAT extends PipeLineAbstractJSAT{
     public void train(){
         // train the model
         this.model.fit((SimpleDataSet) train, thread);
+
+        if (serialize){
+            // serialize the model
+            this.pathToSerializedModel = serializeModel(model);
+        }
     }
 
     public void inference(){
 
         if (serialize){
-            // serialize the model
-            String pathToSerializedModel = serializeModel(model);
-
             // deserialize the model
             this.model = deserializeOutlier(pathToSerializedModel);
         }

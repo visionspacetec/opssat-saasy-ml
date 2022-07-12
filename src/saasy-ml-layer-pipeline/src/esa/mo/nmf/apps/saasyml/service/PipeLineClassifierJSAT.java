@@ -26,6 +26,8 @@ public class PipeLineClassifierJSAT extends PipeLineAbstractJSAT {
 
     private Classifier model = null;
 
+    private String pathToSerializedModel;
+
 
     /***********************************/
     /************ CONSTRUCTOR **********/
@@ -33,14 +35,16 @@ public class PipeLineClassifierJSAT extends PipeLineAbstractJSAT {
 
     /**
      * Constructor
+     * @param datasetId
+     * @param expId
      *
      * @param thread boolean variable that holds the activation of the thread
      * @param serialize boolean variable that holds if we should serialize the model or not
      * @param modelName String that holds the name of the model
      * @param typeModel TypeModel that holds the kind of model
      */
-    public PipeLineClassifierJSAT(boolean thread, boolean serialize, String modelName, MLPipeLineFactory.TypeModel typeModel){
-        super(thread, serialize, modelName, typeModel);
+    public PipeLineClassifierJSAT(int expId, int datasetId, boolean thread, boolean serialize, String modelName, MLPipeLineFactory.TypeModel typeModel){
+        super(expId, datasetId, thread, serialize, modelName, typeModel);
     }
 
     /**************************************/
@@ -59,13 +63,15 @@ public class PipeLineClassifierJSAT extends PipeLineAbstractJSAT {
     public void train(){
         // train the model
         model.train((ClassificationDataSet) train, thread);
+
+        if (serialize){
+            // serialize the model
+            this.pathToSerializedModel = serializeModel(model);
+        }
     }
 
     public void inference(){
         if (serialize){
-            // serialize the model
-            String pathToSerializedModel = serializeModel(model);
-
             // deserialize the model
             this.model = deserializeClassifier(pathToSerializedModel);
         }

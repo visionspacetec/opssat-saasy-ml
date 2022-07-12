@@ -37,7 +37,7 @@ public class SaaSyMLPipeLineTest {
         String modelName = "LogisticRegressionDCD";
 
         // instantiate the class
-        IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(thread, serialize, modelName);
+        IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(123, 1, thread, serialize, modelName);
 
         logger.info("Generate training dataset...");
         DataSet train = GenerateDataset.get2ClassLinear(200, RandomUtil.getRandom());
@@ -66,7 +66,7 @@ public class SaaSyMLPipeLineTest {
         String modelName = "FLAME";
 
         // instantiate the class
-        IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(thread, serialize, modelName);
+        IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(123, 1, thread, serialize, modelName);
 
         logger.info("Generate training dataset...");
         GridDataGenerator gdg = new GridDataGenerator(new Normal(0, 0.05), new Random(12), 2, 5);
@@ -97,7 +97,7 @@ public class SaaSyMLPipeLineTest {
         String modelName = "IsolationForest";
 
         // instantiate the class
-        IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(thread, serialize, modelName);
+        IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(123, 1, thread, serialize, modelName);
 
         logger.info("Generate training dataset...");
         int N = 5000;
