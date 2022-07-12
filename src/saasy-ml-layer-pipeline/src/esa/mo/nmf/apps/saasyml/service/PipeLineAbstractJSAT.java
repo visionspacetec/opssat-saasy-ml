@@ -176,8 +176,8 @@ public abstract class PipeLineAbstractJSAT implements IPipeLineLayer{
 
         String date = new SimpleDateFormat(this.formatDate).format(new Date());
         String pathToSerializedModel = this.modelFileName.replace("{EXPID}", Integer.toString(this.expId));
-        pathToSerializedModel = this.modelFileName.replace("{DATASETID}", Integer.toString(this.datasetId));
-        pathToSerializedModel = this.modelFileName.replace("{MODEL_NAME}", this.modelName);
+        pathToSerializedModel = pathToSerializedModel.replace("{DATASETID}", Integer.toString(this.datasetId));
+        pathToSerializedModel = pathToSerializedModel.replace("{MODEL_NAME}", this.modelName);
         pathToSerializedModel = pathToSerializedModel.replace("{DATE}", date);
         pathToSerializedModel = pathToSerializedModel.replace("{THREAD}", (this.thread)?"1":"0");
 
