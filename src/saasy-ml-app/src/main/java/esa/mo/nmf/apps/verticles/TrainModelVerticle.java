@@ -43,12 +43,28 @@ public class TrainModelVerticle extends AbstractVerticle {
                 vertx.eventBus().request("saasyml.training.data.select", selectPayload, reply -> {
                     JsonObject response = (JsonObject) (reply.result().body());
                     
-                    // response object is somehow does not contain the expected parameter (impossible?)
-                    if(!response.containsKey("data")){    
+                    // response object contains the data
+                    if(response.containsKey("data")){    
     
-                    } else {
-                        
                         // 1.2. prepare data 
+
+                        // name of the model
+                        String modelName = "LogisticRegressionDCD";
+
+                        // instantiate the class
+                        IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(thread, serialize, modelName);
+
+                        logger.info("Generate training dataset...");
+                        DataSet train = GenerateDataset.get2ClassLinear(200, RandomUtil.getRandom());
+
+                        // build the model
+                        saasyml.build(modelName);
+
+                        // upload the train dataset
+                        saasyml.setDataSet(train, null);
+
+                        // start training the model
+                        saasyml.train();
 
                         // 1.3. train model 
                         // Here we enter ML pipeline for the given algorithm
