@@ -3,10 +3,12 @@ package esa.mo.nmf.apps.verticles;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import esa.mo.nmf.apps.PropertiesManager;
 import esa.mo.nmf.apps.saasyml.common.IPipeLineLayer;
 import esa.mo.nmf.apps.saasyml.dataset.utils.GenerateDataset;
 import esa.mo.nmf.apps.saasyml.factories.MLPipeLineFactory;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import jsat.DataSet;
 import jsat.utils.random.RandomUtil;
@@ -47,27 +49,35 @@ public class TrainModelVerticle extends AbstractVerticle {
                 
                 vertx.eventBus().request("saasyml.training.data.select", selectPayload, reply -> {
                     JsonObject response = (JsonObject) (reply.result().body());
-
-                    LOGGER.log(Level.INFO, "saasyml.training.classifier - response: " + response.toString());
                     
                     // response object contains the data
                     if(response.containsKey("data")) {
     
                         // 1.2. prepare data 
+                        final JsonArray data = response.getJsonArray("data");
 
-                        // name of the model
-                        String modelName = "LogisticRegressionDCD";
+                        LOGGER.log(Level.INFO, data.toString());
+                        /*for(int i = 0; i < data.size(); i++){
+                            LOGGER.log(Level.INFO, data.);
+                            
+                        }*/
 
-                        // instantiate the class
-                        boolean thread = true;
-                        boolean serialize = true;
-                        IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(expId, datasetId, thread, serialize, modelName);
 
-                        LOGGER.log(Level.INFO, "Generate training dataset... ");
+                        LOGGER.log(Level.INFO, "Generate train data... ");
                         DataSet train = GenerateDataset.get2ClassLinear(200, RandomUtil.getRandom());
 
+                        // name of the algorithm
+                        // String algorithm = "LogisticRegressionDCD";
+
+                        // instantiate the class
+                        // get data from the configuration
+                        boolean thread = PropertiesManager.getInstance().getThread();
+                        boolean serialize = PropertiesManager.getInstance().getSerialize();
+                        IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(expId, datasetId, thread, serialize, algorithm);
+
+
                         // build the model
-                        saasyml.build(modelName);
+                        saasyml.build(algorithm);
 
                         // upload the train dataset
                         saasyml.setDataSet(train, null);
