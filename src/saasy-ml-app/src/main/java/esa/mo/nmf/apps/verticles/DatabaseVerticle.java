@@ -37,6 +37,7 @@ public class DatabaseVerticle extends AbstractVerticle {
     private final String SQL_INSERT_TRAINING_DATA = "INSERT INTO training_data(exp_id, dataset_id, param_name, data_type, value, timestamp) VALUES(?, ?, ?, ?, ?, ?)";
     private final String SQL_DELETE_TRAINING_DATA = "DELETE FROM training_data WHERE exp_id = ? AND dataset_id = ?";
     private final String SQL_COUNT_TRAINING_DATA = "SELECT count(*) FROM  training_data WHERE exp_id = ? AND dataset_id = ?";
+    private final String SQL_COUNT_COLUMNS_TRAINING_DATA = "SELECT count(*) FROM  training_data WHERE exp_id = ? AND dataset_id = ? GROUP BY timestamp LIMIT 1";
     private final String SQL_SELECT_TRAINING_DATA = "SELECT * FROM training_data WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp DESC";
     private final String SQL_CREATE_TABLE_TRAINING_DATA = 
         "CREATE TABLE IF NOT EXISTS training_data(" +
@@ -226,6 +227,31 @@ public class DatabaseVerticle extends AbstractVerticle {
             
         });
 
+        // count rows in training data
+        vertx.eventBus().consumer("saasyml.training.data.count_columns", msg -> {
+
+            // the request payload (Json)
+            JsonObject payload = (JsonObject) (msg.body());
+
+            // parse the Json payload
+            final int expId = payload.getInteger("expId").intValue();
+            final int datasetId = payload.getInteger("datasetId").intValue();
+
+            // count training data records
+            int counter = -1;
+            try {
+                counter = this.countRowsTrainingData(expId, datasetId);
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Error while trying to count training data rows in the database", e);
+            }
+
+            // response
+            JsonObject response = new JsonObject();
+            response.put("count", counter);
+            msg.reply(response);
+            
+        });
+
         // select training data
         vertx.eventBus().consumer("saasyml.training.data.select", msg -> {
 
@@ -305,6 +331,22 @@ public class DatabaseVerticle extends AbstractVerticle {
     private int countTrainingData(int expId, int datasetId) throws Exception {
         // create the prepared statement
         PreparedStatement ps = this.conn.prepareStatement(SQL_COUNT_TRAINING_DATA);
+
+        // set satement parameters
+        ps.setInt(1, expId); // experiment id
+        ps.setInt(2, datasetId); // dataset id
+
+        // execute the delete statement
+        ResultSet rs = ps.executeQuery();
+
+        // return the result
+        rs.next();
+        return rs.getInt(1);
+    }
+
+    private int countRowsTrainingData(int expId, int datasetId) throws Exception {
+        // create the prepared statement
+        PreparedStatement ps = this.conn.prepareStatement(SQL_COUNT_COLUMNS_TRAINING_DATA);
 
         // set satement parameters
         ps.setInt(1, expId); // experiment id
