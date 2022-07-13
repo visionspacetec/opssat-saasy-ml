@@ -12,6 +12,9 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.handler.impl.TotpAuthHandlerImpl;
 import jsat.DataSet;
+import jsat.classifiers.CategoricalData;
+import jsat.classifiers.ClassificationDataSet;
+import jsat.linear.DenseVector;
 import jsat.utils.random.RandomUtil;
 
 public class TrainModelVerticle extends AbstractVerticle {
@@ -64,34 +67,44 @@ public class TrainModelVerticle extends AbstractVerticle {
                         int total_columns = selectPayload.getInteger("total_cols");
                         
                         LOGGER.log(Level.INFO, "total columns : " + total_columns);
-                    
+
                         // response_select object contains the data
                         if(response_select.containsKey("data")) {
         
-                            // 1.2. Prepare data 
+                            // 1.2. Prepare data
+                           
+                            double[] tempTrainData = new double[total_columns]; // TRAIN
+                            ClassificationDataSet train = new ClassificationDataSet(total_columns, new CategoricalData[0], new CategoricalData(2)); // TRAIN
+                            
                             final JsonArray data = response_select.getJsonArray("data");
 
-                            long colCount = 0;
-                            int rowCount = 1;
-                            LOGGER.log(Level.INFO, String.format("row %d", rowCount));
+                            int colCount = 0;
                             for (int pos = 0; pos < data.size(); pos++) {
-                                
+
                                 // get the Json Object 
                                 JsonObject object = data.getJsonObject(pos);
+                                
+                                tempTrainData[colCount] = Double.parseDouble(object.getString("value")); // TRAIN
 
                                 colCount++;
 
-                                LOGGER.log(Level.INFO, String.format("%d %s %s (%s)", colCount, object.getString("param_name"), object.getString("value"), object.getString("data_type")));                            
+                                LOGGER.log(Level.INFO,
+                                        String.format("%d %s %s (%s)", colCount,
+                                        object.getString("param_name"),
+                                        object.getString("value"),
+                                        object.getString("data_type")));
 
+                                // if colcount is equal to total columns, we add a new row
                                 if (colCount == total_columns){
-                                    rowCount++;
                                     colCount = 0;
-                                    LOGGER.log(Level.INFO, String.format("row %d", rowCount));
+
+                                    train.addDataPoint(new DenseVector(tempTrainData), new int[0], 0); // TRAIN
+                                    tempTrainData = new double[total_columns]; // TRAIN
                                 }
                             }
 
-                            DataSet train = GenerateDataset.get2ClassLinear(200, RandomUtil.getRandom());
-                            LOGGER.log(Level.INFO, "Generated train data: \n" + train.toString());
+                            // DataSet train = GenerateDataset.get2ClassLinear(200, RandomUtil.getRandom());
+                            LOGGER.log(Level.INFO, "Generated train data: \n" + train.getDataPoint(0).getNumericalValues().toString());
 
                             // name of the algorithm
                             // String algorithm = "LogisticRegressionDCD";
