@@ -60,7 +60,7 @@ public class TrainModelVerticle extends AbstractVerticle {
                         selectPayload.put("total_cols", response.getInteger("count").intValue());
                     }
                 
-                    // TODO QUESTION. Can the above eventbus be called asynchronous?, if so, we can move the following eventBus out
+                    // TODO: Can the above eventbus be called asynchronous?, if so, we can move the following eventBus out
                     vertx.eventBus().request("saasyml.training.data.select", selectPayload, reply_select -> {
                         JsonObject response_select = (JsonObject) (reply_select.result().body());
 
