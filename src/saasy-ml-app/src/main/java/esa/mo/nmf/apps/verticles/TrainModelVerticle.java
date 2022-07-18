@@ -1,21 +1,18 @@
 package esa.mo.nmf.apps.verticles;
 
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import esa.mo.nmf.apps.PropertiesManager;
 import esa.mo.nmf.apps.saasyml.common.IPipeLineLayer;
-import esa.mo.nmf.apps.saasyml.dataset.utils.GenerateDataset;
 import esa.mo.nmf.apps.saasyml.factories.MLPipeLineFactory;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.handler.impl.TotpAuthHandlerImpl;
-import jsat.DataSet;
 import jsat.classifiers.CategoricalData;
 import jsat.classifiers.ClassificationDataSet;
 import jsat.linear.DenseVector;
-import jsat.utils.random.RandomUtil;
 
 public class TrainModelVerticle extends AbstractVerticle {
 
@@ -28,17 +25,28 @@ public class TrainModelVerticle extends AbstractVerticle {
         // train classifier
         vertx.eventBus().consumer("saasyml.training.classifier", msg -> {
 
+            // variables to generate the class randomly
+            Random rand = new Random();
+            int classification = 2;
+
             // the request payload (Json)
             JsonObject payload = (JsonObject) (msg.body());
-            LOGGER.log(Level.INFO, "training.classifier: triggered by the following POST request: " + payload.toString());
+            LOGGER.log(Level.INFO, "Started training.classifier."); //": triggered by the following POST request: " + payload.toString());
 
             // parse the Json payload
             final int expId = payload.getInteger("expId").intValue();
             final int datasetId = payload.getInteger("datasetId").intValue();
             final String group = payload.getString("group");
-            final String algorithm = payload.getString("algorithm");
+            final String algorithm = payload.getString("algorithm"); // "LogisticRegressionDCD";
 
-            // todo:
+            // instantiate the class
+            // get data from the configuration
+            boolean thread = PropertiesManager.getInstance().getThread();
+            boolean serialize = PropertiesManager.getInstance().getSerialize();
+            IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(expId, datasetId, thread, serialize, algorithm);
+
+            // build the model
+            saasyml.build();
             
             // 1. Train model using the expId and datasetId to fetch traning data
             // that was stored from AggregationWrite.
@@ -61,95 +69,90 @@ public class TrainModelVerticle extends AbstractVerticle {
                     }
                 
                     // TODO: Can the above eventbus be called asynchronous?, if so, we can move the following eventBus out
-                    vertx.eventBus().request("saasyml.training.data.select", selectPayload, reply_select -> {
-                        JsonObject response_select = (JsonObject) (reply_select.result().body());
+                    vertx.eventBus().request("saasyml.training.data.select", selectPayload, selectReply -> {
 
+                        // get the response from the select
+                        JsonObject selectResponse = (JsonObject) (selectReply.result().body());
+
+                        // the total number of columns
                         int total_columns = selectPayload.getInteger("total_cols");
-                        
-                        LOGGER.log(Level.INFO, "total columns : " + total_columns);
+                        // LOGGER.log(Level.INFO, "total columns : " + total_columns);
 
-                        // response_select object contains the data
-                        if(response_select.containsKey("data")) {
+                        // if the response_select object contains the data, we can continue
+                        if(selectResponse.containsKey("data")) {
         
                             // 1.2. Prepare data
-                           
-                            double[] tempTrainData = new double[total_columns]; // TRAIN
-                            ClassificationDataSet train = new ClassificationDataSet(total_columns, new CategoricalData[0], new CategoricalData(2)); // TRAIN
                             
-                            final JsonArray data = response_select.getJsonArray("data");
+                            // get the data with the result of the select
+                            final JsonArray data = selectResponse.getJsonArray("data");
 
+                            // create variables for the classification
+                            double[] tempTrainData = new double[total_columns]; // TRAIN
+                            ClassificationDataSet train = new ClassificationDataSet(total_columns,
+                                    new CategoricalData[0], new CategoricalData(classification)); // TRAIN
+
+                            // variable to control the number of columns
                             int colCount = 0;
+
+                            // iterate throughout all the data
                             for (int pos = 0; pos < data.size(); pos++) {
 
-                                // get the Json Object 
+                                // get the Json Object and store the value
                                 JsonObject object = data.getJsonObject(pos);
-                                
-                                tempTrainData[colCount] = Double.parseDouble(object.getString("value")); // TRAIN
+                                tempTrainData[colCount++] = Double.parseDouble(object.getString("value")); // TRAIN
 
-                                colCount++;
-
-                                LOGGER.log(Level.INFO,
+                                /*LOGGER.log(Level.INFO,
                                         String.format("%d %s %s (%s)", colCount,
                                         object.getString("param_name"),
                                         object.getString("value"),
-                                        object.getString("data_type")));
+                                        object.getString("data_type")));*/
 
                                 // if colcount is equal to total columns, we add a new row
-                                if (colCount == total_columns){
-                                    colCount = 0;
+                                if (colCount == total_columns) {
 
-                                    train.addDataPoint(new DenseVector(tempTrainData), new int[0], 0); // TRAIN
-                                    tempTrainData = new double[total_columns]; // TRAIN
+                                     // TRAIN
+                                    // we add a data point to our train dataset 
+                                    // with a random value of the class Y
+                                    train.addDataPoint(new DenseVector(tempTrainData), new int[0], rand.nextInt(classification));
+                                    
+                                    // we restart the count of cols to zero and the temporal train data
+                                    colCount = 0;
+                                    // TRAIN
+                                    tempTrainData = new double[total_columns]; 
                                 }
                             }
 
-                            // DataSet train = GenerateDataset.get2ClassLinear(200, RandomUtil.getRandom());
-                            LOGGER.log(Level.INFO, "Generated train data: \n" + train.getDataPoint(0).getNumericalValues().toString());
-
-                            // name of the algorithm
-                            // String algorithm = "LogisticRegressionDCD";
-
-                            // instantiate the class
-                            // get data from the configuration
-                            boolean thread = PropertiesManager.getInstance().getThread();
-                            boolean serialize = PropertiesManager.getInstance().getSerialize();
-                            IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(expId, datasetId, thread, serialize, algorithm);
-
-
-                            // build the model
-                            saasyml.build(algorithm);
+                            LOGGER.log(Level.INFO, "First row of the generated train data: " + train.getDataPoint(0).getNumericalValues().toString());
 
                             // upload the train dataset
                             saasyml.setDataSet(train, null);
-
-                            // start training the model
+        
+                            // 1.3. Here we enter ML pipeline for the given algorithm
+                            // 2. Serialize and save the resulting model.
+                            // Make sure it is uniquely identifiable with expId and datasetId, maybe as part
+                            // of the toGround folder file system:
                             saasyml.train();
 
-                            // 1.3. train model 
-                            // Here we enter ML pipeline for the given algorithm
-
+                            // 3. Return a message with unique identifiers of the serizalized model (or
+                            // maybe just a path to it?)
+                            // store path to model in response of reply
+                            JsonObject selectReponseReply = new JsonObject();
+                            selectReponseReply.put("model_path", saasyml.getModelPathSerialized());
+                            msg.reply(selectReponseReply);
+                
                         }
                     });
                 });
 
-                
-            } catch(Exception e){
+            } catch (Exception e) {
                 // log
                 LOGGER.log(Level.SEVERE, "Failed to get training data.", e);
 
                 // response: error
                 msg.reply("Failed to get training data.");
-            } 
+            }
 
-
-            // 2. Serialize and save the resulting model.
-            // Make sure it is uniquely identifiable with expId and datasetId, maybe as part
-            // of the toGround folder file system:
-            //
-            // 3. Return a message with unique identifiers of the serizalized model (or
-            // maybe just a path to it?)
-
-            msg.reply(String.format("training: classifier %s %s", group, algorithm));
+            // msg.reply(String.format("training: classifier %s %s", group, algorithm));
         });
 
         // train outlier

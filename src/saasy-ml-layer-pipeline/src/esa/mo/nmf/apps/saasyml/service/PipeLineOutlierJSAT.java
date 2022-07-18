@@ -25,8 +25,6 @@ public class PipeLineOutlierJSAT extends PipeLineAbstractJSAT{
 
     private Outlier model = null;
 
-    private String pathToSerializedModel;
-
     /***********************************/
     /************ CONSTRUCTOR **********/
     /***********************************/
@@ -49,13 +47,13 @@ public class PipeLineOutlierJSAT extends PipeLineAbstractJSAT{
     /************ PUBLIC METHODS **********/
     /**************************************/
 
-    public void build(String modelName){
+    public void build(){
         // build the model
         this.model = MLPipeLineFactory.buildModelOutlier(this.modelName);
     }
 
     public void build(String type, String[] parameters){
-        this.build(type);
+        this.build();
     }
 
     public void train(){
@@ -64,7 +62,7 @@ public class PipeLineOutlierJSAT extends PipeLineAbstractJSAT{
 
         if (serialize){
             // serialize the model
-            this.pathToSerializedModel = serializeModel(model);
+            this.modelPathSerialized = serializeModel(model);
         }
     }
 
@@ -72,7 +70,7 @@ public class PipeLineOutlierJSAT extends PipeLineAbstractJSAT{
 
         if (serialize){
             // deserialize the model
-            this.model = deserializeOutlier(pathToSerializedModel);
+            this.model = deserializeOutlier(modelPathSerialized);
         }
 
         // test the model
@@ -91,14 +89,14 @@ public class PipeLineOutlierJSAT extends PipeLineAbstractJSAT{
 
     /**
      * Function to deserialize a model
-     * @param pathToSerializedModel full path name of the model
+     * @param modelPathSerialized full path name of the serialized model
      * @return the model
      */
-    private Outlier deserializeOutlier(String pathToSerializedModel) {
+    private Outlier deserializeOutlier(String modelPathSerialized) {
 
         Outlier model = null;
 
-        try (ObjectInputStream objectinputstream = new ObjectInputStream(new FileInputStream(pathToSerializedModel));) {
+        try (ObjectInputStream objectinputstream = new ObjectInputStream(new FileInputStream(modelPathSerialized));) {
             model = (Outlier) objectinputstream.readObject();
         } catch (Exception e){ logger.debug("Error deserializing the model"); }
 

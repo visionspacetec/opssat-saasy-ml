@@ -58,6 +58,30 @@ public class MLPipeLineFactory {
         }
     }
 
+    /**
+     * Factory Design Pattern to create PipeLine
+     * @param datasetId
+     * @param expId
+     * @param thread that holds a boolean to activate the use of threads in the PipeLine
+     * @param serialize that holds a boolean to activate the serialization of models
+     * @param modelName that holds a String with the name of the model
+     * @param typeModel that holds the type of model to instantiate
+     * @return
+     */
+    public static IPipeLineLayer createPipeLine(int expId, int datasetId, boolean thread, boolean serialize, String modelName, TypeModel typeModel){
+
+        switch(typeModel){
+            case Classifier:
+                return new PipeLineClassifierJSAT(expId, datasetId, thread, serialize, modelName, typeModel);
+            case Cluster:
+                return new PipeLineClusterJSAT(expId, datasetId, thread, serialize, modelName, typeModel);
+            case Outlier:
+                return new PipeLineOutlierJSAT(expId, datasetId, thread, serialize, modelName, typeModel);
+            default:
+                return new PipeLineClassifierJSAT(expId, datasetId, thread, serialize, modelName, typeModel);
+        }
+    }
+
 
     /**
      * Generate classifier models

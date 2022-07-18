@@ -24,12 +24,24 @@ public interface IPipeLineLayer {
      * @param set of parameters
      */
     public void build(String type, String[] parameters);
-    public void build(String type);
+    public void build();
 
     /**
      * Start train of the model
      */
     public void train();
+    
+    /**
+     * Retrieve the path of the serialized model
+     * @return string that holds the path of the serialized model
+     */
+    public String getModelPathSerialized();
+    
+    /**
+     * Set the path of the serialized model
+     * @return string that holds the path of the serialized model
+     */
+    public void setModelPathSerialized(String modelPathSerialized);
 
     /**
      * Begin the inference process using the trained model

@@ -43,7 +43,7 @@ public class SaaSyMLPipeLineTest {
         DataSet train = GenerateDataset.get2ClassLinear(200, RandomUtil.getRandom());
 
         // build the model
-        saasyml.build(modelName);
+        saasyml.build();
 
         // upload the train dataset
         saasyml.setDataSet(train, null);
@@ -73,7 +73,7 @@ public class SaaSyMLPipeLineTest {
         DataSet train = gdg.generateData(100);
 
         // build the model
-        saasyml.build(modelName);
+        saasyml.build();
 
         // upload the train dataset
         saasyml.setDataSet(train, null);
@@ -104,7 +104,7 @@ public class SaaSyMLPipeLineTest {
         DataSet train = new GridDataGenerator(new Normal(), 1,1,1).generateData(N);
 
         // build the model
-        saasyml.build(modelName);
+        saasyml.build();
 
         // upload the train dataset
         saasyml.setDataSet(train, null);
