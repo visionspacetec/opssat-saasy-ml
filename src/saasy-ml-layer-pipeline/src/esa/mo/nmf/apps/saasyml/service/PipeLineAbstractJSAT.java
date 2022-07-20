@@ -106,7 +106,7 @@ public abstract class PipeLineAbstractJSAT implements IPipeLineLayer{
 
     public abstract void build();
 
-    public void build(String type, String[] parameters){
+    public void build(Object[] parameters){
         this.build();
     }
 
@@ -120,7 +120,7 @@ public abstract class PipeLineAbstractJSAT implements IPipeLineLayer{
         return "";
     }
 
-    public void setModelPath(String modelPathStored) {
+    public void setModelPathSerialized(String modelPathStored) {
         this.modelPathSerialized = modelPathStored;
     }
 

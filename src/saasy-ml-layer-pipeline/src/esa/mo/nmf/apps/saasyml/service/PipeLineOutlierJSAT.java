@@ -52,7 +52,7 @@ public class PipeLineOutlierJSAT extends PipeLineAbstractJSAT{
         this.model = MLPipeLineFactory.buildModelOutlier(this.modelName);
     }
 
-    public void build(String type, String[] parameters){
+    public void build(Object[] parameters){
         this.build();
     }
 

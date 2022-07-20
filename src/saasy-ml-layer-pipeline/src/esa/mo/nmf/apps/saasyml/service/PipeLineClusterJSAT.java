@@ -30,6 +30,9 @@ public class PipeLineClusterJSAT extends PipeLineAbstractJSAT{
     // clusters getting during the train model
     private List<List<DataPoint>> clusters;
 
+    // number of k-neightbors
+    private int k = 4;
+
     /***********************************/
     /************ CONSTRUCTOR **********/
     /***********************************/
@@ -54,10 +57,11 @@ public class PipeLineClusterJSAT extends PipeLineAbstractJSAT{
 
     public void build(){
         // build the model
-        this.model = MLPipeLineFactory.buildModelCluster(this.modelName);
+        this.model = MLPipeLineFactory.buildModelCluster(this.modelName, this.k);
     }
 
-    public void build(String type, String[] parameters){
+    public void build(Object[] parameters) {
+        this.k = (int) parameters[0];
         this.build();
     }
 

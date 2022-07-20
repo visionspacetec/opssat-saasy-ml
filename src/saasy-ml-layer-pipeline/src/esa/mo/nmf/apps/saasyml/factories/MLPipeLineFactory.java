@@ -101,11 +101,11 @@ public class MLPipeLineFactory {
      * @param modelName a string that holds the name of the model to create
      * @return Clusterer model
      */
-    public static Clusterer buildModelCluster(String modelName) {
+    public static Clusterer buildModelCluster(String modelName, int k) {
 
         switch (modelName){
             default:
-            case "FLAME" : return new FLAME(new EuclideanDistance(), 30, 800);
+            case "FLAME" : return new FLAME(new EuclideanDistance(), k, 800);
         }
     }
 

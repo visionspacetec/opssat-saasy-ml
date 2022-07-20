@@ -23,7 +23,7 @@ public interface IPipeLineLayer {
      * @param type of inference to realize (e.g., classification, Outlier, etc)
      * @param set of parameters
      */
-    public void build(String type, String[] parameters);
+    public void build(Object[] parameters);
     public void build();
 
     /**
