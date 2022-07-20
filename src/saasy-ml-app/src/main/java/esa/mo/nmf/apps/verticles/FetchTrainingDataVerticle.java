@@ -114,6 +114,8 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
                                                 trainPayload.put("datasetId", datasetId);
                                                 trainPayload.put("group", t.getString("group"));
                                                 trainPayload.put("algorithm", t.getString("algorithm"));
+                                                trainPayload.put("thread", t.getBoolean("thread"));
+                                                trainPayload.put("serialize", t.getBoolean("serialize"));
 
                                                 // trigger training
                                                 // vertx.eventBus().send("saasyml.training." + type, trainPayload);

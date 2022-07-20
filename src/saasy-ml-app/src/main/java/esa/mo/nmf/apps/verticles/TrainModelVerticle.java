@@ -48,7 +48,13 @@ public class TrainModelVerticle extends AbstractVerticle {
 
             // get data from the configuration
             boolean thread = PropertiesManager.getInstance().getThread();
+            if (payload.containsKey("thread")) {
+                thread = payload.getBoolean("thread");
+            }
             boolean serialize = PropertiesManager.getInstance().getSerialize();
+            if (payload.containsKey("serialize")) {
+                serialize = payload.getBoolean("serialize");
+            }
             IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(expId, datasetId, thread, serialize, algorithm);
 
             // build the model
