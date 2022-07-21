@@ -33,41 +33,45 @@ public class PipeLineClassifierJSAT extends PipeLineAbstractJSAT {
 
     /**
      * Constructor
+     * @param datasetId
+     * @param expId
      *
      * @param thread boolean variable that holds the activation of the thread
      * @param serialize boolean variable that holds if we should serialize the model or not
      * @param modelName String that holds the name of the model
      * @param typeModel TypeModel that holds the kind of model
      */
-    public PipeLineClassifierJSAT(boolean thread, boolean serialize, String modelName, MLPipeLineFactory.TypeModel typeModel){
-        super(thread, serialize, modelName, typeModel);
+    public PipeLineClassifierJSAT(int expId, int datasetId, boolean thread, boolean serialize, String modelName, MLPipeLineFactory.TypeModel typeModel){
+        super(expId, datasetId, thread, serialize, modelName, typeModel);
     }
 
     /**************************************/
     /************ PUBLIC METHODS **********/
     /**************************************/
 
-    public void build(String modelName){
+    public void build(){
         // build the model using the factory pattern
         this.model = MLPipeLineFactory.buildModelClassifier(this.modelName);
     }
 
-    public void build(String type, String[] parameters){
-        this.build(type);
+    public void build(Object[] parameters){
+        this.build();
     }
 
-    public void train(){
+    public void train() {
         // train the model
         model.train((ClassificationDataSet) train, thread);
+
+        if (serialize) {
+            // serialize the model
+            this.modelPathSerialized = serializeModel(model);
+        }
     }
 
     public void inference(){
         if (serialize){
-            // serialize the model
-            String pathToSerializedModel = serializeModel(model);
-
             // deserialize the model
-            this.model = deserializeClassifier(pathToSerializedModel);
+            this.model = deserializeClassifier(this.modelPathSerialized);
         }
 
         // test the model
@@ -82,14 +86,14 @@ public class PipeLineClassifierJSAT extends PipeLineAbstractJSAT {
 
     /**
      * Function to deserialize a model
-     * @param pathToSerializedModel full path name of the model
+     * @param modelPathSerialized full path name of the serialized model
      * @return the model
      */
-    private Classifier deserializeClassifier(String pathToSerializedModel) {
+    private Classifier deserializeClassifier(String modelPathSerialized) {
 
         Classifier model = null;
 
-        try (ObjectInputStream objectinputstream = new ObjectInputStream(new FileInputStream(pathToSerializedModel));) {
+        try (ObjectInputStream objectinputstream = new ObjectInputStream(new FileInputStream(modelPathSerialized));) {
             model = (Classifier) objectinputstream.readObject();
         } catch (Exception e){ logger.debug("Error deserializing the model"); }
 

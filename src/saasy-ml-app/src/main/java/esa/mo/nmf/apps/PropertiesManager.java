@@ -104,4 +104,12 @@ public class PropertiesManager {
     public String getDatabaseUrl() {
         return getProperty("db.url");
     }
+
+    public boolean getThread() {
+        return Boolean.parseBoolean(getProperty("mlpipeline.thread"));
+    }
+
+    public boolean getSerialize() {
+        return Boolean.parseBoolean(getProperty("mlpipeline.serialize"));
+    }
 }

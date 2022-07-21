@@ -114,9 +114,19 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
                                                 trainPayload.put("datasetId", datasetId);
                                                 trainPayload.put("group", t.getString("group"));
                                                 trainPayload.put("algorithm", t.getString("algorithm"));
+                                                trainPayload.put("thread", t.getBoolean("thread"));
 
                                                 // trigger training
-                                                vertx.eventBus().send("saasyml.training." + type, trainPayload);
+                                                // vertx.eventBus().send("saasyml.training." + type, trainPayload);
+                                                vertx.eventBus().request("saasyml.training." + type, trainPayload,
+                                                        trainReply -> {
+                                                    
+                                                            JsonObject trainResponse = (JsonObject) (trainReply.result().body());
+                                                            if (trainResponse.containsKey("model_path")) {
+                                                                LOGGER.log(Level.INFO, "model path: " + trainResponse.getString("model_path") + ".");
+                                                            }
+  
+                                                });
                                             }
                                         }
 

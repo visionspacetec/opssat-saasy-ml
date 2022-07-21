@@ -33,6 +33,10 @@ public abstract class PipeLineAbstractJSAT implements IPipeLineLayer{
     /************ ATTRIBUTES **********/
     /**********************************/
 
+    // information of the experimenter and dataset
+    private int expId;
+    private int datasetId;
+
     // to use the thread JVM
     protected boolean thread = false;
 
@@ -40,11 +44,14 @@ public abstract class PipeLineAbstractJSAT implements IPipeLineLayer{
     protected boolean serialize = false;
     private String modelPath = "./models/";
     private String formatDate = "yyyy-MM-dd hh-mm-ss";
-    private String modelFileName = modelPath+"{MODEL_NAME}-{THREAD}-{DATE}.model";
+    private String modelFileName = modelPath + "E{EXPID}-D{DATASETID}-{MODEL_NAME}-{DATE}.model"; // {THREAD}
 
     // data set to train and test
     protected DataSet train = null;
     protected DataSet test = null;
+
+    // full path of the model serialized
+    protected String modelPathSerialized;
 
     // name and type of the model
     protected String modelName = "";
@@ -63,8 +70,11 @@ public abstract class PipeLineAbstractJSAT implements IPipeLineLayer{
      * @param modelName String that holds the name of the model
      * @param typeModel TypeModel that holds the kind of model
      */
-    public PipeLineAbstractJSAT(boolean thread, boolean serialize, String modelName, MLPipeLineFactory.TypeModel typeModel){
+    public PipeLineAbstractJSAT(int expId, int datasetId, boolean thread, boolean serialize, String modelName,
+            MLPipeLineFactory.TypeModel typeModel) {
 
+        this.expId = expId;
+        this.datasetId = datasetId;
         this.serialize = serialize;
         this.thread = thread;
         this.modelName = modelName;
@@ -94,13 +104,25 @@ public abstract class PipeLineAbstractJSAT implements IPipeLineLayer{
         generateRandomDataset();
     }
 
-    public abstract void build(String modelName);
+    public abstract void build();
 
-    public void build(String type, String[] parameters){
-        this.build(type);
+    public void build(Object[] parameters){
+        this.build();
     }
 
     public abstract void train();
+    
+    public String getModelPathSerialized() {
+        if (serialize) {
+            // retrieve the path of the model
+            return this.modelPathSerialized;
+        }
+        return "";
+    }
+
+    public void setModelPathSerialized(String modelPathStored) {
+        this.modelPathSerialized = modelPathStored;
+    }
 
     public abstract void inference();
 
@@ -122,7 +144,8 @@ public abstract class PipeLineAbstractJSAT implements IPipeLineLayer{
      */
     private void generateRandomDataset() {
 
-        switch (typeModel){
+        switch (typeModel) {
+            default:
             case Classifier:
                 if (train == null) {
                     logger.info("Generate train dataset: ");
@@ -147,16 +170,16 @@ public abstract class PipeLineAbstractJSAT implements IPipeLineLayer{
                 int N = 5000;
                 if (train == null) {
                     logger.info("Generate train dataset: ");
-                    train = new GridDataGenerator(new Normal(), 1,1,1).generateData(N);
+                    train = new GridDataGenerator(new Normal(), 1, 1, 1).generateData(N);
                 }
 
                 if (test == null) {
                     logger.info("Generate test dataset: ");
-                    test = new GridDataGenerator(new Normal(10, 1.0), 1,1,1).generateData(N);
+                    test = new GridDataGenerator(new Normal(10, 1.0), 1, 1, 1).generateData(N);
                 }
                 break;
         }
-
+        
     }
 
     /**
@@ -168,9 +191,11 @@ public abstract class PipeLineAbstractJSAT implements IPipeLineLayer{
     protected String serializeModel(Object model) {
 
         String date = new SimpleDateFormat(this.formatDate).format(new Date());
-        String pathToSerializedModel = this.modelFileName.replace("{MODEL_NAME}", this.modelName);
+        String pathToSerializedModel = this.modelFileName.replace("{EXPID}", Integer.toString(this.expId));
+        pathToSerializedModel = pathToSerializedModel.replace("{DATASETID}", Integer.toString(this.datasetId));
+        pathToSerializedModel = pathToSerializedModel.replace("{MODEL_NAME}", this.modelName);
         pathToSerializedModel = pathToSerializedModel.replace("{DATE}", date);
-        pathToSerializedModel = pathToSerializedModel.replace("{THREAD}", (this.thread)?"1":"0");
+        // pathToSerializedModel = pathToSerializedModel.replace("{THREAD}", (this.thread)?"1":"0");
 
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(pathToSerializedModel));) {
             oos.writeObject(model);

@@ -204,7 +204,8 @@ Make several of these requests with different values for `expId`, `datasetId`, `
         {
             "type": "classifier",
             "group": "bayesian",
-            "algorithm": "aode"
+            "algorithm": "aode",
+            "thread" : false
         },
         {
             "type": "classifier",
@@ -214,6 +215,8 @@ Make several of these requests with different values for `expId`, `datasetId`, `
     ]
 }
 ```
+
+Note that the `thread` attribute in the `training` is optional. It allows to train the models with threads for multi-core. 
 
 ### Unsubscribe to a training data feed
 
