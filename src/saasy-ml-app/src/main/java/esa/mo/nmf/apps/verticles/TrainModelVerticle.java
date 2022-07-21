@@ -48,20 +48,23 @@ public class TrainModelVerticle extends AbstractVerticle {
 
             // get data from the configuration
             boolean thread = PropertiesManager.getInstance().getThread();
-            if (payload.containsKey("thread")) {
+            if (payload.containsKey("thread") && payload.getBoolean("thread") != null) {
                 thread = payload.getBoolean("thread");
             }
+            
             boolean serialize = PropertiesManager.getInstance().getSerialize();
-            if (payload.containsKey("serialize")) {
+            /* Does not make sense because we want always to store the model
+            if (payload.containsKey("serialize") && payload.getBoolean("serialize") != null) {
                 serialize = payload.getBoolean("serialize");
-            }
+            }*/
+            
+            // create the pipeline
             IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(expId, datasetId, thread, serialize, algorithm);
 
             // build the model
             saasyml.build();
             
-            // 1. Train model using the expId and datasetId to fetch traning data
-            // that was stored from AggregationWrite.
+            // 1. Train model using the expId and datasetId to fetch traning data that was stored from AggregationWrite.
 
             // 1.1. get data using expId and datasetId
             try{
@@ -80,7 +83,7 @@ public class TrainModelVerticle extends AbstractVerticle {
                         selectPayload.put("total_cols", response.getInteger("count").intValue());
                     }
                 
-                    // TODO: Can the above eventbus be called asynchronous?, if so, we can move the following eventBus out
+                    // select all the data from the dataset
                     vertx.eventBus().request("saasyml.training.data.select", selectPayload, selectReply -> {
 
                         // get the response from the select
@@ -177,7 +180,7 @@ public class TrainModelVerticle extends AbstractVerticle {
             
         });
 
-        // train clustering
+        // train clustering. TODO
         vertx.eventBus().consumer("saasyml.training.clustering", msg -> {
 
             // variables to generate the class randomly

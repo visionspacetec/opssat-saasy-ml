@@ -264,10 +264,14 @@ public class MainVerticle extends AbstractVerticle {
         String type = ctx.pathParam("type");
         String group = ctx.pathParam("group");
         String algorithm = ctx.pathParam("algorithm");
+        String thread = ctx.pathParam("thread");
+        
         if (group != null)
             payload.put("group", group);
         if (algorithm != null)
             payload.put("algorithm", algorithm);
+        if (thread != null)
+            payload.put("thread", thread);
 
         // forward request to event bus
         try {
