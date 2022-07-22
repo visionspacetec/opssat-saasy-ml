@@ -22,6 +22,9 @@ public final class Constants {
     public static final String LABEL_VALUE = "value";
     public static final String LABEL_TIMESTAMP = "timestamp";
     public static final String LABEL_TRAINING = "training";
+    public static final String LABEL_MODELS = "models";
+    public static final String LABEL_PATH = "path";
+    public static final String LABEL_THREAD = "thread";
 
     // labels for the endpoints
     public static final String LABEL_ENDPOINT_DATA_SUBSCRIBE = "/api/v1/training/data/subscribe";
@@ -44,6 +47,8 @@ public final class Constants {
 
     public static final String LABEL_CONSUMER_INFERENCE = "saasyml.inference";
     public static final String LABEL_CONSUMER_INFERENCE_CLASSIFIER = LABEL_CONSUMER_INFERENCE + ".classifier";
+
+
 
     
 

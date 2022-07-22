@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import javax.naming.ldap.Rdn;
 
+import esa.mo.nmf.apps.Constants;
 import esa.mo.nmf.apps.PropertiesManager;
 import esa.mo.nmf.apps.saasyml.common.IPipeLineLayer;
 import esa.mo.nmf.apps.saasyml.factories.MLPipeLineFactory;
@@ -113,7 +114,7 @@ public class TrainModelVerticle extends AbstractVerticle {
 
                                 // get the Json Object and store the value
                                 JsonObject object = data.getJsonObject(pos);
-                                tempTrainData[colCount++] = Double.parseDouble(object.getString("value")); // TRAIN
+                                tempTrainData[colCount++] = Double.parseDouble(object.getString(Constants.LABEL_VALUE)); // TRAIN
 
                                 // if colcount is equal to total columns, we add a new row
                                 if (colCount == total_columns) {
