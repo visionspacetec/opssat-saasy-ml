@@ -1,5 +1,6 @@
 package esa.mo.nmf.apps.verticles;
 
+import io.netty.util.internal.shaded.org.jctools.queues.MessagePassingQueue.Consumer;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.DeploymentOptions;
@@ -14,7 +15,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import esa.mo.helpertools.misc.Const;
 import esa.mo.nmf.apps.AppMCAdapter;
+import esa.mo.nmf.apps.Constants;
 import esa.mo.nmf.apps.PropertiesManager;
 
 
@@ -66,11 +69,13 @@ public class MainVerticle extends AbstractVerticle {
 
         // get the name of the Verticles
         String[] simpleNames = new String[] { FetchTrainingDataVerticle.class.getSimpleName(),
-                TrainModelVerticle.class.getSimpleName(), DatabaseVerticle.class.getSimpleName() };
+                TrainModelVerticle.class.getSimpleName(), DatabaseVerticle.class.getSimpleName(),
+                InferenceVerticle.class.getSimpleName() };
                 
         // get the canonical path/name of the Verticles
         String[] classNames = new String[] { FetchTrainingDataVerticle.class.getCanonicalName(),
-                TrainModelVerticle.class.getCanonicalName(), DatabaseVerticle.class.getCanonicalName()};
+                TrainModelVerticle.class.getCanonicalName(), DatabaseVerticle.class.getCanonicalName(),
+                InferenceVerticle.class.getCanonicalName() };
 
         // total number of Verticles
         int length = simpleNames.length;
@@ -104,38 +109,39 @@ public class MainVerticle extends AbstractVerticle {
         // https://vertx.io/docs/vertx-web-validation/java/
 
         // route for training data feed subscription
-        router.post("/api/v1/training/data/subscribe")
+        router.post(Constants.LABEL_ENDPOINT_DATA_SUBSCRIBE)
                 .handler(BodyHandler.create())
                 .handler(this::trainingDataSubscribe);
 
         // route for training data feed unsubscription
-        router.post("/api/v1/training/data/unsubscribe")
+        router.post(Constants.LABEL_ENDPOINT_DATA_UNSUBSCRIBE)
                 .handler(BodyHandler.create())
                 .handler(this::trainingDataUnsubscribe);
 
         // route for uploading custom training data feed 
-        router.post("/api/v1/training/data/save")
+        router.post(Constants.LABEL_ENDPOINT_DATA_SAVE)
                 .handler(BodyHandler.create())
                 .handler(this::trainingDataSave);
 
         // route for deleting training data feed 
-        router.post("/api/v1/training/data/delete")
+        router.post(Constants.LABEL_ENDPOINT_DATA_DELETE)
                 .handler(BodyHandler.create())
                 .handler(this::trainingDataDelete);
 
         // route for train type model, the given algorithm is pass by parameter
-        router.post("/api/v1/training/:type/")
+        router.post(Constants.LABEL_ENDPOINT_TRAINING)
                 .handler(BodyHandler.create())
                 .handler(this::trainingModel);
 
         // route for train model using given algorithm
-        router.post("/api/v1/training/:type/:group/:algorithm/")
+        router.post(Constants.LABEL_ENDPOINT_TRAINING_ALGORITHM)
                 .handler(BodyHandler.create())
                 .handler(this::trainingModel);
         
-        // todo
-        // route for inference
-        // router.get("/api/v1/inference").handler(this::inference);
+        // route for inference 
+        router.get(Constants.LABEL_ENDPOINT_INFERENCE)
+                .handler(BodyHandler.create())
+                .handler(this::inference);
 
         return router;
     }
@@ -152,7 +158,7 @@ public class MainVerticle extends AbstractVerticle {
 
         try {
             // forward request to event bus to be handled in the appropriate Verticle
-            vertx.eventBus().request("saasyml.training.data.subscribe", payload, reply -> {
+            vertx.eventBus().request(Constants.LABEL_CONSUMER_DATA_SUBSCRIBE, payload, reply -> {
                 // return response from the verticle
                 ctx.request().response().end((String) reply.result().body());
             });
@@ -180,7 +186,7 @@ public class MainVerticle extends AbstractVerticle {
 
         try {
             // forward request to event bus to be handled in the appropriate Verticle
-            vertx.eventBus().request("saasyml.training.data.unsubscribe", payload, reply -> {
+            vertx.eventBus().request(Constants.LABEL_CONSUMER_DATA_UNSUBSCRIBE, payload, reply -> {
                 // return response from the verticle
                 ctx.request().response().end((String) reply.result().body());
             });
@@ -207,7 +213,7 @@ public class MainVerticle extends AbstractVerticle {
 
         try {
             // forward request to event bus to be handled in the appropriate Verticle
-            vertx.eventBus().request("saasyml.training.data.save", payload, reply -> {
+            vertx.eventBus().request(Constants.LABEL_CONSUMER_DATA_SAVE, payload, reply -> {
                 // return response from the verticle
                 ctx.request().response().end((String) reply.result().body());
             });
@@ -230,7 +236,7 @@ public class MainVerticle extends AbstractVerticle {
 
         try {
             // forward request to event bus to be handled in the appropriate Verticle
-            vertx.eventBus().request("saasyml.training.data.delete", payload, reply -> {
+            vertx.eventBus().request(Constants.LABEL_CONSUMER_DATA_DELETE, payload, reply -> {
                 // return response from the verticle
                 ctx.request().response().end((String) reply.result().body());
             });
@@ -258,30 +264,23 @@ public class MainVerticle extends AbstractVerticle {
         // get api request url params
         // e.g. /api/v1/training/classifier/classifier.bayesian.aode
         // type is "classifier"
-        // group is "bayesian"
         // algorithm is "aode"
 
-        String type = ctx.pathParam("type");
-        String group = ctx.pathParam("group");
-        String algorithm = ctx.pathParam("algorithm");
-        String thread = ctx.pathParam("thread");
+        String type = ctx.pathParam(Constants.LABEL_TYPE);
+        String algorithm = ctx.pathParam(Constants.LABEL_ALGORITHMS);
         
-        if (group != null)
-            payload.put("group", group);
         if (algorithm != null)
-            payload.put("algorithm", algorithm);
-        if (thread != null)
-            payload.put("thread", thread);
+            payload.put(Constants.LABEL_ALGORITHMS, algorithm);
 
         // forward request to event bus
         try {
-            vertx.eventBus().request("saasyml.training." + type, payload, reply -> {
+            vertx.eventBus().request(Constants.LABEL_CONSUMER_TRAINING + "." + type, payload, reply -> {
                 ctx.request().response().end((String) reply.result().body());
             });
         } catch (Exception e) {
             // error object
-            resMap.put("request", "error");
-            resMap.put("message", "unsupported or invalid training request");
+            resMap.put(Constants.LABEL_RESPONSE, "error");
+            resMap.put(Constants.LABEL_MESSAGE, "unsupported or invalid training request");
 
             // error response
             ctx.request().response().putHeader("content-type", "application/json; charset=utf-8")
@@ -294,19 +293,39 @@ public class MainVerticle extends AbstractVerticle {
      * 
      * @param ctx
      */
-    /**
-     * void inference(RoutingContext ctx) {
-     * // response map
-     * Map<String, String> resMap = new HashMap<String, String>();
-     * 
-     * // populate map
-     * resMap.put("request", "inference");
-     * 
-     * // response
-     * ctx.request().response()
-     * .putHeader("content-type", "application/json; charset=utf-8")
-     * .end(Json.encodePrettily(resMap));
-     * }
-     */
+    void inference(RoutingContext ctx) {
+
+        // response map
+        Map<String, String> resMap = new HashMap<String, String>();
+
+        // get the payload
+        JsonObject payload = ctx.getBodyAsJson();
+
+        // get api request url payload
+        // e.g. /api/v1/inference/
+        // type is "classifier"
+
+        String type = payload.getString(Constants.LABEL_TYPE);
+
+        // forward request to event bus
+        try {
+            vertx.eventBus().request(Constants.LABEL_CONSUMER_INFERENCE + "." + type, payload, reply -> {
+                payload.put(Constants.LABEL_RESPONSE, (String) reply.result().body());
+                // ctx.request().response().end((String) reply.result().body());
+            });
+
+            resMap.put(Constants.LABEL_RESPONSE, payload.getString(Constants.LABEL_RESPONSE));
+
+        } catch (Exception e) {
+            // error object
+            resMap.put(Constants.LABEL_RESPONSE, "error");
+            resMap.put(Constants.LABEL_MESSAGE, "unsupported or invalid inference request");
+        }
+
+        // populate map with the response
+        ctx.request().response()
+        .putHeader("content-type", "application/json; charset=utf-8")
+        .end(Json.encodePrettily(resMap));
+    }
 
 }

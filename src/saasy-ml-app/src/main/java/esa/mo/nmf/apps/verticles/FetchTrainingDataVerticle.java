@@ -10,6 +10,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.JsonArray;
 
 import esa.mo.nmf.apps.ApplicationManager;
+import esa.mo.nmf.apps.Constants;
 
 public class FetchTrainingDataVerticle extends AbstractVerticle {
   
@@ -23,15 +24,15 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
         LOGGER.log(Level.INFO, "Starting a Verticle instance with deployment id " + this.deploymentID() + ".");
 
         // subscribe to a training data feed
-        vertx.eventBus().consumer("saasyml.training.data.subscribe", msg -> {
+        vertx.eventBus().consumer(Constants.LABEL_CONSUMER_DATA_SUBSCRIBE, msg -> {
 
             // the request payload (Json)
             JsonObject payload = (JsonObject)(msg.body());
             LOGGER.log(Level.INFO, "The POST request payload: " + payload.toString());
 
             // parse the Json payload
-            final int expId = payload.getInteger("expId").intValue();
-            final int datasetId = payload.getInteger("datasetId").intValue();
+            final int expId = payload.getInteger(Constants.LABEL_EXPID).intValue();
+            final int datasetId = payload.getInteger(Constants.LABEL_DATASETID).intValue();
             final double interval = payload.getInteger("interval").doubleValue();
             
             // iterations payload parameter is optional, set it to -1 if it wasn't provided
@@ -48,8 +49,8 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
             // build Json payload object with just expId and datasetId
             // this will be used for the training data count request
             JsonObject countPayload = new JsonObject();
-            countPayload.put("expId", expId);
-            countPayload.put("datasetId", datasetId);
+            countPayload.put(Constants.LABEL_EXPID, expId);
+            countPayload.put(Constants.LABEL_DATASETID, datasetId);
 
             try {
 
@@ -155,14 +156,14 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
         });
 
         // unsubscribe to a training data feed
-        vertx.eventBus().consumer("saasyml.training.data.unsubscribe", msg -> {
+        vertx.eventBus().consumer(Constants.LABEL_CONSUMER_DATA_UNSUBSCRIBE, msg -> {
             // the request payload (Json)
             JsonObject payload = (JsonObject)(msg.body());
             LOGGER.log(Level.INFO, "The POST request payload: " + payload.toString());
 
             // parse the Json payload
-            final int expId = payload.getInteger("expId").intValue();
-            final int datasetId = payload.getInteger("datasetId").intValue();
+            final int expId = payload.getInteger(Constants.LABEL_EXPID).intValue();
+            final int datasetId = payload.getInteger(Constants.LABEL_DATASETID).intValue();
 
             try {
                 // disable parameter feed
