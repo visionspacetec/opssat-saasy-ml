@@ -6,6 +6,7 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import esa.mo.nmf.apps.Constants;
 import esa.mo.nmf.apps.PropertiesManager;
 import esa.mo.nmf.apps.saasyml.common.IPipeLineLayer;
 import esa.mo.nmf.apps.saasyml.factories.MLPipeLineFactory;
@@ -28,17 +29,39 @@ public class InferenceVerticle extends AbstractVerticle {
     public void start() throws Exception {
 
         // inference classifier
-        vertx.eventBus().consumer("saasyml.inference.classifier", msg -> {
+        vertx.eventBus().consumer(Constants.LABEL_CONSUMER_INFERENCE_CLASSIFIER, msg -> {
 
-            
             // the request payload (Json)
             JsonObject payload = (JsonObject) (msg.body());
-            LOGGER.log(Level.INFO, "Started training.classifier");
+            LOGGER.log(Level.INFO, "Started inference.classifier");
 
             // parse the Json payload
-            final int expId = payload.getInteger("expId").intValue();
-            final int datasetId = payload.getInteger("datasetId").intValue();
-            final String algorithm = payload.getString("algorithm"); // "LogisticRegressionDCD";
+            final int expId = payload.getInteger(Constants.LABEL_EXPID).intValue();
+            final int datasetId = payload.getInteger(Constants.LABEL_DATASETID).intValue();
+
+            // get the data 
+
+            // get the models 
+
+            // for each model 
+
+                // create the pipeline with the minimun 
+
+                // do the inference
+                
+                // store the inference in the same json
+                
+            // retrieve the response
+
+            
+            
+            
+            
+            
+            
+            
+            
+            final String algorithm = payload.getString("algorithm"); 
 
             // get data from the configuration
             boolean thread = PropertiesManager.getInstance().getThread();
