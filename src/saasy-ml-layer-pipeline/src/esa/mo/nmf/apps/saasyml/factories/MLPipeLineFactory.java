@@ -1,5 +1,7 @@
 package esa.mo.nmf.apps.saasyml.factories;
 
+import javax.swing.SwingUtilities;
+
 import esa.mo.nmf.apps.saasyml.common.IPipeLineLayer;
 import esa.mo.nmf.apps.saasyml.service.PipeLineClassifierJSAT;
 import esa.mo.nmf.apps.saasyml.service.PipeLineClusterJSAT;
@@ -46,16 +48,7 @@ public class MLPipeLineFactory {
         // detect the type of the model
         TypeModel typeModel = MLPipeLineFactory.getTypeModel(modelName);
 
-        switch(typeModel){
-            case Classifier:
-                return new PipeLineClassifierJSAT(expId, datasetId, thread, serialize, modelName, typeModel);
-            case Cluster:
-                return new PipeLineClusterJSAT(expId, datasetId, thread, serialize, modelName, typeModel);
-            case Outlier:
-                return new PipeLineOutlierJSAT(expId, datasetId, thread, serialize, modelName, typeModel);
-            default:
-                return new PipeLineClassifierJSAT(expId, datasetId, thread, serialize, modelName, typeModel);
-        }
+        return createPipeLine(expId, datasetId, thread, serialize, modelName, typeModel);
     }
 
     /**
@@ -81,7 +74,6 @@ public class MLPipeLineFactory {
                 return new PipeLineClassifierJSAT(expId, datasetId, thread, serialize, modelName, typeModel);
         }
     }
-
 
     /**
      * Generate classifier models

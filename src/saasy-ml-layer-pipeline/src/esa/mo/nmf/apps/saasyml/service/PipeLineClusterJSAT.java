@@ -75,7 +75,7 @@ public class PipeLineClusterJSAT extends PipeLineAbstractJSAT{
         }
     }
 
-    public void inference(){
+    public List<Object> inference(){
 
         if (serialize){
             // deserialize the model
@@ -94,6 +94,8 @@ public class PipeLineClusterJSAT extends PipeLineAbstractJSAT{
                 }
             }
         }
+
+        return null;
     }
 
 

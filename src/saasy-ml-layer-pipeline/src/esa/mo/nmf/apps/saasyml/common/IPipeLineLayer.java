@@ -1,5 +1,7 @@
 package esa.mo.nmf.apps.saasyml.common;
 
+import java.util.List;
+
 import jsat.DataSet;
 
 /**
@@ -45,7 +47,8 @@ public interface IPipeLineLayer {
 
     /**
      * Begin the inference process using the trained model
+     * @return 
      */
-    public void inference();
+    public List<Object> inference();
 
 }

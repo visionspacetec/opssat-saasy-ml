@@ -431,12 +431,12 @@ Sample payload:
     "models": [
         {
             "path": "FULL-PATH-OF-SERIALIZED-THE-MODEL",
-            "type": "classifier",
+            "type": "Classifier",
             "thread" : true
         },
         {
             "path": "FULL-PATH-OF-SERIALIZED-THE-MODEL",
-            "type": "classifier"
+            "type": "Classifier"
         }
     ]
 

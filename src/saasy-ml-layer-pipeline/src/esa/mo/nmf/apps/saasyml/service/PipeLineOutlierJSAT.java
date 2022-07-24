@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.util.List;
 
 /**
  * Class that uses the JSAT library inside the PipeLine
@@ -66,7 +67,7 @@ public class PipeLineOutlierJSAT extends PipeLineAbstractJSAT{
         }
     }
 
-    public void inference(){
+    public List<Object> inference(){
 
         if (serialize){
             // deserialize the model
@@ -80,6 +81,7 @@ public class PipeLineOutlierJSAT extends PipeLineAbstractJSAT{
         double numOutliersInOutliers = ((SimpleDataSet)test).getDataPoints().stream().mapToDouble(model::score).filter(x -> x < 0).count();
         logger.info((numOutliersInOutliers / test.size()) + " vs " + 0.1);//Better say 90% are outliers!
 
+        return null;
     }
 
 

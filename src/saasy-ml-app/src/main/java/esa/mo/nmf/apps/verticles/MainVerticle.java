@@ -303,13 +303,10 @@ public class MainVerticle extends AbstractVerticle {
 
         // get api request url payload
         // e.g. /api/v1/inference/
-        // type is "classifier"
-
-        String type = payload.getString(Constants.LABEL_TYPE);
 
         // forward request to event bus
         try {
-            vertx.eventBus().request(Constants.LABEL_CONSUMER_INFERENCE + "." + type, payload, reply -> {
+            vertx.eventBus().request(Constants.LABEL_CONSUMER_INFERENCE, payload, reply -> {
                 payload.put(Constants.LABEL_RESPONSE, (String) reply.result().body());
                 // ctx.request().response().end((String) reply.result().body());
             });

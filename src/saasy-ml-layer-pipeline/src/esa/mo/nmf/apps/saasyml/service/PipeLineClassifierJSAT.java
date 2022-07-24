@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class that uses the JSAT library inside the PipeLine
@@ -68,16 +70,20 @@ public class PipeLineClassifierJSAT extends PipeLineAbstractJSAT {
         }
     }
 
-    public void inference(){
+    public List<Object> inference(){
         if (serialize){
             // deserialize the model
             this.model = deserializeClassifier(this.modelPathSerialized);
         }
 
         // test the model
+        List<Object> result = new ArrayList<Object>();
         for(DataPointPair<Integer> dpp : ((ClassificationDataSet)test).getAsDPPList()){
-            logger.info(dpp.getPair().longValue()+ " vs " + model.classify(dpp.getDataPoint()).mostLikely());
+            int classify = model.classify(dpp.getDataPoint()).mostLikely();
+            logger.info(dpp.getPair().longValue()+ " vs " + classify);
+            result.add(classify);
         }
+        return result;
     }
 
     /***************************************/
