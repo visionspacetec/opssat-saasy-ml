@@ -43,8 +43,12 @@ public class InferenceVerticle extends AbstractVerticle {
                 final JsonArray data = payload.getJsonArray(Constants.LABEL_DATA);
                 final JsonArray models = payload.getJsonArray(Constants.LABEL_MODELS);
 
+                LOGGER.log(Level.INFO, "1. parse payload");
+
                 // prepare the test data of the classifier
                 DataSet[] test = prepareClassifierTestData(data);
+
+                LOGGER.log(Level.INFO, "2. prepare data classifier");
 
                 // for each model 
                 Iterator<Object> iter = models.iterator();
@@ -60,23 +64,35 @@ public class InferenceVerticle extends AbstractVerticle {
                     boolean     serialize = true;
                     TypeModel   typeModel = TypeModel.valueOf(type);
 
+                    LOGGER.log(Level.INFO, "3. model "+path);
+
                     // create the pipeline with the minimun 
                     IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(expId, datasetId, thread, serialize, "test-"+type, typeModel);
 
                     // set the full path of the model
                     saasyml.setModelPathSerialized(path);
 
+                    LOGGER.log(Level.INFO, "4. create pipeline and set model path");
+
                     // for each test data
                     for (DataSet t : test){
                         
                         // set the test data
                         saasyml.setDataSet(null, t);
+                            
+                        LOGGER.log(Level.INFO, "5. set data set");
 
                         // do the inference
                         List<Object> objects = saasyml.inference();
+                        
+                        LOGGER.log(Level.INFO, "6. do inference");
+
                         List<Integer> inference = objects.stream()
                             .filter(element->element instanceof Integer)
                         .map(element->(Integer) element).collect(Collectors.toList());
+
+                        
+                        LOGGER.log(Level.INFO, "7. store the inference");
 
                         // store the inference in a list
                         model.put("inference", inference);
