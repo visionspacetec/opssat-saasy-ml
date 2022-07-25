@@ -16,11 +16,9 @@ import esa.mo.nmf.apps.saasyml.factories.MLPipeLineFactory.TypeModel;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import jsat.SimpleDataSet;
+import jsat.DataSet;
 import jsat.classifiers.CategoricalData;
 import jsat.classifiers.ClassificationDataSet;
-import jsat.classifiers.DataPoint;
-import jsat.distributions.Normal;
 import jsat.linear.DenseVector;
 
 public class InferenceVerticle extends AbstractVerticle {
@@ -46,7 +44,7 @@ public class InferenceVerticle extends AbstractVerticle {
                 final JsonArray models = payload.getJsonArray(Constants.LABEL_MODELS);
 
                 // prepare the test data of the classifier
-                ClassificationDataSet[] test = prepareClassifierTestData(data);
+                DataSet[] test = prepareClassifierTestData(data);
 
                 // for each model 
                 Iterator<Object> iter = models.iterator();
@@ -69,7 +67,7 @@ public class InferenceVerticle extends AbstractVerticle {
                     saasyml.setModelPathSerialized(path);
 
                     // for each test data
-                    for (ClassificationDataSet t : test){
+                    for (DataSet t : test){
                         
                         // set the test data
                         saasyml.setDataSet(null, t);
@@ -106,14 +104,14 @@ public class InferenceVerticle extends AbstractVerticle {
 
     }
 
-    private ClassificationDataSet[] prepareClassifierTestData(JsonArray data) {
+    private DataSet[] prepareClassifierTestData(JsonArray data) {
         
         // variables to generate the class randomly
         Random rand = new Random();
         int classification = 2;
 
         // create the lists of tests
-        List<ClassificationDataSet> tests = new ArrayList<ClassificationDataSet>();
+        List<DataSet> tests = new ArrayList<DataSet>();
 
         // fetch data
         data.forEach(dataset -> {
@@ -135,15 +133,15 @@ public class InferenceVerticle extends AbstractVerticle {
                 JsonObject p = (JsonObject) iter.next();
 
                 // store the values of the parameters
-                tempTestData[count++] = Double.parseDouble(p.getString(Constants.LABEL_VALUE)); // TRAIN
+                tempTestData[count++] = Double.parseDouble(p.getString(Constants.LABEL_VALUE)); 
             }
             
             // create the data point of the test data
-            tests.get(index).addDataPoint(new DenseVector(tempTestData), new int[0], rand.nextInt(classification));
+            ((ClassificationDataSet)tests.get(index)).addDataPoint(new DenseVector(tempTestData), new int[0], rand.nextInt(classification));
 
         });
 
         // retrieve the list of tests
-        return tests.toArray(new ClassificationDataSet[0]);
+        return tests.toArray(new DataSet[0]);
     }
 }

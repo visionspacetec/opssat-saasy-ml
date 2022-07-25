@@ -10,7 +10,7 @@ public final class Constants {
 
     // labels 
     public static final String LABEL_TYPE = "type";
-    public static final String LABEL_ALGORITHMS = "algorithm";
+    public static final String LABEL_ALGORITHM = "algorithm";
     public static final String LABEL_REQUEST = "request";
     public static final String LABEL_RESPONSE = "response";
     public static final String LABEL_MESSAGE = "message";
@@ -25,6 +25,11 @@ public final class Constants {
     public static final String LABEL_MODELS = "models";
     public static final String LABEL_PATH = "path";
     public static final String LABEL_THREAD = "thread";
+    public static final String LABEL_INTERVAL = "interval";
+    public static final String LABEL_ITERATIONS = "iterations";
+    public static final String LABEL_PARAMS = "params";
+    public static final String LABEL_COUNT = "count";
+    public static final String LABEL_MODEL_PATH = "model_path";
 
     // labels for the endpoints
     public static final String LABEL_ENDPOINT_DATA_SUBSCRIBE = "/api/v1/training/data/subscribe";

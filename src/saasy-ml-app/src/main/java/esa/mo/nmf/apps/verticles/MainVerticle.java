@@ -3,6 +3,7 @@ package esa.mo.nmf.apps.verticles;
 import io.netty.util.internal.shaded.org.jctools.queues.MessagePassingQueue.Consumer;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
+import io.vertx.core.eventbus.Message;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
@@ -139,7 +140,7 @@ public class MainVerticle extends AbstractVerticle {
                 .handler(this::trainingModel);
         
         // route for inference 
-        router.get(Constants.LABEL_ENDPOINT_INFERENCE)
+        router.post(Constants.LABEL_ENDPOINT_INFERENCE)
                 .handler(BodyHandler.create())
                 .handler(this::inference);
 
@@ -267,24 +268,25 @@ public class MainVerticle extends AbstractVerticle {
         // algorithm is "aode"
 
         String type = ctx.pathParam(Constants.LABEL_TYPE);
-        String algorithm = ctx.pathParam(Constants.LABEL_ALGORITHMS);
-        
+        String algorithm = ctx.pathParam(Constants.LABEL_ALGORITHM);        
         if (algorithm != null)
-            payload.put(Constants.LABEL_ALGORITHMS, algorithm);
+            payload.put(Constants.LABEL_ALGORITHM, algorithm);
 
         // forward request to event bus
         try {
-            vertx.eventBus().request(Constants.LABEL_CONSUMER_TRAINING + "." + type, payload, reply -> {
-                ctx.request().response().end((String) reply.result().body());
+            vertx.eventBus().request(Constants.LABEL_CONSUMER_TRAINING + "." + type, payload, reply -> {                
+                JsonObject json = (JsonObject) reply.result().body();
+                /*if (json != null) {
+                    LOGGER.log(Level.INFO, "json body: " + json.getClass());
+                }*/                
+                ctx.request().response().putHeader("Content-Type", "application/json; charset=utf-8").end(json.encode());
             });
+
         } catch (Exception e) {
             // error object
             resMap.put(Constants.LABEL_RESPONSE, "error");
-            resMap.put(Constants.LABEL_MESSAGE, "unsupported or invalid training request");
-
-            // error response
-            ctx.request().response().putHeader("content-type", "application/json; charset=utf-8")
-                    .end(Json.encodePrettily(resMap));
+            resMap.put(Constants.LABEL_MESSAGE, "unsupported or invalid training request");            
+            ctx.request().response().end("Error message with JSON: " + (String) Json.encodePrettily(resMap));
         }
     }
 
@@ -307,22 +309,16 @@ public class MainVerticle extends AbstractVerticle {
         // forward request to event bus
         try {
             vertx.eventBus().request(Constants.LABEL_CONSUMER_INFERENCE, payload, reply -> {
-                payload.put(Constants.LABEL_RESPONSE, (String) reply.result().body());
-                // ctx.request().response().end((String) reply.result().body());
+                JsonObject json = (JsonObject) reply.result().body();
+                ctx.request().response().putHeader("Content-Type", "application/json; charset=utf-8").end(json.encode());
             });
-
-            resMap.put(Constants.LABEL_RESPONSE, payload.getString(Constants.LABEL_RESPONSE));
 
         } catch (Exception e) {
             // error object
             resMap.put(Constants.LABEL_RESPONSE, "error");
             resMap.put(Constants.LABEL_MESSAGE, "unsupported or invalid inference request");
+            ctx.request().response().end("Error message with JSON: " + (String) Json.encodePrettily(resMap));
         }
-
-        // populate map with the response
-        ctx.request().response()
-        .putHeader("content-type", "application/json; charset=utf-8")
-        .end(Json.encodePrettily(resMap));
     }
 
 }
