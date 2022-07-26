@@ -10,6 +10,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.JsonArray;
 
 import esa.mo.nmf.apps.ApplicationManager;
+import esa.mo.nmf.apps.Constants;
 
 public class FetchTrainingDataVerticle extends AbstractVerticle {
   
@@ -23,22 +24,22 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
         LOGGER.log(Level.INFO, "Starting a Verticle instance with deployment id " + this.deploymentID() + ".");
 
         // subscribe to a training data feed
-        vertx.eventBus().consumer("saasyml.training.data.subscribe", msg -> {
+        vertx.eventBus().consumer(Constants.LABEL_CONSUMER_DATA_SUBSCRIBE, msg -> {
 
             // the request payload (Json)
             JsonObject payload = (JsonObject)(msg.body());
             LOGGER.log(Level.INFO, "The POST request payload: " + payload.toString());
 
             // parse the Json payload
-            final int expId = payload.getInteger("expId").intValue();
-            final int datasetId = payload.getInteger("datasetId").intValue();
-            final double interval = payload.getInteger("interval").doubleValue();
+            final int expId = payload.getInteger(Constants.LABEL_EXPID).intValue();
+            final int datasetId = payload.getInteger(Constants.LABEL_DATASETID).intValue();
+            final double interval = payload.getInteger(Constants.LABEL_INTERVAL).doubleValue();
             
             // iterations payload parameter is optional, set it to -1 if it wasn't provided
-            final int iterations = payload.containsKey("iterations") ? payload.getInteger("iterations").intValue() : -1;
+            final int iterations = payload.containsKey(Constants.LABEL_ITERATIONS) ? payload.getInteger(Constants.LABEL_ITERATIONS).intValue() : -1;
             
             // create list of training data param names from JsonArray
-            final JsonArray trainingDataParamNameJsonArray = payload.getJsonArray("params");
+            final JsonArray trainingDataParamNameJsonArray = payload.getJsonArray(Constants.LABEL_PARAMS);
 
             List<String> paramNameList = new ArrayList<String>();
             for(int i = 0; i < trainingDataParamNameJsonArray.size(); i++){
@@ -48,8 +49,8 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
             // build Json payload object with just expId and datasetId
             // this will be used for the training data count request
             JsonObject countPayload = new JsonObject();
-            countPayload.put("expId", expId);
-            countPayload.put("datasetId", datasetId);
+            countPayload.put(Constants.LABEL_EXPID, expId);
+            countPayload.put(Constants.LABEL_DATASETID, datasetId);
 
             try {
 
@@ -110,21 +111,18 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
 
                                                 // build JSON payload object 
                                                 JsonObject trainPayload = new JsonObject();
-                                                trainPayload.put("expId", expId);
-                                                trainPayload.put("datasetId", datasetId);
-                                                trainPayload.put("group", t.getString("group"));
-                                                trainPayload.put("algorithm", t.getString("algorithm"));
-                                                trainPayload.put("thread", t.getBoolean("thread"));
+                                                trainPayload.put(Constants.LABEL_EXPID, expId);
+                                                trainPayload.put(Constants.LABEL_DATASETID, datasetId);
+                                                trainPayload.put(Constants.LABEL_ALGORITHM, t.getString(Constants.LABEL_ALGORITHM));
+                                                trainPayload.put(Constants.LABEL_THREAD, t.getBoolean(Constants.LABEL_THREAD));
 
                                                 // trigger training
                                                 // vertx.eventBus().send("saasyml.training." + type, trainPayload);
-                                                vertx.eventBus().request("saasyml.training." + type, trainPayload,
+                                                vertx.eventBus().request(Constants.LABEL_CONSUMER_TRAINING + "." + type, trainPayload,
                                                         trainReply -> {
                                                     
                                                             JsonObject trainResponse = (JsonObject) (trainReply.result().body());
-                                                            if (trainResponse.containsKey("model_path")) {
-                                                                LOGGER.log(Level.INFO, "model path: " + trainResponse.getString("model_path") + ".");
-                                                            }
+                                                            // msg.reply(trainResponse);
   
                                                 });
                                             }
@@ -155,14 +153,14 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
         });
 
         // unsubscribe to a training data feed
-        vertx.eventBus().consumer("saasyml.training.data.unsubscribe", msg -> {
+        vertx.eventBus().consumer(Constants.LABEL_CONSUMER_DATA_UNSUBSCRIBE, msg -> {
             // the request payload (Json)
             JsonObject payload = (JsonObject)(msg.body());
             LOGGER.log(Level.INFO, "The POST request payload: " + payload.toString());
 
             // parse the Json payload
-            final int expId = payload.getInteger("expId").intValue();
-            final int datasetId = payload.getInteger("datasetId").intValue();
+            final int expId = payload.getInteger(Constants.LABEL_EXPID).intValue();
+            final int datasetId = payload.getInteger(Constants.LABEL_DATASETID).intValue();
 
             try {
                 // disable parameter feed

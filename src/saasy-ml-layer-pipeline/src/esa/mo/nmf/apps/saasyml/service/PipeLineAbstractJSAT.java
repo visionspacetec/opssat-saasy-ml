@@ -124,7 +124,7 @@ public abstract class PipeLineAbstractJSAT implements IPipeLineLayer{
         this.modelPathSerialized = modelPathStored;
     }
 
-    public abstract void inference();
+    public abstract List<Object> inference();
 
     /*****************************************/
     /************ PROTECTED METHODS **********/

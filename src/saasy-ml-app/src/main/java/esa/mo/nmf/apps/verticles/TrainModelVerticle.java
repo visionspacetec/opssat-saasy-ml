@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import javax.naming.ldap.Rdn;
 
+import esa.mo.nmf.apps.Constants;
 import esa.mo.nmf.apps.PropertiesManager;
 import esa.mo.nmf.apps.saasyml.common.IPipeLineLayer;
 import esa.mo.nmf.apps.saasyml.factories.MLPipeLineFactory;
@@ -41,17 +42,13 @@ public class TrainModelVerticle extends AbstractVerticle {
             LOGGER.log(Level.INFO, "Started training.classifier");
 
             // parse the Json payload
-            final int expId = payload.getInteger("expId").intValue();
-            final int datasetId = payload.getInteger("datasetId").intValue();
-            final String group = payload.getString("group");
-            final String algorithm = payload.getString("algorithm"); // "LogisticRegressionDCD";
-
-            // get data from the configuration
+            final int expId = payload.getInteger(Constants.LABEL_EXPID).intValue();
+            final int datasetId = payload.getInteger(Constants.LABEL_DATASETID).intValue();
+            final String algorithm = payload.getString(Constants.LABEL_ALGORITHM); 
             boolean thread = PropertiesManager.getInstance().getThread();
-            if (payload.containsKey("thread") && payload.getBoolean("thread") != null) {
-                thread = payload.getBoolean("thread");
+            if (payload.containsKey(Constants.LABEL_THREAD) && payload.getBoolean(Constants.LABEL_THREAD) != null) {
+                thread = payload.getBoolean(Constants.LABEL_THREAD);
             }
-            
             boolean serialize = PropertiesManager.getInstance().getSerialize();
             /* Does not make sense because we want always to store the model
             if (payload.containsKey("serialize") && payload.getBoolean("serialize") != null) {
@@ -71,16 +68,16 @@ public class TrainModelVerticle extends AbstractVerticle {
 
                 // build Json payload object with just expId and datasetId
                 JsonObject selectPayload = new JsonObject();
-                selectPayload.put("expId", expId);
-                selectPayload.put("datasetId", datasetId);
+                selectPayload.put(Constants.LABEL_EXPID, expId);
+                selectPayload.put(Constants.LABEL_DATASETID, datasetId);
 
                 // get the total number of columns 
                 vertx.eventBus().request("saasyml.training.data.count_columns", selectPayload, reply -> {
                     JsonObject response = (JsonObject) (reply.result().body());
 
                     // if the total number of columns exists, we get it
-                    if (response.containsKey("count")) {
-                        selectPayload.put("total_cols", response.getInteger("count").intValue());
+                    if (response.containsKey(Constants.LABEL_COUNT)) {
+                        selectPayload.put("total_cols", response.getInteger(Constants.LABEL_COUNT).intValue());
                     }
                 
                     // select all the data from the dataset
@@ -114,7 +111,7 @@ public class TrainModelVerticle extends AbstractVerticle {
 
                                 // get the Json Object and store the value
                                 JsonObject object = data.getJsonObject(pos);
-                                tempTrainData[colCount++] = Double.parseDouble(object.getString("value")); // TRAIN
+                                tempTrainData[colCount++] = Double.parseDouble(object.getString(Constants.LABEL_VALUE)); // TRAIN
 
                                 // if colcount is equal to total columns, we add a new row
                                 if (colCount == total_columns) {
@@ -142,11 +139,11 @@ public class TrainModelVerticle extends AbstractVerticle {
                             // of the toGround folder file system:
                             saasyml.train();
 
-                            // 3. Return a message with unique identifiers of the serizalized model (or
-                            // maybe just a path to it?)
-                            // store path to model in response of reply
+                            // 3. Return a message with a path to the serialized model
                             JsonObject selectReponseReply = new JsonObject();
-                            selectReponseReply.put("model_path", saasyml.getModelPathSerialized());
+                            selectReponseReply.put(Constants.LABEL_TYPE, "classifier");
+                            selectReponseReply.put(Constants.LABEL_ALGORITHM, algorithm);
+                            selectReponseReply.put(Constants.LABEL_MODEL_PATH, saasyml.getModelPathSerialized());
                             msg.reply(selectReponseReply);
                 
                         }
@@ -173,10 +170,9 @@ public class TrainModelVerticle extends AbstractVerticle {
             // parse the Json payload
             final int expId = payload.getInteger("expId").intValue();
             final int datasetId = payload.getInteger("datasetId").intValue();
-            final String group = payload.getString("group");
             final String algorithm = payload.getString("algorithm");
 
-            msg.reply(String.format("training: outlier %s %s", group, algorithm));
+            msg.reply(String.format("training: outlier %s %s", algorithm));
             
         });
 
@@ -194,7 +190,6 @@ public class TrainModelVerticle extends AbstractVerticle {
             // parse the Json payload
             final int expId = payload.getInteger("expId").intValue();
             final int datasetId = payload.getInteger("datasetId").intValue();
-            final String group = payload.getString("group");
             final String algorithm = payload.getString("algorithm"); 
 
             // get data from the configuration

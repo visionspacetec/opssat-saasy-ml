@@ -23,6 +23,8 @@ import java.sql.Timestamp;
 
 
 import org.sqlite.SQLiteConfig;
+
+import esa.mo.nmf.apps.Constants;
 import esa.mo.nmf.apps.PropertiesManager;
 
 public class DatabaseVerticle extends AbstractVerticle {
@@ -108,15 +110,15 @@ public class DatabaseVerticle extends AbstractVerticle {
     public void start() throws Exception {
 
         // save training data
-        vertx.eventBus().consumer("saasyml.training.data.save", msg -> {
+        vertx.eventBus().consumer(Constants.LABEL_CONSUMER_DATA_SAVE, msg -> {
 
             // the request payload (Json)
             JsonObject payload = (JsonObject) (msg.body());
 
             // parse the Json payload
-            final int expId = payload.getInteger("expId").intValue();
-            final int datasetId = payload.getInteger("datasetId").intValue();
-            final JsonArray data = payload.getJsonArray("data");
+            final int expId = payload.getInteger(Constants.LABEL_EXPID).intValue();
+            final int datasetId = payload.getInteger(Constants.LABEL_DATASETID).intValue();
+            final JsonArray data = payload.getJsonArray(Constants.LABEL_DATA);
 
             List<Pair<Integer, String>> paramValues = new ArrayList<Pair<Integer, String>>();
             List<String> paramNames = new ArrayList<String>();
@@ -136,15 +138,15 @@ public class DatabaseVerticle extends AbstractVerticle {
                         JsonObject p = (JsonObject) param;
 
                         // parameter name
-                        paramNames.add(p.getString("name"));
+                        paramNames.add(p.getString(Constants.LABEL_NAME));
 
                         // parameter type and value value
-                        int dataType = p.getInteger("dataType");
-                        String value = p.getString("value");
+                        int dataType = p.getInteger(Constants.LABEL_DATA_TYPE);
+                        String value = p.getString(Constants.LABEL_VALUE);
                         paramValues.add(new Pair<Integer, String>(dataType, value));
                         
                         // the timestamp
-                        timestamps.add(p.getLong("timestamp"));
+                        timestamps.add(p.getLong(Constants.LABEL_TIMESTAMP));
                     });
                 });
 
@@ -154,20 +156,20 @@ public class DatabaseVerticle extends AbstractVerticle {
                     prep.executeBatch();
 
                     // auto-trigger training if the payload is configured to do so
-                    if(payload.containsKey("training")) {
+                    if(payload.containsKey(Constants.LABEL_TRAINING)) {
 
                         // the training parameters can be for more than one algorithm
-                        final JsonArray trainings = payload.getJsonArray("training");
+                        final JsonArray trainings = payload.getJsonArray(Constants.LABEL_TRAINING);
 
                         // trigger training for each request
                         for(int i = 0; i < trainings.size(); i++) {
                             final JsonObject t = trainings.getJsonObject(i);
 
                             // fetch training algorithm selection
-                            String type = t.getString("type");
+                            String type = t.getString(Constants.LABEL_TYPE);
 
                             // trigger training
-                            vertx.eventBus().send("saasyml.training." + type, payload);
+                            vertx.eventBus().send(Constants.LABEL_CONSUMER_TRAINING + "." + type, payload);
                         }
                     }
 
@@ -183,14 +185,14 @@ public class DatabaseVerticle extends AbstractVerticle {
         });
 
         // delete training data
-        vertx.eventBus().consumer("saasyml.training.data.delete", msg -> {
+        vertx.eventBus().consumer(Constants.LABEL_CONSUMER_DATA_DELETE, msg -> {
 
             // the request payload (Json)
             JsonObject payload = (JsonObject) (msg.body());
 
             // parse the Json payload
-            final int expId = payload.getInteger("expId").intValue();
-            final int datasetId = payload.getInteger("datasetId").intValue();
+            final int expId = payload.getInteger(Constants.LABEL_EXPID).intValue();
+            final int datasetId = payload.getInteger(Constants.LABEL_DATASETID).intValue();
 
             try {
                 this.deleteTrainingData(expId, datasetId);
@@ -207,14 +209,14 @@ public class DatabaseVerticle extends AbstractVerticle {
         });
 
         // count training data
-        vertx.eventBus().consumer("saasyml.training.data.count", msg -> {
+        vertx.eventBus().consumer(Constants.LABEL_CONSUMER_DATA_COUNT, msg -> {
 
             // the request payload (Json)
             JsonObject payload = (JsonObject) (msg.body());
 
             // parse the Json payload
-            final int expId = payload.getInteger("expId").intValue();
-            final int datasetId = payload.getInteger("datasetId").intValue();
+            final int expId = payload.getInteger(Constants.LABEL_EXPID).intValue();
+            final int datasetId = payload.getInteger(Constants.LABEL_DATASETID).intValue();
 
             // count training data records
             int counter = -1;
@@ -231,15 +233,15 @@ public class DatabaseVerticle extends AbstractVerticle {
             
         });
 
-        // count rows in training data
-        vertx.eventBus().consumer("saasyml.training.data.count_columns", msg -> {
+        // count columns in training data
+        vertx.eventBus().consumer(Constants.LABEL_CONSUMER_DATA_COUNT_COLUMNS, msg -> {
 
             // the request payload (Json)
             JsonObject payload = (JsonObject) (msg.body());
 
             // parse the Json payload
-            final int expId = payload.getInteger("expId").intValue();
-            final int datasetId = payload.getInteger("datasetId").intValue();
+            final int expId = payload.getInteger(Constants.LABEL_EXPID).intValue();
+            final int datasetId = payload.getInteger(Constants.LABEL_DATASETID).intValue();
 
             // count training data records
             int counter = -1;
@@ -257,14 +259,14 @@ public class DatabaseVerticle extends AbstractVerticle {
         });
 
         // select training data
-        vertx.eventBus().consumer("saasyml.training.data.select", msg -> {
+        vertx.eventBus().consumer(Constants.LABEL_CONSUMER_DATA_SELECT, msg -> {
 
             // the request payload (JSON)
             JsonObject payload = (JsonObject) (msg.body());
 
             // parse the JSON payload
-            final int expId = payload.getInteger("expId").intValue();
-            final int datasetId = payload.getInteger("datasetId").intValue();
+            final int expId = payload.getInteger(Constants.LABEL_EXPID).intValue();
+            final int datasetId = payload.getInteger(Constants.LABEL_DATASETID).intValue();
 
             // select training data records
             JsonArray data = null;

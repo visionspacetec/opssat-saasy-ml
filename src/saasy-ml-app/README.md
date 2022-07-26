@@ -203,13 +203,11 @@ Make several of these requests with different values for `expId`, `datasetId`, `
     "training": [
         {
             "type": "classifier",
-            "group": "bayesian",
             "algorithm": "aode",
             "thread" : false
         },
         {
             "type": "classifier",
-            "group": "boosting",
             "algorithm": "bagging"
         }
     ]
@@ -247,7 +245,6 @@ Sample payload:
 ```json
 {
     "expId": 123,
-    "datasetId": 1,
     "data": [
         [
             {
@@ -313,12 +310,10 @@ Sample payload:
     "training": [
         {
             "type": "classifier",
-            "group": "bayesian",
             "algorithm": "aode"
         },
         {
             "type": "classifier",
-            "group": "boosting",
             "algorithm": "bagging"
         }
     ]
@@ -349,7 +344,7 @@ Sample payload:
 Make an POST request to the following endpoints:
 
 ```
-http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/:type/:group/:algorithm
+http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/:type/:algorithm
 ```
 
 Sample payload:
@@ -372,8 +367,78 @@ Sample payload:
 {
     "expId": 123,
     "datasetId": 1,
-    "group": "baye", 
     "algorithm": "RandomForest"
+}
+```
+
+### Inference
+
+Make an POST request to the following endpoints:
+
+```
+http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/inference/
+```
+
+Sample payload:
+
+```json
+{
+    "expId": 123,
+    "datasetId": 1, 
+    "data": [
+        [
+            {
+                "name": "GNC_0005",
+                "value": "1001",
+                "dataType": 1,
+                "timestamp": 1656803525000
+            },
+            {
+                "name": "GNC_0011",
+                "value": "2001",
+                "dataType": 1,
+                "timestamp": 1656803525000
+            },
+            {
+                "name": "GNC_0007",
+                "value": "3001",
+                "dataType": 1,
+                "timestamp": 1656803525000
+            }
+        ],
+        [
+            {
+                "name": "GNC_0005",
+                "value": "1002",
+                "dataType": 1,
+                "timestamp": 1656804525000
+            },
+            {
+                "name": "GNC_0011",
+                "value": "2002",
+                "dataType": 1,
+                "timestamp": 1656804525000
+            },
+            {
+                "name": "GNC_0007",
+                "value": "3002",
+                "dataType": 1,
+                "timestamp": 1656804525000
+            }
+        ]
+    ],
+    "models": [
+        {
+            "path": "FULL-PATH-OF-SERIALIZED-THE-MODEL",
+            "type": "Classifier",
+            "thread" : true
+        },
+        {
+            "path": "FULL-PATH-OF-SERIALIZED-THE-MODEL",
+            "type": "Classifier"
+        }
+    ]
+
 }
 ```
 
