@@ -30,6 +30,7 @@ public final class Constants {
     public static final String LABEL_PARAMS = "params";
     public static final String LABEL_COUNT = "count";
     public static final String LABEL_MODEL_PATH = "model_path";
+    public static final String LABEL_INFERENCE = "inference";
 
     // labels for the endpoints
     public static final String LABEL_ENDPOINT_DATA_SUBSCRIBE = "/api/v1/training/data/subscribe";
@@ -52,6 +53,7 @@ public final class Constants {
 
     public static final String LABEL_CONSUMER_INFERENCE = "saasyml.inference";
     public static final String LABEL_CONSUMER_INFERENCE_CLASSIFIER = LABEL_CONSUMER_INFERENCE + ".classifier";
+
 
 
 

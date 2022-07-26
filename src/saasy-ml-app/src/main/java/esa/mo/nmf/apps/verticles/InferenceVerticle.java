@@ -35,76 +35,63 @@ public class InferenceVerticle extends AbstractVerticle {
             try{
                 // the request payload (Json)
                 JsonObject payload = (JsonObject) (msg.body());
-                LOGGER.log(Level.INFO, "Started inference.classifier");
+                LOGGER.log(Level.INFO, "Started "+Constants.LABEL_CONSUMER_INFERENCE);
 
                 // parse the Json payload
                 final int expId = payload.getInteger(Constants.LABEL_EXPID).intValue();
-                final int datasetId = payload.getInteger(Constants.LABEL_DATASETID).intValue();
+                final int datasetId = 1000;
                 final JsonArray data = payload.getJsonArray(Constants.LABEL_DATA);
                 final JsonArray models = payload.getJsonArray(Constants.LABEL_MODELS);
 
-                LOGGER.log(Level.INFO, "1. parse payload");
-
                 // prepare the test data of the classifier
-                DataSet[] test = prepareClassifierTestData(data);
-
-                LOGGER.log(Level.INFO, "2. prepare data classifier");
+                DataSet[] test = prepareClassifierOneTestData(data);
 
                 // for each model 
                 Iterator<Object> iter = models.iterator();
                 while (iter.hasNext()) {
                     JsonObject model = (JsonObject) iter.next();
 
-                    String      path = model.getString(Constants.LABEL_PATH);
-                    String      type = model.getString(Constants.LABEL_TYPE);
-                    boolean     thread = PropertiesManager.getInstance().getThread();
+                    String path = model.getString(Constants.LABEL_PATH);
+                    String type = model.getString(Constants.LABEL_TYPE);
+                    boolean thread = PropertiesManager.getInstance().getThread();
                     if (model.containsKey(Constants.LABEL_THREAD) && model.getBoolean(Constants.LABEL_THREAD) != null) {
                         thread = model.getBoolean(Constants.LABEL_THREAD);
                     }
-                    boolean     serialize = true;
-                    TypeModel   typeModel = TypeModel.valueOf(type);
-
-                    LOGGER.log(Level.INFO, "3. model "+path);
+                    boolean serialize = true;
+                    TypeModel typeModel = TypeModel.valueOf(type);
 
                     // create the pipeline with the minimun 
-                    IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(expId, datasetId, thread, serialize, "test-"+type, typeModel);
+                    IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(expId, datasetId, thread, serialize, "test-" + type, typeModel);
 
                     // set the full path of the model
                     saasyml.setModelPathSerialized(path);
 
-                    LOGGER.log(Level.INFO, "4. create pipeline and set model path");
-
                     // for each test data
-                    for (DataSet t : test){
-                        
+                    for (DataSet t : test) {
+
                         // set the test data
                         saasyml.setDataSet(null, t);
-                            
-                        LOGGER.log(Level.INFO, "5. set data set");
 
                         // do the inference
                         List<Object> objects = saasyml.inference();
-                        
-                        LOGGER.log(Level.INFO, "6. do inference");
 
                         List<Integer> inference = objects.stream()
-                            .filter(element->element instanceof Integer)
-                        .map(element->(Integer) element).collect(Collectors.toList());
-
-                        
-                        LOGGER.log(Level.INFO, "7. store the inference");
+                                .filter(element -> element instanceof Integer)
+                                .map(element -> (Integer) element).collect(Collectors.toList());
 
                         // store the inference in a list
-                        model.put("inference", inference);
+                        // if (!model.containsKey(Constants.LABEL_INFERENCE))
+                        model.put(Constants.LABEL_INFERENCE, inference);
 
                     }
                 }
-                        
+                
+                LOGGER.log(Level.INFO, "Stoped "+Constants.LABEL_CONSUMER_INFERENCE);
+
                 // retrieve the response
                 JsonObject response = new JsonObject();
-                response.put("expId", expId);
-                response.put("datasetId", datasetId);
-                response.put("models", models);
+                response.put(Constants.LABEL_EXPID, expId);
+                response.put(Constants.LABEL_MODELS, models);
                 msg.reply(response);
 
                 
@@ -120,7 +107,49 @@ public class InferenceVerticle extends AbstractVerticle {
 
     }
 
-    private DataSet[] prepareClassifierTestData(JsonArray data) {
+    private DataSet[] prepareClassifierOneTestData(JsonArray data) {
+
+        // variables to generate the class randomly
+        Random rand = new Random();
+        int classification = 2;
+
+        // create the lists of tests
+        List<DataSet> tests = new ArrayList<DataSet>();
+
+        int total_columns = ((JsonArray) data.getValue(0)).size();
+        tests.add(new ClassificationDataSet(total_columns, new CategoricalData[0],
+                new CategoricalData(classification)));
+        int index = 0;
+
+        // fetch data
+        data.forEach(dataset -> {
+            JsonArray ds = (JsonArray) dataset;
+
+            // create the test data
+            double[] tempTestData = new double[total_columns];
+
+            int count = 0;
+
+            // iterate through the parameters
+            Iterator<Object> iter = ds.iterator();
+            while (iter.hasNext()) {
+                JsonObject p = (JsonObject) iter.next();
+
+                // store the values of the parameters
+                tempTestData[count++] = Double.parseDouble(p.getString(Constants.LABEL_VALUE));
+            }
+
+            // create the data point of the test data
+            ((ClassificationDataSet) tests.get(index)).addDataPoint(new DenseVector(tempTestData), new int[0],
+                    rand.nextInt(classification));
+
+        });
+
+        // retrieve the list of tests
+        return tests.toArray(new DataSet[0]);
+    }
+
+    private DataSet[] prepareClassifierManyTestData(JsonArray data) {
         
         // variables to generate the class randomly
         Random rand = new Random();

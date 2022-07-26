@@ -1,9 +1,7 @@
 package esa.mo.nmf.apps.verticles;
 
-import io.netty.util.internal.shaded.org.jctools.queues.MessagePassingQueue.Consumer;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
-import io.vertx.core.eventbus.Message;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
@@ -16,7 +14,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import esa.mo.helpertools.misc.Const;
 import esa.mo.nmf.apps.AppMCAdapter;
 import esa.mo.nmf.apps.Constants;
 import esa.mo.nmf.apps.PropertiesManager;
