@@ -166,7 +166,24 @@ public class MLPipeLineFactory {
     public static TypeModel getTypeModel(String modelName) {
 
         switch (modelName){
-            case "LogisticRegressionDCD" :  return TypeModel.Classifier;
+            case "ALMA2" :
+            case "AROW" :
+            case "BBR" : 
+            case "LinearBatch" : 
+            case "LinearL1SCD" : 
+            case "LinearSGD" :
+            case "LogisticRegressionDCD" : 
+            case "NewGLMNET" :
+            case "NHERD" : 
+            case "PassiveAggressive" :
+            case "SCD" :
+            case "SCW" : 
+            case "SDCA" :
+            case "SMIDAS" :
+            case "SPA" :
+            case "STGD" : 
+            case "StochasticMultinomialLogisticRegression":
+                return TypeModel.Classifier;
             case "FLAME" :                  return TypeModel.Cluster;
             case "IsolationForest":         return TypeModel.Outlier;
         }

@@ -43,6 +43,9 @@ public final class Constants {
 
     // labels to consume the verticles
     public static final String LABEL_CONSUMER_TRAINING = "saasyml.training";
+    public static final String LABEL_CONSUMER_TRAINING_CLASSIFIER = LABEL_CONSUMER_TRAINING + ".classifier";
+    public static final String LABEL_CONSUMER_TRAINING_CLUSTERING = LABEL_CONSUMER_TRAINING + ".clustering";
+    public static final String LABEL_CONSUMER_TRAINING_OUTLIER = LABEL_CONSUMER_TRAINING + ".outlier";
     public static final String LABEL_CONSUMER_DATA_SAVE = LABEL_CONSUMER_TRAINING + ".data.save";
     public static final String LABEL_CONSUMER_DATA_DELETE = LABEL_CONSUMER_TRAINING + ".data.delete";
     public static final String LABEL_CONSUMER_DATA_COUNT = LABEL_CONSUMER_TRAINING + ".data.count";

@@ -31,7 +31,7 @@ public class TrainModelVerticle extends AbstractVerticle {
     public void start() throws Exception {
 
         // train classifier
-        vertx.eventBus().consumer("saasyml.training.classifier", msg -> {
+        vertx.eventBus().consumer(Constants.LABEL_CONSUMER_TRAINING_CLASSIFIER, msg -> {
 
             // variables to generate the class randomly
             Random rand = new Random();
@@ -72,7 +72,7 @@ public class TrainModelVerticle extends AbstractVerticle {
                 selectPayload.put(Constants.LABEL_DATASETID, datasetId);
 
                 // get the total number of columns 
-                vertx.eventBus().request("saasyml.training.data.count_columns", selectPayload, reply -> {
+                vertx.eventBus().request(Constants.LABEL_CONSUMER_DATA_COUNT_COLUMNS, selectPayload, reply -> {
                     JsonObject response = (JsonObject) (reply.result().body());
 
                     // if the total number of columns exists, we get it
@@ -81,22 +81,21 @@ public class TrainModelVerticle extends AbstractVerticle {
                     }
                 
                     // select all the data from the dataset
-                    vertx.eventBus().request("saasyml.training.data.select", selectPayload, selectReply -> {
+                    vertx.eventBus().request(Constants.LABEL_CONSUMER_DATA_SELECT, selectPayload, selectReply -> {
 
                         // get the response from the select
                         JsonObject selectResponse = (JsonObject) (selectReply.result().body());
 
                         // the total number of columns
                         int total_columns = selectPayload.getInteger("total_cols");
-                        // LOGGER.log(Level.INFO, "total columns : " + total_columns);
 
                         // if the response_select object contains the data, we can continue
-                        if(selectResponse.containsKey("data")) {
+                        if(selectResponse.containsKey(Constants.LABEL_DATA)) {
         
                             // 1.2. Prepare data
                             
                             // get the data with the result of the select
-                            final JsonArray data = selectResponse.getJsonArray("data");
+                            final JsonArray data = selectResponse.getJsonArray(Constants.LABEL_DATA);
 
                             // create variables for the classification
                             double[] tempTrainData = new double[total_columns]; // TRAIN
@@ -157,12 +156,10 @@ public class TrainModelVerticle extends AbstractVerticle {
                 // response: error
                 msg.reply("Failed to get training data.");
             }
-
-            // msg.reply(String.format("training: classifier %s %s", group, algorithm));
         });
 
         // train outlier
-        vertx.eventBus().consumer("saasyml.training.outlier", msg -> {
+        vertx.eventBus().consumer(Constants.LABEL_CONSUMER_TRAINING_OUTLIER, msg -> {
             // the request payload (Json)
             JsonObject payload = (JsonObject) (msg.body());
             LOGGER.log(Level.INFO, "training.outlier: triggered by the following POST request: " + payload.toString());
@@ -176,8 +173,8 @@ public class TrainModelVerticle extends AbstractVerticle {
             
         });
 
-        // train clustering. TODO
-        vertx.eventBus().consumer("saasyml.training.clustering", msg -> {
+        // train clustering. 
+        vertx.eventBus().consumer(Constants.LABEL_CONSUMER_TRAINING_CLUSTERING, msg -> {
 
             // variables to generate the class randomly
             Random rand = new Random();
@@ -188,28 +185,31 @@ public class TrainModelVerticle extends AbstractVerticle {
             LOGGER.log(Level.INFO, "Started training.clustering");
 
             // parse the Json payload
-            final int expId = payload.getInteger("expId").intValue();
-            final int datasetId = payload.getInteger("datasetId").intValue();
-            final String algorithm = payload.getString("algorithm"); 
-
-            // get data from the configuration
+            final int expId = payload.getInteger(Constants.LABEL_EXPID).intValue();
+            final int datasetId = payload.getInteger(Constants.LABEL_DATASETID).intValue();
+            final String algorithm = payload.getString(Constants.LABEL_ALGORITHM); 
             boolean thread = PropertiesManager.getInstance().getThread();
+            if (payload.containsKey(Constants.LABEL_THREAD) && payload.getBoolean(Constants.LABEL_THREAD) != null) {
+                thread = payload.getBoolean(Constants.LABEL_THREAD);
+            }
             boolean serialize = PropertiesManager.getInstance().getSerialize();
+
+            // create the pipeline
             IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(expId, datasetId, thread, serialize, algorithm);
 
             // build the model
             saasyml.build(new Integer[] {classification});
             
-            // 1.1. get data using expId and datasetId
+            // Train the model 
             try{
 
                 // build Json payload object with just expId and datasetId
                 JsonObject selectPayload = new JsonObject();
-                selectPayload.put("expId", expId);
-                selectPayload.put("datasetId", datasetId);
+                selectPayload.put(Constants.LABEL_EXPID, expId);
+                selectPayload.put(Constants.LABEL_DATASETID, datasetId);
 
                 // get the total number of columns 
-                vertx.eventBus().request("saasyml.training.data.count_columns", selectPayload, reply -> {
+                vertx.eventBus().request(Constants.LABEL_CONSUMER_DATA_COUNT_COLUMNS, selectPayload, reply -> {
                     JsonObject response = (JsonObject) (reply.result().body());
 
                     // if the total number of columns exists, we get it
@@ -217,8 +217,8 @@ public class TrainModelVerticle extends AbstractVerticle {
                         selectPayload.put("total_cols", response.getInteger("count").intValue());
                     }
                 
-                    // TODO: Can the above eventbus be called asynchronous?, if so, we can move the following eventBus out
-                    vertx.eventBus().request("saasyml.training.data.select", selectPayload, selectReply -> {
+                    // select all the data from the dataset
+                    vertx.eventBus().request(Constants.LABEL_CONSUMER_DATA_SELECT, selectPayload, selectReply -> {
 
                         // get the response from the select
                         JsonObject selectResponse = (JsonObject) (selectReply.result().body());
@@ -227,12 +227,12 @@ public class TrainModelVerticle extends AbstractVerticle {
                         int total_columns = selectPayload.getInteger("total_cols");
 
                         // if the response_select object contains the data, we can continue
-                        if(selectResponse.containsKey("data")) {
+                        if(selectResponse.containsKey(Constants.LABEL_DATA)) {
         
                             // 1.2. Prepare data
                             
                             // get the data with the result of the select
-                            final JsonArray data = selectResponse.getJsonArray("data");
+                            final JsonArray data = selectResponse.getJsonArray(Constants.LABEL_DATA);
 
                             // create variables for the classification
                             double[] tempTrainData = new double[total_columns]; // TRAIN
@@ -249,7 +249,7 @@ public class TrainModelVerticle extends AbstractVerticle {
 
                                 // get the Json Object and store the value
                                 JsonObject object = data.getJsonObject(pos);
-                                tempTrainData[colCount++] = Double.parseDouble(object.getString("value")); // TRAIN
+                                tempTrainData[colCount++] = Double.parseDouble(object.getString(Constants.LABEL_VALUE)); // TRAIN
 
                                 // if colcount is equal to total columns, we add a new row
                                 if (colCount == total_columns) {
@@ -291,12 +291,12 @@ public class TrainModelVerticle extends AbstractVerticle {
 
                             LOGGER.log(Level.INFO, "Executed method train");
 
-                            // 3. Return a message with unique identifiers of the serizalized model (or
-                            // maybe just a path to it?)
-                            // store path to model in response of reply
-                            JsonObject selectReponseReply = new JsonObject();
-                            selectReponseReply.put("model_path", saasyml.getModelPathSerialized());
-                            msg.reply(selectReponseReply);
+                             // 3. Return a message with a path to the serialized model
+                             JsonObject selectReponseReply = new JsonObject();
+                             selectReponseReply.put(Constants.LABEL_TYPE, "cluster");
+                             selectReponseReply.put(Constants.LABEL_ALGORITHM, algorithm);
+                             selectReponseReply.put(Constants.LABEL_MODEL_PATH, saasyml.getModelPathSerialized());
+                             msg.reply(selectReponseReply);
                 
                         }
                     });
