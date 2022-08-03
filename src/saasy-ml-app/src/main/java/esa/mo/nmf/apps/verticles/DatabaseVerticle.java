@@ -10,6 +10,7 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Context;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 
 import java.sql.Connection;
@@ -39,11 +40,7 @@ public class DatabaseVerticle extends AbstractVerticle {
     private final String SQL_INSERT_TRAINING_DATA = "INSERT INTO training_data(exp_id, dataset_id, param_name, data_type, value, timestamp) VALUES(?, ?, ?, ?, ?, ?)";
     private final String SQL_DELETE_TRAINING_DATA = "DELETE FROM training_data WHERE exp_id = ? AND dataset_id = ?";
     private final String SQL_COUNT_TRAINING_DATA = "SELECT count(*) FROM  training_data WHERE exp_id = ? AND dataset_id = ?";
-    
-    
-    private final String SQL_COUNT_COLUMNS_TRAINING_DATA = "SELECT count(*) FROM  training_data WHERE exp_id = ? AND dataset_id = ? GROUP BY timestamp LIMIT 1";
-
-
+    private final String SQL_COUNT_COLUMNS_TRAINING_DATA = "SELECT count(*) FROM  training_data WHERE exp_id = ? AND dataset_id = ? GROUP BY timestamp LIMIT 1"; // "SELECT count(DISTINCT param_name) FROM training_data WHERE exp_id=? AND dataset_id=?"
     private final String SQL_SELECT_TRAINING_DATA = "SELECT * FROM training_data WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp DESC";
     private final String SQL_CREATE_TABLE_TRAINING_DATA = 
         "CREATE TABLE IF NOT EXISTS training_data(" +
@@ -156,13 +153,13 @@ public class DatabaseVerticle extends AbstractVerticle {
                     prep.executeBatch();
 
                     // auto-trigger training if the payload is configured to do so
-                    if(payload.containsKey(Constants.LABEL_TRAINING)) {
+                    if (payload.containsKey(Constants.LABEL_TRAINING)) {
 
                         // the training parameters can be for more than one algorithm
                         final JsonArray trainings = payload.getJsonArray(Constants.LABEL_TRAINING);
 
                         // trigger training for each request
-                        for(int i = 0; i < trainings.size(); i++) {
+                        for (int i = 0; i < trainings.size(); i++) {
                             final JsonObject t = trainings.getJsonObject(i);
 
                             // fetch training algorithm selection
@@ -172,6 +169,8 @@ public class DatabaseVerticle extends AbstractVerticle {
                             vertx.eventBus().send(Constants.LABEL_CONSUMER_TRAINING + "." + type, payload);
                         }
                     }
+                    
+                    prep.close();
 
                 } catch (Exception e) {
                     LOGGER.log(Level.SEVERE, "Failed to insert training data into the database.", e);
@@ -332,6 +331,7 @@ public class DatabaseVerticle extends AbstractVerticle {
 
         // execute the delete statement
         ps.executeUpdate();
+        ps.close();
     }
 
     private int countTrainingData(int expId, int datasetId) throws Exception {
@@ -347,7 +347,10 @@ public class DatabaseVerticle extends AbstractVerticle {
 
         // return the result
         rs.next();
-        return rs.getInt(1);
+        int result = rs.getInt(1);
+        rs.close();
+        ps.close();
+        return result;
     }
 
     private int countRowsTrainingData(int expId, int datasetId) throws Exception {
@@ -361,9 +364,14 @@ public class DatabaseVerticle extends AbstractVerticle {
         // execute the delete statement
         ResultSet rs = ps.executeQuery();
 
+        LOGGER.info(SQL_COUNT_COLUMNS_TRAINING_DATA);
+
         // return the result
         rs.next();
-        return rs.getInt(1);
+        int result = rs.getInt(1);
+        rs.close();
+        ps.close();
+        return result;
     }
     
     private JsonArray selectTrainingData(int expId, int datasetId) throws Exception {
@@ -379,7 +387,10 @@ public class DatabaseVerticle extends AbstractVerticle {
         ResultSet rs = ps.executeQuery();
 
         // return the result
-        return toJSON(rs);
+        JsonArray result = toJSON(rs);
+        rs.close();
+        ps.close();
+        return result;
 
     }
 
