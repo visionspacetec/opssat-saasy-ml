@@ -28,7 +28,7 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
 
             // the request payload (Json)
             JsonObject payload = (JsonObject) (msg.body());
-            LOGGER.log(Level.INFO, "The POST request payload: " + payload.toString());
+            LOGGER.log(Level.INFO, "The POST "+Constants.LABEL_CONSUMER_DATA_SUBSCRIBE+" request payload: " + payload.toString());
 
             // parse the Json payload
             final int expId = payload.getInteger(Constants.LABEL_EXPID).intValue();
@@ -37,17 +37,16 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
 
             // iterations payload parameter is optional, set it to -1 if it wasn't provided
             final int iterations = payload.containsKey(Constants.LABEL_ITERATIONS)
-                    ? payload.getInteger(Constants.LABEL_ITERATIONS).intValue()
-                    : -1;
+                    ? payload.getInteger(Constants.LABEL_ITERATIONS).intValue() : -1;
 
             // create list of training data param names from JsonArray
             List<String> paramNameList = createArrayFromJsonArray(payload.getJsonArray(Constants.LABEL_PARAMS));
 
             // build Json payload object with just expId and datasetId
             // this will be used for the training data count request
-            JsonObject countPayload = new JsonObject();
-            countPayload.put(Constants.LABEL_EXPID, expId);
-            countPayload.put(Constants.LABEL_DATASETID, datasetId);
+            JsonObject payloadCount = new JsonObject();
+            payloadCount.put(Constants.LABEL_EXPID, expId);
+            payloadCount.put(Constants.LABEL_DATASETID, datasetId);
 
             try {
 
@@ -63,19 +62,19 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
                 if (iterations > 0) {
                     // register periodic timer
                     vertx.setPeriodic(500, id -> {
-                        vertx.eventBus().request("saasyml.training.data.count", countPayload, reply -> {
+                        vertx.eventBus().request(Constants.LABEL_CONSUMER_DATA_COUNT, payloadCount, reply -> {
                             JsonObject response = (JsonObject) (reply.result().body());
 
                             // response object is somehow does not contain the expected parameter (impossible?)
                             // stop timer if this happens
-                            if (!response.containsKey("count")) {
+                            if (!response.containsKey(Constants.LABEL_COUNT)) {
                                 vertx.cancelTimer(id);
 
                             } else {
                                 // get training data row count
                                 // fixme: dividing by paramNameList.size() will break if the number of params change during from one data fetching session to another for
                                 // the same expId and datasetId
-                                int counter = response.getInteger("count").intValue() / paramNameList.size();
+                                int counter = response.getInteger(Constants.LABEL_COUNT).intValue() / paramNameList.size();
 
                                 // the counter is set to -1 if there was an error while attempting to query the database
                                 // stop timer if  this happens
@@ -104,7 +103,7 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
                                                 final JsonObject t = trainings.getJsonObject(i);
 
                                                 // fetch training algorithm selection
-                                                String type = t.getString("type");
+                                                String type = t.getString(Constants.LABEL_TYPE);
 
                                                 // build JSON payload object 
                                                 JsonObject trainPayload = new JsonObject();

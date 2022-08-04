@@ -169,8 +169,6 @@ public class DatabaseVerticle extends AbstractVerticle {
                             vertx.eventBus().send(Constants.LABEL_CONSUMER_TRAINING + "." + type, payload);
                         }
                     }
-                    
-                    prep.close();
 
                 } catch (Exception e) {
                     LOGGER.log(Level.SEVERE, "Failed to insert training data into the database.", e);
@@ -220,14 +218,14 @@ public class DatabaseVerticle extends AbstractVerticle {
             // count training data records
             int counter = -1;
             try {
-                counter = this.countTrainingData(expId, datasetId);
+                counter = this.countTrainingData(expId, datasetId, SQL_COUNT_TRAINING_DATA);
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Error while trying to count training data rows in the database", e);
             }
 
             // response
             JsonObject response = new JsonObject();
-            response.put("count", counter);
+            response.put(Constants.LABEL_COUNT, counter);
             msg.reply(response);
             
         });
@@ -245,14 +243,14 @@ public class DatabaseVerticle extends AbstractVerticle {
             // count training data records
             int counter = -1;
             try {
-                counter = this.countRowsTrainingData(expId, datasetId);
+                counter = this.countTrainingData(expId, datasetId, SQL_COUNT_COLUMNS_TRAINING_DATA);
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Error while trying to count training data rows in the database", e);
             }
 
             // response
             JsonObject response = new JsonObject();
-            response.put("count", counter);
+            response.put(Constants.LABEL_COUNT, counter);
             msg.reply(response);
             
         });
@@ -277,7 +275,7 @@ public class DatabaseVerticle extends AbstractVerticle {
             
             // response
             JsonObject response = new JsonObject();
-            response.put("data", data);
+            response.put(Constants.LABEL_DATA, data);
             msg.reply(response);
 
         });
@@ -334,9 +332,9 @@ public class DatabaseVerticle extends AbstractVerticle {
         ps.close();
     }
 
-    private int countTrainingData(int expId, int datasetId) throws Exception {
+    private int countTrainingData(int expId, int datasetId, String querySQL) throws Exception {
         // create the prepared statement
-        PreparedStatement ps = this.conn.prepareStatement(SQL_COUNT_TRAINING_DATA);
+        PreparedStatement ps = this.conn.prepareStatement(querySQL);
 
         // set satement parameters
         ps.setInt(1, expId); // experiment id
@@ -345,33 +343,13 @@ public class DatabaseVerticle extends AbstractVerticle {
         // execute the delete statement
         ResultSet rs = ps.executeQuery();
 
-        // return the result
-        rs.next();
-        int result = rs.getInt(1);
-        rs.close();
-        ps.close();
-        return result;
-    }
-
-    private int countRowsTrainingData(int expId, int datasetId) throws Exception {
-        // create the prepared statement
-        PreparedStatement ps = this.conn.prepareStatement(SQL_COUNT_COLUMNS_TRAINING_DATA);
-
-        // set satement parameters
-        ps.setInt(1, expId); // experiment id
-        ps.setInt(2, datasetId); // dataset id
-
-        // execute the delete statement
-        ResultSet rs = ps.executeQuery();
-
-        LOGGER.info(SQL_COUNT_COLUMNS_TRAINING_DATA);
-
-        // return the result
-        rs.next();
-        int result = rs.getInt(1);
-        rs.close();
-        ps.close();
-        return result;
+        // return the result        
+        if (rs.next()) {
+            return rs.getInt(1);
+        } else {
+            LOGGER.log(Level.SEVERE, "Error in the Query. Please, check the statement parameters");
+            return -1;
+        }
     }
     
     private JsonArray selectTrainingData(int expId, int datasetId) throws Exception {
@@ -387,10 +365,7 @@ public class DatabaseVerticle extends AbstractVerticle {
         ResultSet rs = ps.executeQuery();
 
         // return the result
-        JsonArray result = toJSON(rs);
-        rs.close();
-        ps.close();
-        return result;
+        return toJSON(rs);
 
     }
 
