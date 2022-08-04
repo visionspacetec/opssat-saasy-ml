@@ -82,8 +82,8 @@ public class TrainModelVerticle extends AbstractVerticle {
                             JsonObject selectResponse = (JsonObject) (selectReply.result().body());
 
                             // if the response_select object contains the data, we can continue
-                            if(selectResponse.containsKey(Constants.LABEL_DATA)) {
-            
+                            if (selectResponse.containsKey(Constants.LABEL_DATA)) {
+                                
                                 // 1.2. Prepare data
 
                                 // the total number of columns
@@ -105,7 +105,7 @@ public class TrainModelVerticle extends AbstractVerticle {
 
                                     // get the Json Object and store the value
                                     JsonObject object = data.getJsonObject(pos);
-                                    tempTrainData[colCount++] = object.getDouble(Constants.LABEL_VALUE); // TRAIN
+                                    tempTrainData[colCount++] = Double.valueOf(object.getString(Constants.LABEL_VALUE)); // TRAIN
 
                                     // if colcount is equal to total columns, we add a new row
                                     if (colCount == total_columns) {
@@ -142,9 +142,10 @@ public class TrainModelVerticle extends AbstractVerticle {
                     
                             }
                         });
+                    } else {
+                        LOGGER.log(Level.SEVERE, "Failed to get the total number of columns");
                     }
                 
-                    
                 });
 
             } catch (Exception e) {
@@ -154,6 +155,8 @@ public class TrainModelVerticle extends AbstractVerticle {
                 // response: error
                 msg.reply("Failed to get training data.");
             }
+
+            LOGGER.log(Level.INFO, "Finished training.classifier");
         });
 
         // train outlier
@@ -176,11 +179,11 @@ public class TrainModelVerticle extends AbstractVerticle {
 
             // variables to generate the class randomly
             Random rand = new Random();
-            int k = 2;
+            int totalClasses = 2;
 
             // the request payload (Json)
             JsonObject payload = (JsonObject) (msg.body());
-            LOGGER.log(Level.INFO, "Started training.clustering");
+            LOGGER.log(Level.INFO, "Started training.cluster");
 
             // parse the Json payload
             final int expId = payload.getInteger(Constants.LABEL_EXPID).intValue();
@@ -193,7 +196,7 @@ public class TrainModelVerticle extends AbstractVerticle {
             IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(expId, datasetId, thread, serialize, algorithm);
 
             // build the model with parameters
-            saasyml.build(new Integer[] {k});
+            saasyml.build(new Integer[] {totalClasses});
             
             // Train the model 
             try{
@@ -222,6 +225,8 @@ public class TrainModelVerticle extends AbstractVerticle {
                             // if the response_select object contains the data, we can continue
                             if(selectResponse.containsKey(Constants.LABEL_DATA)) {
             
+                                LOGGER.log(Level.INFO, "Prepare data ");
+
                                 // 1.2. Prepare data
 
                                 // the total number of columns
@@ -232,7 +237,7 @@ public class TrainModelVerticle extends AbstractVerticle {
 
                                 // create variables for the k
                                 double[] tempTrainData = new double[total_columns]; // TRAIN
-                                CategoricalData[] catDataInfo = new CategoricalData[] { new CategoricalData(k)} ; 
+                                CategoricalData[] catDataInfo = new CategoricalData[] { new CategoricalData(totalClasses)} ; 
             
                                 List<DataPoint> dataPoints = new ArrayList<DataPoint>();
                                 Normal noiseSource = new Normal(0, 0.05);
@@ -245,14 +250,14 @@ public class TrainModelVerticle extends AbstractVerticle {
 
                                     // get the Json Object and store the value
                                     JsonObject object = data.getJsonObject(pos);
-                                    tempTrainData[colCount++] = object.getDouble(Constants.LABEL_VALUE);
+                                    tempTrainData[colCount++] = colCount + Double.valueOf(object.getString(Constants.LABEL_VALUE));;
 
                                     // if colcount is equal to total columns, we add a new row
                                     if (colCount == total_columns) {
 
                                         // we add a data point to our train dataset 
                                         // with a random value of the class Y
-                                        dataPoints.add(new DataPoint(new DenseVector(tempTrainData), new int[] { rand.nextInt(k) }, catDataInfo));
+                                        dataPoints.add(new DataPoint(new DenseVector(tempTrainData), new int[] { rand.nextInt(totalClasses) }, catDataInfo));
 
                                         // we restart the count of cols to zero and the temporal train data
                                         colCount = 0;
@@ -271,26 +276,16 @@ public class TrainModelVerticle extends AbstractVerticle {
                                 // 2. Serialize and save the resulting model.
                                 // Make sure it is uniquely identifiable with expId and datasetId, maybe as part
                                 // of the toGround folder file system:
-                                try{
-                                    
-                                    LOGGER.log(Level.INFO, "Executed method train");
-                                    saasyml.train();
+                                LOGGER.log(Level.INFO, "Executed method train");
+                                saasyml.train();
 
-                                    // 3. Return a message with a path to the serialized model
-                                    JsonObject selectReponseReply = new JsonObject();
-                                    selectReponseReply.put(Constants.LABEL_TYPE, "cluster");
-                                    selectReponseReply.put(Constants.LABEL_ALGORITHM, algorithm);
-                                    selectReponseReply.put(Constants.LABEL_MODEL_PATH, saasyml.getModelPathSerialized());
-                                        msg.reply(selectReponseReply);
-                                    
-                                } catch (Exception e) {
-                                    // log
-                                    LOGGER.log(Level.SEVERE, "Failed to get training data.", e);
-                    
-                                    // response: error
-                                    msg.reply("Failed to get training data.");
-                                }
-                    
+                                // 3. Return a message with a path to the serialized model
+                                JsonObject selectReponseReply = new JsonObject();
+                                selectReponseReply.put(Constants.LABEL_TYPE, "cluster");
+                                selectReponseReply.put(Constants.LABEL_ALGORITHM, algorithm);
+                                selectReponseReply.put(Constants.LABEL_MODEL_PATH, saasyml.getModelPathSerialized());
+                                msg.reply(selectReponseReply);
+                                
                             }
                         });
                     } else {
