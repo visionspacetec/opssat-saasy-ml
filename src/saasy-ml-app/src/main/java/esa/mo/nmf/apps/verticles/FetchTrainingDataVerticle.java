@@ -27,30 +27,26 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
         vertx.eventBus().consumer(Constants.LABEL_CONSUMER_DATA_SUBSCRIBE, msg -> {
 
             // the request payload (Json)
-            JsonObject payload = (JsonObject)(msg.body());
-            LOGGER.log(Level.INFO, "The POST request payload: " + payload.toString());
+            JsonObject payload = (JsonObject) (msg.body());
+            LOGGER.log(Level.INFO, "The POST "+Constants.LABEL_CONSUMER_DATA_SUBSCRIBE+" request payload: " + payload.toString());
 
             // parse the Json payload
             final int expId = payload.getInteger(Constants.LABEL_EXPID).intValue();
             final int datasetId = payload.getInteger(Constants.LABEL_DATASETID).intValue();
             final double interval = payload.getInteger(Constants.LABEL_INTERVAL).doubleValue();
-            
-            // iterations payload parameter is optional, set it to -1 if it wasn't provided
-            final int iterations = payload.containsKey(Constants.LABEL_ITERATIONS) ? payload.getInteger(Constants.LABEL_ITERATIONS).intValue() : -1;
-            
-            // create list of training data param names from JsonArray
-            final JsonArray trainingDataParamNameJsonArray = payload.getJsonArray(Constants.LABEL_PARAMS);
 
-            List<String> paramNameList = new ArrayList<String>();
-            for(int i = 0; i < trainingDataParamNameJsonArray.size(); i++){
-                paramNameList.add(trainingDataParamNameJsonArray.getString(i));
-            }
+            // iterations payload parameter is optional, set it to -1 if it wasn't provided
+            final int iterations = payload.containsKey(Constants.LABEL_ITERATIONS)
+                    ? payload.getInteger(Constants.LABEL_ITERATIONS).intValue() : -1;
+
+            // create list of training data param names from JsonArray
+            List<String> paramNameList = createArrayFromJsonArray(payload.getJsonArray(Constants.LABEL_PARAMS));
 
             // build Json payload object with just expId and datasetId
             // this will be used for the training data count request
-            JsonObject countPayload = new JsonObject();
-            countPayload.put(Constants.LABEL_EXPID, expId);
-            countPayload.put(Constants.LABEL_DATASETID, datasetId);
+            JsonObject payloadCount = new JsonObject();
+            payloadCount.put(Constants.LABEL_EXPID, expId);
+            payloadCount.put(Constants.LABEL_DATASETID, datasetId);
 
             try {
 
@@ -59,103 +55,107 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
                 ApplicationManager.getInstance().addParamNames(expId, datasetId, paramNameList);
 
                 // create aggregation handler and subscribe the parameter feed
-                ApplicationManager.getInstance().createAggregationHandler(expId, datasetId, interval, paramNameList, true);
+                ApplicationManager.getInstance().createAggregationHandler(expId, datasetId, interval, paramNameList,
+                        true);
 
                 // check periodically when to stop fetching datam if "interations" is set and > 0
-                if(iterations > 0)
-                {
+                if (iterations > 0) {
                     // register periodic timer
                     vertx.setPeriodic(500, id -> {
-                        vertx.eventBus().request("saasyml.training.data.count", countPayload, reply -> {
-                            JsonObject response = (JsonObject)(reply.result().body());
+                        vertx.eventBus().request(Constants.LABEL_CONSUMER_DATA_COUNT, payloadCount, reply -> {
+                            JsonObject response = (JsonObject) (reply.result().body());
 
                             // response object is somehow does not contain the expected parameter (impossible?)
                             // stop timer if this happens
-                            if(!response.containsKey("count")){    
+                            if (!response.containsKey(Constants.LABEL_COUNT)) {
                                 vertx.cancelTimer(id);
 
                             } else {
                                 // get training data row count
                                 // fixme: dividing by paramNameList.size() will break if the number of params change during from one data fetching session to another for
                                 // the same expId and datasetId
-                                int counter = response.getInteger("count").intValue() / paramNameList.size();
+                                int counter = response.getInteger(Constants.LABEL_COUNT).intValue() / paramNameList.size();
 
                                 // the counter is set to -1 if there was an error while attempting to query the database
                                 // stop timer if  this happens
-                                if(counter < 0) {
+                                if (counter < 0) {
                                     vertx.cancelTimer(id);
-                                }
-                                else if(counter >= iterations) {
+                                } else if (counter >= iterations) {
 
                                     // target number of training dataset has been achieved
                                     // unsubscribe from the training data feed
                                     try {
                                         // disable parameter feed
-                                        ApplicationManager.getInstance().enableSupervisorParametersSubscription(expId, datasetId, false);
-            
+                                        ApplicationManager.getInstance().enableSupervisorParametersSubscription(expId,
+                                                datasetId, false);
+
                                         // remove the aggregation handler from the map
                                         ApplicationManager.getInstance().removeAggregationHandler(expId, datasetId);
 
                                         // auto-trigger training if the payload is configured to do so
-                                        if(payload.containsKey("training")) {
+                                        if (payload.containsKey("training")) {
 
                                             // the training parameters can be for more than one algorithm
                                             final JsonArray trainings = payload.getJsonArray("training");
 
                                             // trigger training for each request
-                                            for(int i = 0; i < trainings.size(); i++) {
+                                            for (int i = 0; i < trainings.size(); i++) {
                                                 final JsonObject t = trainings.getJsonObject(i);
 
                                                 // fetch training algorithm selection
-                                                String type = t.getString("type");
+                                                String type = t.getString(Constants.LABEL_TYPE);
 
                                                 // build JSON payload object 
                                                 JsonObject trainPayload = new JsonObject();
                                                 trainPayload.put(Constants.LABEL_EXPID, expId);
                                                 trainPayload.put(Constants.LABEL_DATASETID, datasetId);
-                                                trainPayload.put(Constants.LABEL_ALGORITHM, t.getString(Constants.LABEL_ALGORITHM));
-                                                trainPayload.put(Constants.LABEL_THREAD, t.getBoolean(Constants.LABEL_THREAD));
+                                                trainPayload.put(Constants.LABEL_ALGORITHM,
+                                                        t.getString(Constants.LABEL_ALGORITHM));
+                                                trainPayload.put(Constants.LABEL_THREAD,
+                                                        t.getBoolean(Constants.LABEL_THREAD));
 
                                                 // trigger training
                                                 // vertx.eventBus().send("saasyml.training." + type, trainPayload);
-                                                vertx.eventBus().request(Constants.LABEL_CONSUMER_TRAINING + "." + type, trainPayload,
+                                                vertx.eventBus().request(Constants.LABEL_CONSUMER_TRAINING + "." + type,
+                                                        trainPayload,
                                                         trainReply -> {
-                                                    
-                                                            JsonObject trainResponse = (JsonObject) (trainReply.result().body());
+
+                                                            JsonObject trainResponse = (JsonObject) (trainReply.result()
+                                                                    .body());
                                                             // msg.reply(trainResponse);
-  
-                                                });
+
+                                                        });
                                             }
                                         }
 
                                         // can now stop this periodic check
                                         vertx.cancelTimer(id);
 
-                                    } catch(Exception e) {
+                                    } catch (Exception e) {
                                         LOGGER.log(Level.SEVERE, "Failed to unsubscribe from training data feed.", e);
                                     }
                                 }
                             }
-                        });    
+                        });
                     });
                 }
 
                 // response: success
                 msg.reply("Successfully subscribed to training data feed.");
 
-            } catch(Exception e){
+            } catch (Exception e) {
                 // log
                 LOGGER.log(Level.SEVERE, "Failed to start Aggregation Handler.", e);
 
                 // response: error
                 msg.reply("Failed to subscribe to training data feed.");
-            } 
+            }
         });
 
         // unsubscribe to a training data feed
         vertx.eventBus().consumer(Constants.LABEL_CONSUMER_DATA_UNSUBSCRIBE, msg -> {
             // the request payload (Json)
-            JsonObject payload = (JsonObject)(msg.body());
+            JsonObject payload = (JsonObject) (msg.body());
             LOGGER.log(Level.INFO, "The POST request payload: " + payload.toString());
 
             // parse the Json payload
@@ -169,17 +169,37 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
                 // remove from map
                 ApplicationManager.getInstance().removeAggregationHandler(expId, datasetId);
 
-
                 // response: success
                 msg.reply("Successfully unsubscribed to training data feed.");
 
-            } catch(Exception e) {
+            } catch (Exception e) {
                 // log
                 LOGGER.log(Level.SEVERE, "Failed to unsubscribe from training data feed.", e);
 
                 // response: error
                 msg.reply("Failed to unsubscribe from training data feed.");
             }
-        });    
+        });
+    }
+
+    /**
+     * Convert a jsonArray to an Array List
+     * @param jsonArray holds the json array
+     * @return converted JsonArray to Array List
+     */
+    private List<String> createArrayFromJsonArray(JsonArray jsonArray) {
+
+        // create the variable to hold the array list
+        List<String> paramNameList = new ArrayList<String>();
+
+        jsonArray.forEach(e -> {
+            paramNameList.add((String) e);
+        });
+        /*for (int i = 0; i < jsonArray.size(); i++) {
+            paramNameList.add(jsonArray.getString(i));
+        }*/
+           
+        // retrieve the Array list
+        return paramNameList;
     }
 }

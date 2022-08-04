@@ -10,6 +10,7 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Context;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 
 import java.sql.Connection;
@@ -39,11 +40,7 @@ public class DatabaseVerticle extends AbstractVerticle {
     private final String SQL_INSERT_TRAINING_DATA = "INSERT INTO training_data(exp_id, dataset_id, param_name, data_type, value, timestamp) VALUES(?, ?, ?, ?, ?, ?)";
     private final String SQL_DELETE_TRAINING_DATA = "DELETE FROM training_data WHERE exp_id = ? AND dataset_id = ?";
     private final String SQL_COUNT_TRAINING_DATA = "SELECT count(*) FROM  training_data WHERE exp_id = ? AND dataset_id = ?";
-    
-    
-    private final String SQL_COUNT_COLUMNS_TRAINING_DATA = "SELECT count(*) FROM  training_data WHERE exp_id = ? AND dataset_id = ? GROUP BY timestamp LIMIT 1";
-
-
+    private final String SQL_COUNT_COLUMNS_TRAINING_DATA = "SELECT count(*) FROM  training_data WHERE exp_id = ? AND dataset_id = ? GROUP BY timestamp LIMIT 1"; // "SELECT count(DISTINCT param_name) FROM training_data WHERE exp_id=? AND dataset_id=?"
     private final String SQL_SELECT_TRAINING_DATA = "SELECT * FROM training_data WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp DESC";
     private final String SQL_CREATE_TABLE_TRAINING_DATA = 
         "CREATE TABLE IF NOT EXISTS training_data(" +
@@ -156,13 +153,13 @@ public class DatabaseVerticle extends AbstractVerticle {
                     prep.executeBatch();
 
                     // auto-trigger training if the payload is configured to do so
-                    if(payload.containsKey(Constants.LABEL_TRAINING)) {
+                    if (payload.containsKey(Constants.LABEL_TRAINING)) {
 
                         // the training parameters can be for more than one algorithm
                         final JsonArray trainings = payload.getJsonArray(Constants.LABEL_TRAINING);
 
                         // trigger training for each request
-                        for(int i = 0; i < trainings.size(); i++) {
+                        for (int i = 0; i < trainings.size(); i++) {
                             final JsonObject t = trainings.getJsonObject(i);
 
                             // fetch training algorithm selection
@@ -221,14 +218,14 @@ public class DatabaseVerticle extends AbstractVerticle {
             // count training data records
             int counter = -1;
             try {
-                counter = this.countTrainingData(expId, datasetId);
+                counter = this.countTrainingData(expId, datasetId, SQL_COUNT_TRAINING_DATA);
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Error while trying to count training data rows in the database", e);
             }
 
             // response
             JsonObject response = new JsonObject();
-            response.put("count", counter);
+            response.put(Constants.LABEL_COUNT, counter);
             msg.reply(response);
             
         });
@@ -246,14 +243,14 @@ public class DatabaseVerticle extends AbstractVerticle {
             // count training data records
             int counter = -1;
             try {
-                counter = this.countRowsTrainingData(expId, datasetId);
+                counter = this.countTrainingData(expId, datasetId, SQL_COUNT_COLUMNS_TRAINING_DATA);
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Error while trying to count training data rows in the database", e);
             }
 
             // response
             JsonObject response = new JsonObject();
-            response.put("count", counter);
+            response.put(Constants.LABEL_COUNT, counter);
             msg.reply(response);
             
         });
@@ -278,7 +275,7 @@ public class DatabaseVerticle extends AbstractVerticle {
             
             // response
             JsonObject response = new JsonObject();
-            response.put("data", data);
+            response.put(Constants.LABEL_DATA, data);
             msg.reply(response);
 
         });
@@ -332,11 +329,12 @@ public class DatabaseVerticle extends AbstractVerticle {
 
         // execute the delete statement
         ps.executeUpdate();
+        ps.close();
     }
 
-    private int countTrainingData(int expId, int datasetId) throws Exception {
+    private int countTrainingData(int expId, int datasetId, String querySQL) throws Exception {
         // create the prepared statement
-        PreparedStatement ps = this.conn.prepareStatement(SQL_COUNT_TRAINING_DATA);
+        PreparedStatement ps = this.conn.prepareStatement(querySQL);
 
         // set satement parameters
         ps.setInt(1, expId); // experiment id
@@ -345,25 +343,13 @@ public class DatabaseVerticle extends AbstractVerticle {
         // execute the delete statement
         ResultSet rs = ps.executeQuery();
 
-        // return the result
-        rs.next();
-        return rs.getInt(1);
-    }
-
-    private int countRowsTrainingData(int expId, int datasetId) throws Exception {
-        // create the prepared statement
-        PreparedStatement ps = this.conn.prepareStatement(SQL_COUNT_COLUMNS_TRAINING_DATA);
-
-        // set satement parameters
-        ps.setInt(1, expId); // experiment id
-        ps.setInt(2, datasetId); // dataset id
-
-        // execute the delete statement
-        ResultSet rs = ps.executeQuery();
-
-        // return the result
-        rs.next();
-        return rs.getInt(1);
+        // return the result        
+        if (rs.next()) {
+            return rs.getInt(1);
+        } else {
+            LOGGER.log(Level.SEVERE, "Error in the Query. Please, check the statement parameters");
+            return -1;
+        }
     }
     
     private JsonArray selectTrainingData(int expId, int datasetId) throws Exception {

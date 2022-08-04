@@ -220,6 +220,11 @@ public class MainVerticle extends AbstractVerticle {
             // error response message
             Map<String, String> responseMap = new HashMap<String, String>();
             responseMap.put("message", "error while saving training data.");
+
+            // error response
+            ctx.request().response()
+                .putHeader("content-type", "application/json; charset=utf-8")
+                .end(Json.encodePrettily(responseMap));
         }
     }
 
@@ -243,6 +248,10 @@ public class MainVerticle extends AbstractVerticle {
             // error response message
             Map<String, String> responseMap = new HashMap<String, String>();
             responseMap.put("message", "error while deleting training data.");
+            // error response
+            ctx.request().response()
+                .putHeader("content-type", "application/json; charset=utf-8")
+                .end(Json.encodePrettily(responseMap));
         }
     }
 

@@ -73,7 +73,7 @@ public class PropertiesManager {
      * Searches for the property with the specified key in the application's properties.
      *
      * @param key The property key
-     * @param default The default value
+     * @param defaultValue The default value
      * @return The property or null if the property is not found
      */
     public String getProperty(String key, String defaultValue) {

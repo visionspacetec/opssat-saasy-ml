@@ -68,7 +68,7 @@ public class AppMCAdapter extends MonitorAndControlNMFAdapter{
     /**
      * Sets the NMF connector, the application's NMF provider.
      * 
-     * @param the connector to set
+     * @param connector the connector to set
      */
     public void setConnector(NanoSatMOConnectorImpl connector) {
          this.connector = connector;
@@ -121,7 +121,7 @@ public class AppMCAdapter extends MonitorAndControlNMFAdapter{
     /**
      * Sets the the application's NMF consumer (consuming supervisor).
      * 
-     * @param the consumer to set
+     * @param supervisorSMA the consumer to set
      */
     public void setSupervisorSMA(SpaceMOApdapterImpl supervisorSMA) {
         this.supervisorSMA = supervisorSMA;

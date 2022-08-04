@@ -56,7 +56,7 @@ public class AggregationHandler {
      * @param expId the experiment id
      * @param datasetId the dataset id
      * @param paramSamplingInterval sampling interval in seconds
-     * @param parametersNames names of datapool parameters to sample
+     * @param paramNames names of datapool parameters to sample
      */
     public AggregationHandler(int expId, int datasetId, double paramSamplingInterval, List<String> paramNames) throws Exception {
         this.paramSamplingInterval = paramSamplingInterval;
@@ -71,7 +71,7 @@ public class AggregationHandler {
      * Toggle the subscription to the OBSW parameters values we need.
      * 
      * @param subscribe True if we want supervisor to push new parameters data, false to stop the push
-     * @return null if it was successful. If not null, then the returned value holds the error number
+     * return null if it was successful. If not null, then the returned value holds the error number
      */
     public synchronized void enableSupervisorParametersSubscription(boolean subscribe) throws Exception{    
         if (subscribe) {
