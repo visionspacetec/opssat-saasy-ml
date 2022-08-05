@@ -31,7 +31,11 @@ import jsat.clustering.Clusterer;
 import jsat.clustering.FLAME;
 import jsat.linear.distancemetrics.EuclideanDistance;
 import jsat.lossfunctions.LogisticLoss;
+import jsat.outlier.DensityOutlier;
 import jsat.outlier.IsolationForest;
+import jsat.outlier.LOF;
+import jsat.outlier.LinearOCSVM;
+import jsat.outlier.LoOP;
 import jsat.outlier.Outlier;
 
 /**
@@ -154,7 +158,16 @@ public class MLPipeLineFactory {
 
         switch (modelName){
             default:
-            case "IsolationForest" : return new IsolationForest();
+            case "IsolationForest":
+                return new IsolationForest();
+            case "DensityOutlier":
+                return new DensityOutlier();
+            case "LOF":
+                return new LOF();  
+            case "LoOP":
+                return new LoOP();
+            case "LinearOCSVM": // test
+                return new LinearOCSVM();
         }
     }
 
@@ -184,8 +197,16 @@ public class MLPipeLineFactory {
             case "STGD" : 
             case "StochasticMultinomialLogisticRegression":
                 return TypeModel.Classifier;
-            case "FLAME" :                  return TypeModel.Cluster;
-            case "IsolationForest":         return TypeModel.Outlier;
+
+            case "FLAME":
+                return TypeModel.Cluster;
+            
+            case "IsolationForest": 
+            case "DensityOutlier":
+            case "LOF":        
+            case "LoOP":       
+            case "LinearOCSVM":
+                return TypeModel.Outlier;
         }
 
         return TypeModel.Unknown;
