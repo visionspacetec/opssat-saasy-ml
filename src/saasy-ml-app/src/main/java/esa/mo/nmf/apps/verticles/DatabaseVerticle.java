@@ -3,14 +3,17 @@ package esa.mo.nmf.apps.verticles;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
+import java.util.Iterator;
+
+import javafx.application.Application;
 import javafx.util.Pair;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Context;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 
 import java.sql.Connection;
@@ -19,12 +22,14 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 
 
 import org.sqlite.SQLiteConfig;
 
+import esa.mo.nmf.apps.ApplicationManager;
 import esa.mo.nmf.apps.Constants;
 import esa.mo.nmf.apps.PropertiesManager;
 
@@ -38,10 +43,12 @@ public class DatabaseVerticle extends AbstractVerticle {
 
     // sql query strings
     private final String SQL_INSERT_TRAINING_DATA = "INSERT INTO training_data(exp_id, dataset_id, param_name, data_type, value, timestamp) VALUES(?, ?, ?, ?, ?, ?)";
-    private final String SQL_DELETE_TRAINING_DATA = "DELETE FROM training_data WHERE exp_id = ? AND dataset_id = ?";
+    private final String SQL_INSERT_LABELS = "INSERT INTO labels(exp_id, dataset_id, name, value, timestamp) VALUES(?, ?, ?, ?, ?)";
     private final String SQL_COUNT_TRAINING_DATA = "SELECT count(*) FROM  training_data WHERE exp_id = ? AND dataset_id = ?";
     private final String SQL_COUNT_COLUMNS_TRAINING_DATA = "SELECT count(*) FROM  training_data WHERE exp_id = ? AND dataset_id = ? GROUP BY timestamp LIMIT 1"; // "SELECT count(DISTINCT param_name) FROM training_data WHERE exp_id=? AND dataset_id=?"
     private final String SQL_SELECT_TRAINING_DATA = "SELECT * FROM training_data WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp DESC";
+    private final String SQL_DELETE_TRAINING_DATA = "DELETE FROM training_data WHERE exp_id = ? AND dataset_id = ?";
+    private final String SQL_DELETE_LABELS = "DELETE FROM labels WHERE exp_id = ? AND dataset_id = ?";
     private final String SQL_CREATE_TABLE_TRAINING_DATA = 
         "CREATE TABLE IF NOT EXISTS training_data(" +
             "exp_id INTEGER NOT NULL, " +
@@ -49,6 +56,14 @@ public class DatabaseVerticle extends AbstractVerticle {
             "param_name TEXT NOT NULL, " +
             "data_type INTEGER NOT NULL, " +
             "value TEXT NOT NULL, " +
+            "timestamp TIMESTAMP NOT NULL" +
+        ")";
+    private final String SQL_CREATE_TABLE_LABELS = 
+        "CREATE TABLE IF NOT EXISTS labels(" +
+            "exp_id INTEGER NOT NULL, " +
+            "dataset_id INTEGER NOT NULL, " +
+            "name TEXT NOT NULL, " +
+            "value BOOLEAN NOT NULL, " +
             "timestamp TIMESTAMP NOT NULL" +
         ")";
 
@@ -76,6 +91,14 @@ public class DatabaseVerticle extends AbstractVerticle {
                         LOGGER.log(Level.INFO, "Created the training data table.");
                     }else {
                         LOGGER.log(Level.INFO, "The training data table already exists.");
+                    }
+
+                    // check if the labels table exists and create it if it does not.
+                    if(!this.labelsTableExists()) {
+                        this.createLabelsTable();
+                        LOGGER.log(Level.INFO, "Created the labels table.");
+                    }else {
+                        LOGGER.log(Level.INFO, "The labels table already exists.");
                     }
                     
                 }else {
@@ -121,11 +144,10 @@ public class DatabaseVerticle extends AbstractVerticle {
             List<String> paramNames = new ArrayList<String>();
             List<Long> timestamps = new ArrayList<Long>();
 
-            try {
-                // the prepared statement
-                PreparedStatement prep = this.conn.prepareStatement(
-                    SQL_INSERT_TRAINING_DATA
-                );
+            // the prepared statement
+            PreparedStatement prep = null;
+
+            try { 
 
                 // fetch data
                 data.forEach(dataset -> {
@@ -146,37 +168,94 @@ public class DatabaseVerticle extends AbstractVerticle {
                         timestamps.add(p.getLong(Constants.LABEL_TIMESTAMP));
                     });
                 });
-
-                // create the prepared statement and execute
-                try {
-                    this.setInsertTrainingDataPreparedStatementParameters(prep, expId, datasetId, paramNames, paramValues, timestamps);
-                    prep.executeBatch();
-
-                    // auto-trigger training if the payload is configured to do so
-                    if (payload.containsKey(Constants.LABEL_TRAINING)) {
-
-                        // the training parameters can be for more than one algorithm
-                        final JsonArray trainings = payload.getJsonArray(Constants.LABEL_TRAINING);
-
-                        // trigger training for each request
-                        for (int i = 0; i < trainings.size(); i++) {
-                            final JsonObject t = trainings.getJsonObject(i);
-
-                            // fetch training algorithm selection
-                            String type = t.getString(Constants.LABEL_TYPE);
-
-                            // trigger training
-                            vertx.eventBus().send(Constants.LABEL_CONSUMER_TRAINING + "." + type, payload);
-                        }
-                    }
-
-                } catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, "Failed to insert training data into the database.", e);
-                }  
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Error while trying to insert training data into the database", e);
+                LOGGER.log(Level.SEVERE, "Error preparing training data and labels to insert into the database.", e);
+
+                // response
+                msg.reply("error preparing training data to insert into the database.");
+                return;
             }
 
+            // create the prepared statement and execute
+            try {
+
+                // no commit per statement
+                this.conn.setAutoCommit(false);
+
+                // insert training data
+                prep = this.conn.prepareStatement(
+                    SQL_INSERT_TRAINING_DATA
+                );
+
+                this.setInsertTrainingDataPreparedStatementParameters(prep, expId, datasetId, paramNames, paramValues, timestamps);
+                prep.executeBatch();
+                prep.close();
+
+                // insert labels
+                prep = this.conn.prepareStatement(
+                    SQL_INSERT_LABELS
+                );
+
+                this.setInsertLabelsPreparedStatementParameters(prep, expId, datasetId, timestamps.get(0));
+                prep.executeBatch();
+                prep.close();
+
+            } catch (Exception e) {
+                try {
+
+                    // reset auto-commit to true
+                    this.conn.setAutoCommit(true); 
+
+                    // an error has occured: rollback
+                    LOGGER.log(Level.SEVERE, "Failed to insert training data and labels into the database: rolling back.", e);
+                    this.conn.rollback();
+
+                    // response
+                    msg.reply("failed to insert training data and labels into the database.");
+                    return;
+
+                } catch(SQLException sqle) {
+                    LOGGER.log(Level.SEVERE, "Error rolling back.", sqle);
+
+                    // response
+                    msg.reply("failed to insert training data and labels, could not rollback.");
+                    return;
+                } 
+            }
+
+            // cleanup resources
+            try {
+                // reset auto-commit to true
+                this.conn.setAutoCommit(true); 
+
+                if(prep != null && !prep.isClosed()) {
+                    
+                    prep.close();
+                }
+            }
+            catch (SQLException e) {
+                LOGGER.log(Level.SEVERE, "Error cleaning up.", e);
+            }
+
+
+            // auto-trigger training if the payload is configured to do so
+            if (payload.containsKey(Constants.LABEL_TRAINING)) {
+
+                // the training parameters can be for more than one algorithm
+                final JsonArray trainings = payload.getJsonArray(Constants.LABEL_TRAINING);
+
+                // trigger training for each request
+                for (int i = 0; i < trainings.size(); i++) {
+                    final JsonObject t = trainings.getJsonObject(i);
+
+                    // fetch training algorithm selection
+                    String type = t.getString(Constants.LABEL_TYPE);
+
+                    // trigger training
+                    vertx.eventBus().send(Constants.LABEL_CONSUMER_TRAINING + "." + type, payload);
+                }
+            }
+           
             // response
             msg.reply("saved training data.");
         });
@@ -198,7 +277,7 @@ public class DatabaseVerticle extends AbstractVerticle {
                 msg.reply("deleted training data.");
 
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Error while trying to delete training data from the database", e);
+                LOGGER.log(Level.SEVERE, "Error while trying to delete training data from the database.", e);
 
                 // response
                 msg.reply("error deleting training data.");
@@ -220,7 +299,7 @@ public class DatabaseVerticle extends AbstractVerticle {
             try {
                 counter = this.countTrainingData(expId, datasetId, SQL_COUNT_TRAINING_DATA);
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Error while trying to count training data rows in the database", e);
+                LOGGER.log(Level.SEVERE, "Error while trying to count training data rows in the database.", e);
             }
 
             // response
@@ -245,7 +324,7 @@ public class DatabaseVerticle extends AbstractVerticle {
             try {
                 counter = this.countTrainingData(expId, datasetId, SQL_COUNT_COLUMNS_TRAINING_DATA);
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Error while trying to count training data rows in the database", e);
+                LOGGER.log(Level.SEVERE, "Error while trying to count training data rows in the database.", e);
             }
 
             // response
@@ -270,7 +349,7 @@ public class DatabaseVerticle extends AbstractVerticle {
             try {
                 data = this.selectTrainingData(expId, datasetId);
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Error while trying to get training data in the database", e);
+                LOGGER.log(Level.SEVERE, "Error while trying to get training data in the database.", e);
             }
             
             // response
@@ -306,6 +385,31 @@ public class DatabaseVerticle extends AbstractVerticle {
         }
     }
 
+    private void setInsertLabelsPreparedStatementParameters(PreparedStatement prep,
+        int expId, int datasetId, Long timestamp) throws Exception {
+
+        // fetch the label map for the given experiment and dataset ids
+        Map<String, Boolean> labelMap = ApplicationManager.getInstance().getLabels(expId, datasetId);
+
+        // iterator to iterate through the map
+        Iterator<Map.Entry<String, Boolean>> iter = labelMap.entrySet().iterator();
+          
+        // prepare a prepared statement for each batch of training data fetched for the given experiment and dataset id
+        while(iter.hasNext()){
+            Map.Entry<String, Boolean> label = iter.next();
+
+            // set satement parameters
+            prep.setInt(1, expId); // experiment id
+            prep.setInt(2, datasetId); // dataset id
+            prep.setString(3, label.getKey()); // get label name
+            prep.setBoolean(4, label.getValue()); // get label value
+            prep.setTimestamp(5, new Timestamp(timestamp)); // the timestamp returned by NMF marking when the data was fetched
+
+            // add to batch
+            prep.addBatch();
+        }
+    }
+
     /**
     private void insertTrainingData(int expId, int datasetId, List<String> paramNames, List<Pair<Integer, String>> paramValues, List<Long>timestamps) throws Exception {
         // create the prepared statement
@@ -320,8 +424,69 @@ public class DatabaseVerticle extends AbstractVerticle {
     } */
 
     private void deleteTrainingData(int expId, int datasetId) throws Exception {
+        
+        // when deleting training data we need to also delete their labels in the labels table
+        // we have two execute 2 delete statements in 2 different tables
+        // we can't have a sitation where one query fails and the other succeeds
+        // manage this with transactions
+
+        // no commit per statement
+        this.conn.setAutoCommit(false); 
+
+        // the prepared statement object that will be used for both training data and labels deletes
+        PreparedStatement ps = null;
+
+        try {    
+            // init the prepared statement to delete the training data
+            ps = this.conn.prepareStatement(SQL_DELETE_TRAINING_DATA);
+
+            // set satement parameters
+            ps.setInt(1, expId); // experiment id
+            ps.setInt(2, datasetId); // dataset id
+
+            // execute the delete statement to delete training data
+            ps.executeUpdate();
+
+            // close
+            ps.close();
+
+            // init the prepared statement to delete the labels
+            ps = this.conn.prepareStatement(SQL_DELETE_LABELS);
+
+            // set satement parameters
+            ps.setInt(1, expId); // experiment id
+            ps.setInt(2, datasetId); // dataset id
+
+            // execute the delete statement to delete labels
+            ps.executeUpdate();
+
+            // close
+            ps.close();
+
+        } catch(SQLException e){
+            // an error has occured: rollback
+            LOGGER.log(Level.SEVERE, "Error executing the training data and labels delete transaction: rolling back", e);
+            this.conn.rollback();
+
+        } finally {
+            try {
+                // reset auto-commit to true
+                this.conn.setAutoCommit(true); 
+
+                if(ps != null && !ps.isClosed()) {
+                    // cleanup resources
+                    ps.close();
+                }
+            }
+            catch (SQLException e) {
+                LOGGER.log(Level.SEVERE, "Error cleaning up", e);
+            }
+        }  
+    }
+
+    private void deleteLabels(int expId, int datasetId) throws Exception {
         // create the prepared statement
-        PreparedStatement ps = this.conn.prepareStatement(SQL_DELETE_TRAINING_DATA);
+        PreparedStatement ps = this.conn.prepareStatement(SQL_DELETE_LABELS);
 
         // set satement parameters
         ps.setInt(1, expId); // experiment id
@@ -343,6 +508,8 @@ public class DatabaseVerticle extends AbstractVerticle {
         // execute the delete statement
         ResultSet rs = ps.executeQuery();
 
+        // todo: ps.close()?
+
         // return the result        
         if (rs.next()) {
             return rs.getInt(1);
@@ -363,6 +530,8 @@ public class DatabaseVerticle extends AbstractVerticle {
 
         // execute the select statement
         ResultSet rs = ps.executeQuery();
+
+        // todo: ps.close()?
 
         // return the result
         return toJSON(rs);
@@ -398,7 +567,7 @@ public class DatabaseVerticle extends AbstractVerticle {
         DatabaseMetaData md = this.conn.getMetaData();
         ResultSet tables = md.getTables(null, null, "training_data", null);
 
-        // returm true if the table exists and false if it does not
+        // return true if the table exists and false if it does not
         return tables.next() ? true : false;
     }
 
@@ -409,6 +578,28 @@ public class DatabaseVerticle extends AbstractVerticle {
 
         // execute the statement to create the table
         stmt.executeUpdate(SQL_CREATE_TABLE_TRAINING_DATA);
+
+        // close the statement
+        stmt.close();
+    }
+
+    private boolean labelsTableExists() throws Exception {
+
+        // search for table macthing expected table name
+        DatabaseMetaData md = this.conn.getMetaData();
+        ResultSet tables = md.getTables(null, null, "labels", null);
+
+        // return true if the table exists and false if it does not
+        return tables.next() ? true : false;
+    }
+
+    private void createLabelsTable() throws Exception {
+
+        // create a statement
+        Statement stmt = this.conn.createStatement();
+
+        // execute the statement to create the table
+        stmt.executeUpdate(SQL_CREATE_TABLE_LABELS);
 
         // close the statement
         stmt.close();

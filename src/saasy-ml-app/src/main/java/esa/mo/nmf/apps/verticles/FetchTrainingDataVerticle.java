@@ -3,7 +3,10 @@ package esa.mo.nmf.apps.verticles;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.json.JsonObject;
@@ -38,6 +41,15 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
             // iterations payload parameter is optional, set it to -1 if it wasn't provided
             final int iterations = payload.containsKey(Constants.LABEL_ITERATIONS)
                     ? payload.getInteger(Constants.LABEL_ITERATIONS).intValue() : -1;
+
+            // the labels map for the expected output
+            // this will be read when inserting the fetched training data
+            // the labels will be inserted into their own labels table
+            if(payload.containsKey(Constants.LABEL_LABELS))
+            {
+                final Map<String, Boolean> labelMap = createLabelMapFromJsonObject(payload.getJsonObject(Constants.LABEL_LABELS));
+                ApplicationManager.getInstance().addLabels(expId, datasetId, labelMap);
+            }
 
             // create list of training data param names from JsonArray
             List<String> paramNameList = createArrayFromJsonArray(payload.getJsonArray(Constants.LABEL_PARAMS));
@@ -201,5 +213,23 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
            
         // retrieve the Array list
         return paramNameList;
+    }
+
+    private Map<String, Boolean> createLabelMapFromJsonObject(JsonObject jsonObject) {
+
+        // the labels (expected output) map
+        Map<String, Boolean> labelMap = new HashMap<String, Boolean>();
+
+        // iterator to loop through the json object's <key, value> pairs
+        Iterator<Map.Entry<String, Object>> iter = jsonObject.iterator();
+        
+        // put <key, value> pairs in the map
+        while(iter.hasNext()){
+            Map.Entry<String, Object> entry = iter.next();
+            labelMap.put(entry.getKey(), (Boolean)entry.getValue());
+        }
+
+        // return the map
+        return labelMap;
     }
 }

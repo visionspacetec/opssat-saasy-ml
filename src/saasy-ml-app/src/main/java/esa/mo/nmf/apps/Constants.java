@@ -27,6 +27,7 @@ public final class Constants {
     public static final String LABEL_THREAD = "thread";
     public static final String LABEL_INTERVAL = "interval";
     public static final String LABEL_ITERATIONS = "iterations";
+    public static final String LABEL_LABELS = "labels";
     public static final String LABEL_PARAMS = "params";
     public static final String LABEL_COUNT = "count";
     public static final String LABEL_MODEL_PATH = "model_path";
