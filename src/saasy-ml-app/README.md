@@ -179,7 +179,7 @@ Use an API platform like [Postman](https://www.postman.com/) to make an POST req
 http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/data/subscribe
 ```
 
-Sample payload:
+Sample payload with label values (expected output) provided by the client:
 
 ```json
 {
@@ -187,6 +187,27 @@ Sample payload:
     "datasetId": 1,
     "iterations": 10,
     "interval": 2,
+    "labels": {
+        "0": true,
+        "1": false,
+        "2": false
+    },
+    "params": ["GNC_0005", "GNC_0011", "GNC_0007"]
+}
+```
+
+Sample payload with label values calculated by a plugin given fetched parameters:
+
+```json
+{
+    "expId": 123,
+    "datasetId": 1,
+    "iterations": 10,
+    "interval": 2,
+    "labelsPlugin": {
+        "params": ["GNC_0001", "GNC_0002", "GNC_0003"],
+        "class": "esa.mo.nmf.apps.MyCustomLabelsPlugin"
+    },
     "params": ["GNC_0005", "GNC_0011", "GNC_0007"]
 }
 ```
@@ -199,6 +220,11 @@ Make several of these requests with different values for `expId`, `datasetId`, `
     "datasetId": 1,
     "iterations": 10,
     "interval": 2,
+    "labels": {
+        "0": false,
+        "1": true,
+        "2": false
+    },
     "params": ["GNC_0005", "GNC_0011", "GNC_0007"],
     "training": [
         {
@@ -245,6 +271,11 @@ Sample payload:
 ```json
 {
     "expId": 123,
+    "labels": {
+        "0": false,
+        "1": false,
+        "2": true
+    },
     "data": [
         [
             {

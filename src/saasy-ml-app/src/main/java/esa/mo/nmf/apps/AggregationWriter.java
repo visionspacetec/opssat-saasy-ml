@@ -92,7 +92,7 @@ public class AggregationWriter implements CompleteAggregationReceivedListener {
             payload.put("data", data);
             
             // send the payload to the database verticle
-            this.vertx.eventBus().send("saasyml.training.data.save", payload);   
+            this.vertx.eventBus().send(Constants.LABEL_CONSUMER_DATA_SAVE, payload);   
 
         }catch(Exception e) {
             LOGGER.log(Level.SEVERE, "Error fetching and writing parameters for aggregation " + aggId + ".", e);

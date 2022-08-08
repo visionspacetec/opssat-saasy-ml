@@ -14,13 +14,18 @@ public class ApplicationManager {
     // map to track parameter names for the requested data
     // we need this because the response object received in the onReceivedData listener does not reference the parameter names
     private Map<Pair<Integer, Integer>, List<String>> paramNamesMap;
+
+    // map to track the label (expected output) for the requested data
+    private Map<Pair<Integer, Integer>, Map<String, Boolean>> labelMap;
     
     // map that contains all instances of aggregation handlers
     private Map<Pair<Integer, Integer>, AggregationHandler> aggregationHandlerMap;
 
+
     // hide the constructor
     private ApplicationManager() {
         this.paramNamesMap = new ConcurrentHashMap<Pair<Integer, Integer>, List<String>>();
+        this.labelMap = new ConcurrentHashMap<Pair<Integer, Integer>, Map<String, Boolean>>();
         this.aggregationHandlerMap = new ConcurrentHashMap<Pair<Integer, Integer>, AggregationHandler>();
     }
 
@@ -50,6 +55,14 @@ public class ApplicationManager {
 
     public List<String> getParamNames(int expId, int datasetId) {
         return this.paramNamesMap.get(new Pair<Integer, Integer>(expId, datasetId));
+    }
+
+    public void addLabels(int expId, int datasetId, Map<String, Boolean> labelMap) {
+        this.labelMap.put(new Pair<Integer, Integer>(expId, datasetId), labelMap);
+    }
+
+    public Map<String, Boolean> getLabels(int expId, int datasetId) {
+        return this.labelMap.get(new Pair<Integer, Integer>(expId, datasetId));
     }
 
     public void addAggregationHandler(int expId, int datasetId, AggregationHandler aggregationHandler) {
