@@ -1,7 +1,5 @@
 package esa.mo.nmf.apps.saasyml.factories;
 
-import javax.swing.SwingUtilities;
-
 import esa.mo.nmf.apps.saasyml.common.IPipeLineLayer;
 import esa.mo.nmf.apps.saasyml.service.PipeLineClassifierJSAT;
 import esa.mo.nmf.apps.saasyml.service.PipeLineClusterJSAT;
@@ -17,7 +15,6 @@ import jsat.classifiers.linear.LinearSGD;
 import jsat.classifiers.linear.LogisticRegressionDCD;
 import jsat.classifiers.linear.NHERD;
 import jsat.classifiers.linear.NewGLMNET;
-import jsat.classifiers.linear.OWA;
 import jsat.classifiers.linear.PassiveAggressive;
 import jsat.classifiers.linear.SCD;
 import jsat.classifiers.linear.SCW;
@@ -26,7 +23,6 @@ import jsat.classifiers.linear.SMIDAS;
 import jsat.classifiers.linear.SPA;
 import jsat.classifiers.linear.STGD;
 import jsat.classifiers.linear.StochasticMultinomialLogisticRegression;
-import jsat.classifiers.linear.StochasticSTLinearL1;
 import jsat.clustering.Clusterer;
 import jsat.clustering.FLAME;
 import jsat.linear.distancemetrics.EuclideanDistance;

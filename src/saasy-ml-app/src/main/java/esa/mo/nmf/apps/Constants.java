@@ -37,6 +37,7 @@ public final class Constants {
     public static final String LABEL_ENDPOINT_DATA_SUBSCRIBE = "/api/v1/training/data/subscribe";
     public static final String LABEL_ENDPOINT_DATA_UNSUBSCRIBE = "/api/v1/training/data/unsubscribe";
     public static final String LABEL_ENDPOINT_DATA_SAVE = "/api/v1/training/data/save";
+    public static final String LABEL_ENDPOINT_DATA_DOWNLOAD = "/api/v1/training/data/download";
     public static final String LABEL_ENDPOINT_DATA_DELETE = "/api/v1/training/data/delete";
     public static final String LABEL_ENDPOINT_TRAINING = "/api/v1/training/:type/";
     public static final String LABEL_ENDPOINT_TRAINING_ALGORITHM = LABEL_ENDPOINT_TRAINING + ":algorithm/";
@@ -48,6 +49,7 @@ public final class Constants {
     public static final String LABEL_CONSUMER_TRAINING_CLUSTER = LABEL_CONSUMER_TRAINING + ".cluster";
     public static final String LABEL_CONSUMER_TRAINING_OUTLIER = LABEL_CONSUMER_TRAINING + ".outlier";
     public static final String LABEL_CONSUMER_DATA_SAVE = LABEL_CONSUMER_TRAINING + ".data.save";
+    public static final String LABEL_CONSUMER_DATA_DOWNLOAD = LABEL_CONSUMER_TRAINING + ".data.download";
     public static final String LABEL_CONSUMER_DATA_DELETE = LABEL_CONSUMER_TRAINING + ".data.delete";
     public static final String LABEL_CONSUMER_DATA_COUNT = LABEL_CONSUMER_TRAINING + ".data.count";
     public static final String LABEL_CONSUMER_DATA_COUNT_COLUMNS = LABEL_CONSUMER_TRAINING + ".data.count_columns";

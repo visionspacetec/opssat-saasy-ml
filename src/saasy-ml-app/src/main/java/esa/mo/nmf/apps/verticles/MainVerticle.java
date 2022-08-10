@@ -7,6 +7,7 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.util.HashMap;
@@ -79,7 +80,7 @@ public class MainVerticle extends AbstractVerticle {
         int length = simpleNames.length;
 
         // create and deploy the Verticles
-        LOGGER.log(Level.INFO, "Deploying Verticles --------------------");
+        LOGGER.log(Level.INFO, "Deploying Verticles");
         for (int index = 0; index < length; index++) {
 
             // create the Verticle as deployment Options
@@ -115,6 +116,11 @@ public class MainVerticle extends AbstractVerticle {
         router.post(Constants.LABEL_ENDPOINT_DATA_UNSUBSCRIBE)
                 .handler(BodyHandler.create())
                 .handler(this::trainingDataUnsubscribe);
+
+        // route for downloading training data feed 
+        router.post(Constants.LABEL_ENDPOINT_DATA_DOWNLOAD)
+                .handler(BodyHandler.create())
+                .handler(this::trainingDataDownload);
 
         // route for uploading custom training data feed 
         router.post(Constants.LABEL_ENDPOINT_DATA_SAVE)
@@ -201,7 +207,7 @@ public class MainVerticle extends AbstractVerticle {
     }
 
     /**
-     * delete training data
+     * save custom training data
      * 
      * @param ctx body context of the request
      */
@@ -223,9 +229,89 @@ public class MainVerticle extends AbstractVerticle {
 
             // error response
             ctx.request().response()
+                    .putHeader("content-type", "application/json; charset=utf-8")
+                    .end(Json.encodePrettily(responseMap));
+        }
+    }
+    
+    /**
+     * download training data
+     * 
+     * @param ctx body context of the request
+     */
+    void trainingDataDownload(RoutingContext ctx) {
+        // payload
+        JsonObject payload = ctx.getBodyAsJson();
+
+        try {
+            
+            // forward request to event bus to be handled in the appropriate Verticle
+            vertx.eventBus().request(Constants.LABEL_CONSUMER_DATA_SELECT, payload, reply -> {
+                JsonObject json = (JsonObject) reply.result().body();
+
+                json = prepareDownloadResponse(json);
+                json.put(Constants.LABEL_EXPID, payload.getInteger(Constants.LABEL_EXPID));
+                json.put(Constants.LABEL_DATASETID, payload.getInteger(Constants.LABEL_DATASETID));
+                
+                ctx.request().response()
+                    .putHeader("Content-Type", "application/json; charset=utf-8")
+                    .end(json.encode());
+            });
+
+        } catch (Exception e) {
+            // error response message
+            Map<String, String> responseMap = new HashMap<String, String>();
+            responseMap.put("message", "error while saving training data.");
+
+            // error response
+            ctx.request().response()
                 .putHeader("content-type", "application/json; charset=utf-8")
                 .end(Json.encodePrettily(responseMap));
         }
+    }
+
+    private JsonObject prepareDownloadResponse(JsonObject json) {
+
+        JsonArray newData = new JsonArray();
+        JsonArray finalResponse = new JsonArray();
+
+        JsonArray data = json.getJsonArray(Constants.LABEL_DATA);
+
+        // variable to control the number of columns
+        String timestamp = "";
+
+        // iterate throughout all the data
+        for (int pos = 0; pos < data.size(); pos++) {
+
+            // get the Json Object and store the value
+            JsonObject object = data.getJsonObject(pos);
+
+            String cur_timestamp = object.getString(Constants.LABEL_TIMESTAMP);
+            if (timestamp == "") {
+                timestamp = cur_timestamp;
+            }
+
+            // create a new JsonObject
+            JsonObject newObject = new JsonObject();
+            newObject.put(Constants.LABEL_NAME, object.getValue("param_name"));
+            newObject.put(Constants.LABEL_VALUE, object.getValue(Constants.LABEL_VALUE));
+            newObject.put(Constants.LABEL_DATA_TYPE, object.getValue("data_type"));
+            newObject.put(Constants.LABEL_TIMESTAMP, object.getValue(Constants.LABEL_TIMESTAMP));
+            
+            // if colcount is equal to total columns, we add a new row
+            if (!timestamp.equals(cur_timestamp)) {
+                timestamp = cur_timestamp;
+                finalResponse.add(newData.copy());
+                newData = new JsonArray();
+            }
+
+            newData.add(newObject);
+        }
+
+        JsonObject finalObject = new JsonObject();
+        finalObject.put(Constants.LABEL_DATA, finalResponse);
+        
+        return finalObject;
     }
 
     /**

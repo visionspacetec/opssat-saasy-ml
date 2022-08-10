@@ -71,13 +71,9 @@ public class DatabaseVerticle extends AbstractVerticle {
         if(this.conn == null || this.conn.isClosed())
         {
             try {
-                
-                LOGGER.log(Level.INFO, "-------------------------.");
 
                 // register the database driver
                 Class.forName(PropertiesManager.getInstance().getDatabaseDriver());
-                
-                LOGGER.log(Level.INFO, "-------------------------." +PropertiesManager.getInstance().getDatabaseUrl());
                 
                 // create the connection with the diven database connection configuration
                 // by default a single write to the database locks the database for a short time, nothing, even reading, can access the database file at all.
@@ -396,6 +392,9 @@ public class DatabaseVerticle extends AbstractVerticle {
 
         // fetch the label map for the given experiment and dataset ids
         Map<String, Boolean> labelMap = ApplicationManager.getInstance().getLabels(expId, datasetId);
+        
+        if (labelMap == null)
+            return;
 
         // iterator to iterate through the map
         Iterator<Map.Entry<String, Boolean>> iter = labelMap.entrySet().iterator();
@@ -537,7 +536,7 @@ public class DatabaseVerticle extends AbstractVerticle {
         // execute the select statement
         ResultSet rs = ps.executeQuery();
 
-        // todo: ps.close()?
+        // ps.close();
 
         // return the result
         return toJSON(rs);
