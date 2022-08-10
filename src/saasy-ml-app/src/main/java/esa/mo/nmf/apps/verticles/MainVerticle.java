@@ -79,7 +79,7 @@ public class MainVerticle extends AbstractVerticle {
         int length = simpleNames.length;
 
         // create and deploy the Verticles
-        LOGGER.log(Level.INFO, "Deploying Verticles");
+        LOGGER.log(Level.INFO, "Deploying Verticles --------------------");
         for (int index = 0; index < length; index++) {
 
             // create the Verticle as deployment Options

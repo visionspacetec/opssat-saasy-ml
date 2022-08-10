@@ -71,8 +71,13 @@ public class DatabaseVerticle extends AbstractVerticle {
         if(this.conn == null || this.conn.isClosed())
         {
             try {
+                
+                LOGGER.log(Level.INFO, "-------------------------.");
+
                 // register the database driver
                 Class.forName(PropertiesManager.getInstance().getDatabaseDriver());
+                
+                LOGGER.log(Level.INFO, "-------------------------." +PropertiesManager.getInstance().getDatabaseUrl());
                 
                 // create the connection with the diven database connection configuration
                 // by default a single write to the database locks the database for a short time, nothing, even reading, can access the database file at all.
@@ -106,6 +111,7 @@ public class DatabaseVerticle extends AbstractVerticle {
                     throw new Exception("Failed to create database connection");
                 }
             } catch (Exception e) {
+                LOGGER.log(Level.INFO, "[Error] It was not possible to create the connection");
                 // close connection in case it is open despite the exception.
                 this.closeConnection();
             }            
