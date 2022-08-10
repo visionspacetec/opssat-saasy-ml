@@ -179,6 +179,18 @@ Use an API platform like [Postman](https://www.postman.com/) to make an POST req
 http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/data/subscribe
 ```
 
+Sample payload:
+
+```json
+{
+    "expId": 123,
+    "datasetId": 1,
+    "iterations": 10,
+    "interval": 2,
+    "params": ["GNC_0005", "GNC_0011", "GNC_0007"]
+}
+```
+
 Sample payload with label values (expected output) provided by the client:
 
 ```json
@@ -267,6 +279,86 @@ http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/data/save
 ```
 
 Sample payload:
+
+```json
+{
+    "expId": 123,
+    "data": [
+        [
+            {
+                "name": "PARAM_10",
+                "value": "1001",
+                "dataType": 1,
+                "timestamp": 1656803525000
+            },
+            {
+                "name": "PARAM_20",
+                "value": "2001",
+                "dataType": 1,
+                "timestamp": 1656803525000
+            },
+            {
+                "name": "PARAM_30",
+                "value": "3001",
+                "dataType": 1,
+                "timestamp": 1656803525000
+            }
+        ],
+        [
+            {
+                "name": "PARAM_10",
+                "value": "1002",
+                "dataType": 1,
+                "timestamp": 1656804525000
+            },
+            {
+                "name": "PARAM_20",
+                "value": "2002",
+                "dataType": 1,
+                "timestamp": 1656804525000
+            },
+            {
+                "name": "PARAM_30",
+                "value": "3002",
+                "dataType": 1,
+                "timestamp": 1656804525000
+            }
+        ],
+        [
+            {
+                "name": "PARAM_10",
+                "value": "1003",
+                "dataType": 1,
+                "timestamp": 1656805525000
+            },
+            {
+                "name": "PARAM_20",
+                "value": "2003",
+                "dataType": 1,
+                "timestamp": 1656805525000
+            },
+            {
+                "name": "PARAM_30",
+                "value": "3003",
+                "dataType": 1,
+                "timestamp": 1656805525000
+            }
+        ]
+    ],
+    "training": [
+        {
+            "type": "classifier",
+            "algorithm": "aode"
+        },
+        {
+            "type": "classifier",
+            "algorithm": "bagging"
+        }
+    ]
+}
+```
+
+Sample payload with label values (expected output) provided by the client:
 
 ```json
 {
