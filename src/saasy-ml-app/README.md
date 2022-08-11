@@ -524,7 +524,6 @@ Sample payload:
 ```json
 {
     "expId": 123,
-    "datasetId": 1, 
     "data": [
         [
             {

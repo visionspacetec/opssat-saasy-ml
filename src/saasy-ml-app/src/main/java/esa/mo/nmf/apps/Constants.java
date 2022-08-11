@@ -18,6 +18,7 @@ public final class Constants {
     public static final String LABEL_DATASETID = "datasetId";
     public static final String LABEL_DATA = "data";
     public static final String LABEL_NAME = "name";
+    public static final String LABEL_PARAM_NAME = "param_name";
     public static final String LABEL_DATA_TYPE = "dataType";
     public static final String LABEL_VALUE = "value";
     public static final String LABEL_TIMESTAMP = "timestamp";
@@ -27,6 +28,7 @@ public final class Constants {
     public static final String LABEL_THREAD = "thread";
     public static final String LABEL_INTERVAL = "interval";
     public static final String LABEL_ITERATIONS = "iterations";
+    public static final String LABEL_LABEL = "label";
     public static final String LABEL_LABELS = "labels";
     public static final String LABEL_PARAMS = "params";
     public static final String LABEL_COUNT = "count";
