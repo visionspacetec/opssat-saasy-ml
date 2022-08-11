@@ -102,25 +102,38 @@ public class TrainModelVerticle extends AbstractVerticle {
                                 // variable to control the number of columns
                                 int colCount = 0;
 
+                                // variable to keep track of the label class
+                                int labelClass = -1;
+
                                 // iterate throughout all the data
                                 for (int pos = 0; pos < data.size(); pos++) {
 
                                     // get the Json Object and store the value
                                     JsonObject object = data.getJsonObject(pos);
-                                    tempTrainData[colCount++] = Double.valueOf(object.getString(Constants.LABEL_VALUE)); // TRAIN
+                                    if (object.getString(Constants.LABEL_PARAM_NAME).trim().toLowerCase()
+                                            .equals(Constants.LABEL_LABEL)) {
+                                        labelClass = Integer.valueOf(object.getString(Constants.LABEL_VALUE));
+                                    } else {
+                                        tempTrainData[colCount++] = Double.valueOf(object.getString(Constants.LABEL_VALUE)); // TRAIN
+                                    }
 
                                     // if colcount is equal to total columns, we add a new row
                                     if (colCount == total_columns) {
 
+                                        if (labelClass == -1) {
+                                            labelClass = rand.nextInt(k);
+                                        }
+
                                         // TRAIN
                                         // we add a data point to our train dataset 
                                         // with a random value of the class Y
-                                        train.addDataPoint(new DenseVector(tempTrainData), new int[0], rand.nextInt(k));
+                                        train.addDataPoint(new DenseVector(tempTrainData), new int[0], labelClass);
 
                                         // we restart the count of cols to zero and the temporal train data
                                         colCount = 0;
                                         // TRAIN
                                         tempTrainData = new double[total_columns];
+                                        labelClass = -1;
                                     }
                                 }
 

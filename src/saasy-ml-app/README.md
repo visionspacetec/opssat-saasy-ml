@@ -271,6 +271,23 @@ Sample payload:
 }
 ```
 
+### Download a training data feed
+
+Download to the data feed with a POST request to the following endpoint:
+
+```
+http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/data/download
+```
+
+Sample payload:
+
+```json
+{
+    "expId": 123,
+    "datasetId": 1
+}
+```
+
 ### Send training data
 In some cases, clients generate their own training data to send to the app to train a model:
 
@@ -507,7 +524,6 @@ Sample payload:
 ```json
 {
     "expId": 123,
-    "datasetId": 1, 
     "data": [
         [
             {

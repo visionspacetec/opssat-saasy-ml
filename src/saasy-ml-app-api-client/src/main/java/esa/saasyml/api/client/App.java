@@ -2,81 +2,135 @@ package esa.saasyml.api.client;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Hello world!
+ * Server API client
  */
 public final class App {
+    
+    private static Logger logger = LoggerFactory.getLogger(App.class);
+
     private App() {
     }
-
-    private static String readAll(Reader rd) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        int cp;
-        while ((cp = rd.read()) != -1) {
-            sb.append((char) cp);
-        }
-        return sb.toString();
-    }
     
-    public static void readFromUrl(String url) throws Exception {
-        InputStream is = new URL(url).openStream();
-        BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-        String jsonText = readAll(rd);
-        System.out.println(jsonText);
+    public static void readFromUrl(String serverAddress, String payload) throws Exception {
+
+        try {
+
+            System.out.println("\n"+serverAddress);
+            // payload = "{ \"expId\": 123, \"datasetId\": 1, \"iterations\": 10, \"interval\": 2, \"params\": [\"GNC_0005\", \"GNC_0011\", \"GNC_0007\"] }";
+            System.out.println(payload);
+
+            URL url = new URL(serverAddress);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setDoOutput(true);
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json");
+    
+            OutputStream os = conn.getOutputStream();
+            os.write(payload.getBytes());
+            os.flush();
+    
+            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                throw new RuntimeException("Failed : HTTP error code : "
+                    + conn.getResponseCode());
+            }
+    
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+                    (conn.getInputStream())));
+    
+            String output;
+            System.out.println("\nOutput from sever: \n");
+            logger.info("Output from Server: \n");
+            while ((output = br.readLine()) != null) {
+                System.out.println(output);
+                logger.info(output);
+            }
+    
+            conn.disconnect();
+    
+        } catch (MalformedURLException e) {
+
+            e.printStackTrace();
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+
+        }
     }
 
     /**
-     * Says hello to the world.
      * @param args The arguments of the program.
      */
     public static void main(String[] args) {
 
-        // set ML server host
-        String host;
-        try {
-            host = System.getProperty("host", "localhost");
-        } catch (NumberFormatException e) {
-            host = "localhost";
+        // how to use information
+        String howToUse = "$ java -jar saasy-ml-app-api-client-0.1.0-SNAPSHOT-jar-with-dependencies.jar -server [URL] -payload [JSON]";
+
+        // we stored all in a tuple <o, v>, where o is an option and v is a set or values (tests)
+        final Map<String, String> params = new HashMap<>();
+
+        // for each argument, we take the values
+        for (int index = 0; index < args.length; index++) {
+
+            final String arg = args[index];
+
+            if (arg.charAt(0) == '-') {
+
+                if (arg.length() < 2) {
+                    System.err.println("Error at argument " + arg);
+                    return;
+                }
+
+                params.put(arg.substring(1), args[++index]);
+
+            }
         }
 
+        String serverAddress = "";
 
-        // set ML server port
-        int port;
-        try {
-            port = Integer.parseInt(System.getProperty("port", "9999"));
-        } catch (NumberFormatException e) {
-            port = 9999;
+        // if it is empty or it does not containt the server address
+        if (params.isEmpty() || !params.containsKey("server")) {
+            serverAddress = "http://localhost:9999/api/v1/training/data/subscribe/";
+        } else {
+            // get the server address
+            serverAddress = params.get("server");
         }
 
-        String serverAddress = "http://" + host + ":" + port;
-        
-        try{
+        if (!params.containsKey("payload")) {
+            System.out.println("Payload can not be empty");
+        } else {
+            String payload = params.get("payload");
 
-            System.out.println("Test API requests on " + serverAddress);
-
-            System.out.println("\nTest #1:");
-            readFromUrl(serverAddress + "/api/v1/training/classifier/bayesian/aode");
-
-            System.out.println("\nTest #2:");
-            readFromUrl(serverAddress + "/api/v1/training/classifier/boosting/bagging ");
+            logger.info("************* ************************************ ****");
+            logger.info("************* Test API requests **************");
+            logger.info("- server address: "+serverAddress);
+            logger.info("- payload: "+ payload);
+            logger.info("************* ************************************ ****\n");
             
-            System.out.println("\nTest #3:");
-            readFromUrl(serverAddress + "/api/v1/inference");
-
-            System.out.println("\nTest completed.");
-
-        }catch(Exception e){
-            e.printStackTrace();
+            try{
+    
+                logger.info("\nTest #1:");
+                readFromUrl(serverAddress, payload);
+                logger.info("\nTest completed.");
+    
+            } catch(Exception e){
+                e.printStackTrace();
+            }
         }
         
+        System.out.println("\nHelp of use:\n" + howToUse + "\n");
+
     }
 }

@@ -18,6 +18,7 @@ public final class Constants {
     public static final String LABEL_DATASETID = "datasetId";
     public static final String LABEL_DATA = "data";
     public static final String LABEL_NAME = "name";
+    public static final String LABEL_PARAM_NAME = "param_name";
     public static final String LABEL_DATA_TYPE = "dataType";
     public static final String LABEL_VALUE = "value";
     public static final String LABEL_TIMESTAMP = "timestamp";
@@ -27,6 +28,7 @@ public final class Constants {
     public static final String LABEL_THREAD = "thread";
     public static final String LABEL_INTERVAL = "interval";
     public static final String LABEL_ITERATIONS = "iterations";
+    public static final String LABEL_LABEL = "label";
     public static final String LABEL_LABELS = "labels";
     public static final String LABEL_PARAMS = "params";
     public static final String LABEL_COUNT = "count";
@@ -37,6 +39,7 @@ public final class Constants {
     public static final String LABEL_ENDPOINT_DATA_SUBSCRIBE = "/api/v1/training/data/subscribe";
     public static final String LABEL_ENDPOINT_DATA_UNSUBSCRIBE = "/api/v1/training/data/unsubscribe";
     public static final String LABEL_ENDPOINT_DATA_SAVE = "/api/v1/training/data/save";
+    public static final String LABEL_ENDPOINT_DATA_DOWNLOAD = "/api/v1/training/data/download";
     public static final String LABEL_ENDPOINT_DATA_DELETE = "/api/v1/training/data/delete";
     public static final String LABEL_ENDPOINT_TRAINING = "/api/v1/training/:type/";
     public static final String LABEL_ENDPOINT_TRAINING_ALGORITHM = LABEL_ENDPOINT_TRAINING + ":algorithm/";
@@ -48,6 +51,7 @@ public final class Constants {
     public static final String LABEL_CONSUMER_TRAINING_CLUSTER = LABEL_CONSUMER_TRAINING + ".cluster";
     public static final String LABEL_CONSUMER_TRAINING_OUTLIER = LABEL_CONSUMER_TRAINING + ".outlier";
     public static final String LABEL_CONSUMER_DATA_SAVE = LABEL_CONSUMER_TRAINING + ".data.save";
+    public static final String LABEL_CONSUMER_DATA_DOWNLOAD = LABEL_CONSUMER_TRAINING + ".data.download";
     public static final String LABEL_CONSUMER_DATA_DELETE = LABEL_CONSUMER_TRAINING + ".data.delete";
     public static final String LABEL_CONSUMER_DATA_COUNT = LABEL_CONSUMER_TRAINING + ".data.count";
     public static final String LABEL_CONSUMER_DATA_COUNT_COLUMNS = LABEL_CONSUMER_TRAINING + ".data.count_columns";

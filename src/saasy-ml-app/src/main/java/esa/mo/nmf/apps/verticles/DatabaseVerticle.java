@@ -45,7 +45,7 @@ public class DatabaseVerticle extends AbstractVerticle {
     private final String SQL_INSERT_TRAINING_DATA = "INSERT INTO training_data(exp_id, dataset_id, param_name, data_type, value, timestamp) VALUES(?, ?, ?, ?, ?, ?)";
     private final String SQL_INSERT_LABELS = "INSERT INTO labels(exp_id, dataset_id, name, value, timestamp) VALUES(?, ?, ?, ?, ?)";
     private final String SQL_COUNT_TRAINING_DATA = "SELECT count(*) FROM  training_data WHERE exp_id = ? AND dataset_id = ?";
-    private final String SQL_COUNT_COLUMNS_TRAINING_DATA = "SELECT count(*) FROM  training_data WHERE exp_id = ? AND dataset_id = ? GROUP BY timestamp LIMIT 1"; // "SELECT count(DISTINCT param_name) FROM training_data WHERE exp_id=? AND dataset_id=?"
+    private final String SQL_COUNT_COLUMNS_TRAINING_DATA = "SELECT count(*) FROM  training_data WHERE exp_id = ? AND dataset_id = ? AND param_name != 'label' GROUP BY timestamp LIMIT 1"; // "SELECT count(DISTINCT param_name) FROM training_data WHERE exp_id=? AND dataset_id=?"
     private final String SQL_SELECT_TRAINING_DATA = "SELECT * FROM training_data WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp DESC";
     private final String SQL_DELETE_TRAINING_DATA = "DELETE FROM training_data WHERE exp_id = ? AND dataset_id = ?";
     private final String SQL_DELETE_LABELS = "DELETE FROM labels WHERE exp_id = ? AND dataset_id = ?";
@@ -71,6 +71,7 @@ public class DatabaseVerticle extends AbstractVerticle {
         if(this.conn == null || this.conn.isClosed())
         {
             try {
+
                 // register the database driver
                 Class.forName(PropertiesManager.getInstance().getDatabaseDriver());
                 
@@ -106,6 +107,7 @@ public class DatabaseVerticle extends AbstractVerticle {
                     throw new Exception("Failed to create database connection");
                 }
             } catch (Exception e) {
+                LOGGER.log(Level.INFO, "[Error] It was not possible to create the connection");
                 // close connection in case it is open despite the exception.
                 this.closeConnection();
             }            
@@ -390,6 +392,9 @@ public class DatabaseVerticle extends AbstractVerticle {
 
         // fetch the label map for the given experiment and dataset ids
         Map<String, Boolean> labelMap = ApplicationManager.getInstance().getLabels(expId, datasetId);
+        
+        if (labelMap == null)
+            return;
 
         // iterator to iterate through the map
         Iterator<Map.Entry<String, Boolean>> iter = labelMap.entrySet().iterator();
@@ -531,7 +536,7 @@ public class DatabaseVerticle extends AbstractVerticle {
         // execute the select statement
         ResultSet rs = ps.executeQuery();
 
-        // todo: ps.close()?
+        // ps.close();
 
         // return the result
         return toJSON(rs);
