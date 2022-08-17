@@ -12,6 +12,7 @@ import io.vertx.core.json.JsonObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -251,8 +252,21 @@ public class MainVerticle extends AbstractVerticle {
 
                 json = prepareDownloadResponse(json);
                 json.put(Constants.LABEL_EXPID, payload.getInteger(Constants.LABEL_EXPID));
-                json.put(Constants.LABEL_DATASETID, payload.getInteger(Constants.LABEL_DATASETID));
                 
+                // TODO: temporal code for the EM Session. Remove later
+                json.put(Constants.LABEL_DATASETID, payload.getInteger(Constants.LABEL_DATASETID) + 1);
+                
+                /*JsonArray jsonArray = new JsonArray();
+                JsonObject object = new JsonObject();
+                object.put(Constants.LABEL_TYPE, "classifier");
+                object.put(Constants.LABEL_ALGORITHM, "aode");
+                jsonArray.add(object);
+                json.put(Constants.LABEL_TRAINING, jsonArray);*/
+                
+                // temporal code for the EM Session. Remove later
+                // And replace for this code:
+                // json.put(Constants.LABEL_DATASETID, payload.getInteger(Constants.LABEL_DATASETID));
+
                 ctx.request().response()
                     .putHeader("Content-Type", "application/json; charset=utf-8")
                     .end(json.encode());
@@ -296,11 +310,21 @@ public class MainVerticle extends AbstractVerticle {
             newObject.put(Constants.LABEL_NAME, object.getValue("param_name"));
             newObject.put(Constants.LABEL_VALUE, object.getValue(Constants.LABEL_VALUE));
             newObject.put(Constants.LABEL_DATA_TYPE, object.getValue("data_type"));
-            newObject.put(Constants.LABEL_TIMESTAMP, object.getValue(Constants.LABEL_TIMESTAMP));
+            newObject.put(Constants.LABEL_TIMESTAMP,  object.getLong(Constants.LABEL_TIMESTAMP));
             
             // if colcount is equal to total columns, we add a new row
             if (!timestamp.equals(cur_timestamp)) {
                 timestamp = cur_timestamp;
+
+                // TODO: temporal code for the EM Session. Remove later
+                JsonObject labelObject = new JsonObject();
+                labelObject.put(Constants.LABEL_NAME, "label");
+                labelObject.put(Constants.LABEL_VALUE, String.valueOf(new Random().nextInt(4)));
+                labelObject.put(Constants.LABEL_DATA_TYPE, object.getValue("data_type"));
+                labelObject.put(Constants.LABEL_TIMESTAMP, object.getLong(Constants.LABEL_TIMESTAMP));
+                newData.add(labelObject);
+                // Temporal code for the EM Session. Remove later
+
                 finalResponse.add(newData.copy());
                 newData = new JsonArray();
             }
