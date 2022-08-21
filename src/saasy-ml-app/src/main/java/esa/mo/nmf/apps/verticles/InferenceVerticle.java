@@ -30,18 +30,18 @@ public class InferenceVerticle extends AbstractVerticle {
     public void start() throws Exception {
 
         // inference classifier
-        vertx.eventBus().consumer(Constants.LABEL_CONSUMER_INFERENCE, msg -> {
+        vertx.eventBus().consumer(Constants.BASE_ADDRESS_INFERENCE, msg -> {
 
             try{
                 // the request payload (Json)
                 JsonObject payload = (JsonObject) (msg.body());
-                LOGGER.log(Level.INFO, "Started "+Constants.LABEL_CONSUMER_INFERENCE);
+                LOGGER.log(Level.INFO, "Started "+Constants.BASE_ADDRESS_INFERENCE);
 
                 // parse the Json payload
-                final int expId = payload.getInteger(Constants.LABEL_EXPID).intValue();
+                final int expId = payload.getInteger(Constants.KEY_EXPID).intValue();
                 final int datasetId = 1000;
-                final JsonArray data = payload.getJsonArray(Constants.LABEL_DATA);
-                final JsonArray models = payload.getJsonArray(Constants.LABEL_MODELS);
+                final JsonArray data = payload.getJsonArray(Constants.KEY_DATA);
+                final JsonArray models = payload.getJsonArray(Constants.KEY_MODELS);
 
                 // prepare the test data of the classifier
                 DataSet[] test = prepareClassifierOneTestData(data);
@@ -51,11 +51,11 @@ public class InferenceVerticle extends AbstractVerticle {
                 while (iter.hasNext()) {
                     JsonObject model = (JsonObject) iter.next();
 
-                    String path = model.getString(Constants.LABEL_PATH);
-                    String type = model.getString(Constants.LABEL_TYPE);
+                    String path = model.getString(Constants.KEY_PATH);
+                    String type = model.getString(Constants.KEY_TYPE);
                     boolean thread = PropertiesManager.getInstance().getThread();
-                    if (model.containsKey(Constants.LABEL_THREAD) && model.getBoolean(Constants.LABEL_THREAD) != null) {
-                        thread = model.getBoolean(Constants.LABEL_THREAD);
+                    if (model.containsKey(Constants.KEY_THREAD) && model.getBoolean(Constants.KEY_THREAD) != null) {
+                        thread = model.getBoolean(Constants.KEY_THREAD);
                     }
                     boolean serialize = true;
                     TypeModel typeModel = TypeModel.valueOf(type);
@@ -81,17 +81,17 @@ public class InferenceVerticle extends AbstractVerticle {
 
                         // store the inference in a list
                         // if (!model.containsKey(Constants.LABEL_INFERENCE))
-                        model.put(Constants.LABEL_INFERENCE, inference);
+                        model.put(Constants.KEY_INFERENCE, inference);
 
                     }
                 }
                 
-                LOGGER.log(Level.INFO, "Stoped "+Constants.LABEL_CONSUMER_INFERENCE);
+                LOGGER.log(Level.INFO, "Stoped "+Constants.BASE_ADDRESS_INFERENCE);
 
                 // retrieve the response
                 JsonObject response = new JsonObject();
-                response.put(Constants.LABEL_EXPID, expId);
-                response.put(Constants.LABEL_MODELS, models);
+                response.put(Constants.KEY_EXPID, expId);
+                response.put(Constants.KEY_MODELS, models);
                 msg.reply(response);
 
                 
@@ -136,7 +136,7 @@ public class InferenceVerticle extends AbstractVerticle {
                 JsonObject p = (JsonObject) iter.next();
 
                 // store the values of the parameters
-                tempTestData[count++] = Double.parseDouble(p.getString(Constants.LABEL_VALUE));
+                tempTestData[count++] = Double.parseDouble(p.getString(Constants.KEY_VALUE));
             }
 
             // create the data point of the test data
@@ -178,7 +178,7 @@ public class InferenceVerticle extends AbstractVerticle {
                 JsonObject p = (JsonObject) iter.next();
 
                 // store the values of the parameters
-                tempTestData[count++] = Double.parseDouble(p.getString(Constants.LABEL_VALUE)); 
+                tempTestData[count++] = Double.parseDouble(p.getString(Constants.KEY_VALUE)); 
             }
             
             // create the data point of the test data

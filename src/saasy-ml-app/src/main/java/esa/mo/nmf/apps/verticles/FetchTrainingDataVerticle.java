@@ -27,38 +27,38 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
         LOGGER.log(Level.INFO, "Starting a Verticle instance with deployment id " + this.deploymentID() + ".");
 
         // subscribe to a training data feed
-        vertx.eventBus().consumer(Constants.LABEL_CONSUMER_DATA_SUBSCRIBE, msg -> {
+        vertx.eventBus().consumer(Constants.ADDRESS_DATA_SUBSCRIBE, msg -> {
 
             // the request payload (Json)
             JsonObject payload = (JsonObject) (msg.body());
-            LOGGER.log(Level.INFO, "The POST "+Constants.LABEL_CONSUMER_DATA_SUBSCRIBE+" request payload: " + payload.toString());
+            LOGGER.log(Level.INFO, "The POST "+Constants.ADDRESS_DATA_SUBSCRIBE+" request payload: " + payload.toString());
 
             // parse the Json payload
-            final int expId = payload.getInteger(Constants.LABEL_EXPID).intValue();
-            final int datasetId = payload.getInteger(Constants.LABEL_DATASETID).intValue();
-            final double interval = payload.getInteger(Constants.LABEL_INTERVAL).doubleValue();
+            final int expId = payload.getInteger(Constants.KEY_EXPID).intValue();
+            final int datasetId = payload.getInteger(Constants.KEY_DATASETID).intValue();
+            final double interval = payload.getInteger(Constants.KEY_INTERVAL).doubleValue();
 
             // iterations payload parameter is optional, set it to -1 if it wasn't provided
-            final int iterations = payload.containsKey(Constants.LABEL_ITERATIONS)
-                    ? payload.getInteger(Constants.LABEL_ITERATIONS).intValue() : -1;
+            final int iterations = payload.containsKey(Constants.KEY_ITERATIONS)
+                    ? payload.getInteger(Constants.KEY_ITERATIONS).intValue() : -1;
 
             // the labels map for the expected output
             // this will be read when inserting the fetched training data
             // the labels will be inserted into their own labels table
-            if(payload.containsKey(Constants.LABEL_LABELS))
+            if(payload.containsKey(Constants.KEY_LABELS))
             {
-                final Map<String, Boolean> labelMap = createLabelMapFromJsonObject(payload.getJsonObject(Constants.LABEL_LABELS));
+                final Map<String, Boolean> labelMap = createLabelMapFromJsonObject(payload.getJsonObject(Constants.KEY_LABELS));
                 ApplicationManager.getInstance().addLabels(expId, datasetId, labelMap);
             }
 
             // create list of training data param names from JsonArray
-            List<String> paramNameList = createArrayFromJsonArray(payload.getJsonArray(Constants.LABEL_PARAMS));
+            List<String> paramNameList = createArrayFromJsonArray(payload.getJsonArray(Constants.KEY_PARAMS));
 
             // build Json payload object with just expId and datasetId
             // this will be used for the training data count request
             JsonObject payloadCount = new JsonObject();
-            payloadCount.put(Constants.LABEL_EXPID, expId);
-            payloadCount.put(Constants.LABEL_DATASETID, datasetId);
+            payloadCount.put(Constants.KEY_EXPID, expId);
+            payloadCount.put(Constants.KEY_DATASETID, datasetId);
 
             try {
 
@@ -74,19 +74,19 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
                 if (iterations > 0) {
                     // register periodic timer
                     vertx.setPeriodic(500, id -> {
-                        vertx.eventBus().request(Constants.LABEL_CONSUMER_DATA_COUNT, payloadCount, reply -> {
+                        vertx.eventBus().request(Constants.ADDRESS_DATA_COUNT, payloadCount, reply -> {
                             JsonObject response = (JsonObject) (reply.result().body());
 
                             // response object is somehow does not contain the expected parameter (impossible?)
                             // stop timer if this happens
-                            if (!response.containsKey(Constants.LABEL_COUNT)) {
+                            if (!response.containsKey(Constants.KEY_COUNT)) {
                                 vertx.cancelTimer(id);
 
                             } else {
                                 // get training data row count
                                 // fixme: dividing by paramNameList.size() will break if the number of params change during from one data fetching session to another for
                                 // the same expId and datasetId
-                                int counter = response.getInteger(Constants.LABEL_COUNT).intValue() / paramNameList.size();
+                                int counter = response.getInteger(Constants.KEY_COUNT).intValue() / paramNameList.size();
 
                                 // the counter is set to -1 if there was an error while attempting to query the database
                                 // stop timer if  this happens
@@ -115,20 +115,20 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
                                                 final JsonObject t = trainings.getJsonObject(i);
 
                                                 // fetch training algorithm selection
-                                                String type = t.getString(Constants.LABEL_TYPE);
+                                                String type = t.getString(Constants.KEY_TYPE);
 
                                                 // build JSON payload object 
                                                 JsonObject trainPayload = new JsonObject();
-                                                trainPayload.put(Constants.LABEL_EXPID, expId);
-                                                trainPayload.put(Constants.LABEL_DATASETID, datasetId);
-                                                trainPayload.put(Constants.LABEL_ALGORITHM,
-                                                        t.getString(Constants.LABEL_ALGORITHM));
-                                                trainPayload.put(Constants.LABEL_THREAD,
-                                                        t.getBoolean(Constants.LABEL_THREAD));
+                                                trainPayload.put(Constants.KEY_EXPID, expId);
+                                                trainPayload.put(Constants.KEY_DATASETID, datasetId);
+                                                trainPayload.put(Constants.KEY_ALGORITHM,
+                                                        t.getString(Constants.KEY_ALGORITHM));
+                                                trainPayload.put(Constants.KEY_THREAD,
+                                                        t.getBoolean(Constants.KEY_THREAD));
 
                                                 // trigger training
                                                 // vertx.eventBus().send("saasyml.training." + type, trainPayload);
-                                                vertx.eventBus().request(Constants.LABEL_CONSUMER_TRAINING + "." + type,
+                                                vertx.eventBus().request(Constants.BASE_ADDRESS_TRAINING + "." + type,
                                                         trainPayload,
                                                         trainReply -> {
 
@@ -165,14 +165,14 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
         });
 
         // unsubscribe to a training data feed
-        vertx.eventBus().consumer(Constants.LABEL_CONSUMER_DATA_UNSUBSCRIBE, msg -> {
+        vertx.eventBus().consumer(Constants.ADDRESS_DATA_UNSUBSCRIBE, msg -> {
             // the request payload (Json)
             JsonObject payload = (JsonObject) (msg.body());
             LOGGER.log(Level.INFO, "The POST request payload: " + payload.toString());
 
             // parse the Json payload
-            final int expId = payload.getInteger(Constants.LABEL_EXPID).intValue();
-            final int datasetId = payload.getInteger(Constants.LABEL_DATASETID).intValue();
+            final int expId = payload.getInteger(Constants.KEY_EXPID).intValue();
+            final int datasetId = payload.getInteger(Constants.KEY_DATASETID).intValue();
 
             try {
                 // disable parameter feed

@@ -300,6 +300,7 @@ Sample payload:
 ```json
 {
     "expId": 123,
+    "datasetId": 1,
     "data": [
         [
             {
@@ -380,6 +381,7 @@ Sample payload with label values (expected output) provided by the client:
 ```json
 {
     "expId": 123,
+    "datasetId": 1,
     "labels": {
         "0": false,
         "1": false,
@@ -498,7 +500,7 @@ Sample payload:
 
 
 ```
-http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/:type/
+http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/:type
 ```
 
 Sample payload:
@@ -507,7 +509,7 @@ Sample payload:
 {
     "expId": 123,
     "datasetId": 1,
-    "algorithm": "RandomForest"
+    "algorithm": "AROW"
 }
 ```
 
@@ -516,7 +518,7 @@ Sample payload:
 Make an POST request to the following endpoints:
 
 ```
-http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/inference/
+http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/inference
 ```
 
 Sample payload:
