@@ -1,7 +1,6 @@
 package esa.mo.nmf.apps.verticles;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -10,8 +9,6 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.naming.ldap.Rdn;
-
 import esa.mo.nmf.apps.Constants;
 import esa.mo.nmf.apps.PropertiesManager;
 import esa.mo.nmf.apps.saasyml.common.IPipeLineLayer;
@@ -19,7 +16,6 @@ import esa.mo.nmf.apps.saasyml.factories.MLPipeLineFactory;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import javafx.util.Pair;
 import jsat.SimpleDataSet;
 import jsat.classifiers.CategoricalData;
 import jsat.classifiers.ClassificationDataSet;
@@ -159,32 +155,21 @@ public class TrainModelVerticle extends AbstractVerticle {
                                                 }
 
                                                 // add the data point array as a dense vector and set the expected label
-                                                LOGGER.log(Level.INFO, "train.addDataPoint() - START");
                                                 train.addDataPoint(
                                                     new DenseVector(trainingDatapointArray),
                                                     new int[0],
                                                     entry.getValue().getInteger(Constants.KEY_LABEL).intValue());
-                                                LOGGER.log(Level.INFO, "train.addDataPoint() - DONE");
                                             }
                                         }
 
-                                        // FIXME: remove, for verbose debugging only
-                                        for(int i=0; i < train.getDataPoints().size(); i++) {
-                                            LOGGER.log(Level.INFO, "training data: "
-                                                + train.getDataPoint(i).getNumericalValues().toString() + " | label: " + train.getDataPointCategory(i));
-                                        }
-
                                         // upload the training dataset
-                                        LOGGER.log(Level.INFO, "saasyml.setDataSet(train, null);");
                                         saasyml.setDataSet(train, null);
 
                                         // enter ML pipeline for the given algorithm
                                         // serialize and save the resulting model
-                                        LOGGER.log(Level.INFO, "saasyml.train();");
                                         saasyml.train();
 
                                         // Return a message with a path to the serialized model
-                                        LOGGER.log(Level.INFO, "msg.reply(resp);");
                                         JsonObject resp = new JsonObject();
                                         resp.put(Constants.KEY_MODEL_PATH, saasyml.getModelPathSerialized());
                                         msg.reply(resp);                                
