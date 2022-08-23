@@ -318,12 +318,12 @@ public class MainVerticle extends AbstractVerticle {
                 timestamp = cur_timestamp;
 
                 // TODO: temporal code for the EM Session. Remove later
-                JsonObject labelObject = new JsonObject();
-                labelObject.put(Constants.LABEL_NAME, "label");
-                labelObject.put(Constants.LABEL_VALUE, String.valueOf(new Random().nextInt(4)));
-                labelObject.put(Constants.LABEL_DATA_TYPE, object.getValue("data_type"));
-                labelObject.put(Constants.LABEL_TIMESTAMP, object.getLong(Constants.LABEL_TIMESTAMP));
-                newData.add(labelObject);
+                // JsonObject labelObject = new JsonObject();
+                // labelObject.put(Constants.KEY_NAME, "label");
+                // labelObject.put(Constants.KEY_VALUE, String.valueOf(new Random().nextInt(4)));
+                // labelObject.put(Constants.KEY_DATA_TYPE, object.getValue("data_type"));
+                // labelObject.put(Constants.KEY_TIMESTAMP, object.getLong(Constants.KEY_TIMESTAMP));
+                // newData.add(labelObject);
                 // Temporal code for the EM Session. Remove later
 
                 finalResponse.add(newData.copy());
