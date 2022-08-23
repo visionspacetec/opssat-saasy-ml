@@ -171,6 +171,8 @@ public class TrainModelVerticle extends AbstractVerticle {
 
                                         // Return a message with a path to the serialized model
                                         JsonObject resp = new JsonObject();
+                                        resp.put(Constants.KEY_TYPE, "classifier");
+                                        resp.put(Constants.KEY_ALGORITHM, algorithm);
                                         resp.put(Constants.KEY_MODEL_PATH, saasyml.getModelPathSerialized());
                                         msg.reply(resp);                                
                                     });
