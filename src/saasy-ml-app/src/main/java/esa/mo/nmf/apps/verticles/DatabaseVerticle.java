@@ -43,10 +43,12 @@ public class DatabaseVerticle extends AbstractVerticle {
 
     // sql query strings
     private final String SQL_INSERT_TRAINING_DATA = "INSERT INTO training_data(exp_id, dataset_id, param_name, data_type, value, timestamp) VALUES(?, ?, ?, ?, ?, ?)";
-    private final String SQL_INSERT_LABELS = "INSERT INTO labels(exp_id, dataset_id, name, value, timestamp) VALUES(?, ?, ?, ?, ?)";
+    private final String SQL_INSERT_LABELS = "INSERT INTO labels(exp_id, dataset_id, timestamp, label) VALUES(?, ?, ?, ?)";
     private final String SQL_COUNT_TRAINING_DATA = "SELECT count(*) FROM  training_data WHERE exp_id = ? AND dataset_id = ?";
-    private final String SQL_COUNT_COLUMNS_TRAINING_DATA = "SELECT count(*) FROM  training_data WHERE exp_id = ? AND dataset_id = ? AND param_name != 'label' GROUP BY timestamp LIMIT 1"; // "SELECT count(DISTINCT param_name) FROM training_data WHERE exp_id=? AND dataset_id=?"
-    private final String SQL_SELECT_TRAINING_DATA = "SELECT * FROM training_data WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp DESC";
+    private final String SQL_COUNT_COLUMNS_TRAINING_DATA = "SELECT count(*) FROM  training_data WHERE exp_id = ? AND dataset_id = ? AND param_name != 'label' GROUP BY timestamp LIMIT 1"; // "SELECT count(DISTINCT param_name) FROM training_data WHERE exp_id=? AND dataset_id=?" 
+    private final String SQL_SELECT_TRAINING_DATA = "SELECT * FROM training_data WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp ASC";
+    private final String SQL_SELECT_LABELS = "SELECT * FROM labels WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp ASC";
+    private final String SQL_SELECT_DISTINCT_LABELS = "SELECT DISTINCT label FROM labels  WHERE exp_id = ? AND dataset_id = ? ORDER BY label ASC";
     private final String SQL_DELETE_TRAINING_DATA = "DELETE FROM training_data WHERE exp_id = ? AND dataset_id = ?";
     private final String SQL_DELETE_LABELS = "DELETE FROM labels WHERE exp_id = ? AND dataset_id = ?";
     private final String SQL_CREATE_TABLE_TRAINING_DATA = 
@@ -62,9 +64,8 @@ public class DatabaseVerticle extends AbstractVerticle {
         "CREATE TABLE IF NOT EXISTS labels(" +
             "exp_id INTEGER NOT NULL, " +
             "dataset_id INTEGER NOT NULL, " +
-            "name TEXT NOT NULL, " +
-            "value BOOLEAN NOT NULL, " +
-            "timestamp TIMESTAMP NOT NULL" +
+            "timestamp TIMESTAMP NOT NULL, " +
+            "label INTEGER NOT NULL " +
         ")";
 
     public Connection connect() throws Exception {
@@ -132,15 +133,15 @@ public class DatabaseVerticle extends AbstractVerticle {
     public void start() throws Exception {
 
         // save training data
-        vertx.eventBus().consumer(Constants.LABEL_CONSUMER_DATA_SAVE, msg -> {
+        vertx.eventBus().consumer(Constants.ADDRESS_DATA_SAVE, msg -> {
 
             // the request payload (Json)
             JsonObject payload = (JsonObject) (msg.body());
 
             // parse the Json payload
-            final int expId = payload.getInteger(Constants.LABEL_EXPID).intValue();
-            final int datasetId = payload.getInteger(Constants.LABEL_DATASETID).intValue();
-            final JsonArray data = payload.getJsonArray(Constants.LABEL_DATA);
+            final int expId = payload.getInteger(Constants.KEY_EXPID).intValue();
+            final int datasetId = payload.getInteger(Constants.KEY_DATASETID).intValue();
+            final JsonArray data = payload.getJsonArray(Constants.KEY_DATA);
 
             List<Pair<Integer, String>> paramValues = new ArrayList<Pair<Integer, String>>();
             List<String> paramNames = new ArrayList<String>();
@@ -159,15 +160,15 @@ public class DatabaseVerticle extends AbstractVerticle {
                         JsonObject p = (JsonObject) param;
 
                         // parameter name
-                        paramNames.add(p.getString(Constants.LABEL_NAME));
+                        paramNames.add(p.getString(Constants.KEY_NAME));
 
                         // parameter type and value value
-                        int dataType = p.getInteger(Constants.LABEL_DATA_TYPE);
-                        String value = p.getString(Constants.LABEL_VALUE);
+                        int dataType = p.getInteger(Constants.KEY_DATA_TYPE);
+                        String value = p.getString(Constants.KEY_VALUE);
                         paramValues.add(new Pair<Integer, String>(dataType, value));
                         
                         // the timestamp
-                        timestamps.add(p.getLong(Constants.LABEL_TIMESTAMP));
+                        timestamps.add(p.getLong(Constants.KEY_TIMESTAMP));
                     });
                 });
             } catch (Exception e) {
@@ -241,20 +242,20 @@ public class DatabaseVerticle extends AbstractVerticle {
 
 
             // auto-trigger training if the payload is configured to do so
-            if (payload.containsKey(Constants.LABEL_TRAINING)) {
+            if (payload.containsKey(Constants.KEY_TRAINING)) {
 
                 // the training parameters can be for more than one algorithm
-                final JsonArray trainings = payload.getJsonArray(Constants.LABEL_TRAINING);
+                final JsonArray trainings = payload.getJsonArray(Constants.KEY_TRAINING);
 
                 // trigger training for each request
                 for (int i = 0; i < trainings.size(); i++) {
                     final JsonObject t = trainings.getJsonObject(i);
 
                     // fetch training algorithm selection
-                    String type = t.getString(Constants.LABEL_TYPE);
+                    String type = t.getString(Constants.KEY_TYPE);
 
                     // trigger training
-                    vertx.eventBus().send(Constants.LABEL_CONSUMER_TRAINING + "." + type, payload);
+                    vertx.eventBus().send(Constants.BASE_ADDRESS_TRAINING + "." + type, payload);
                 }
             }
            
@@ -263,14 +264,14 @@ public class DatabaseVerticle extends AbstractVerticle {
         });
 
         // delete training data
-        vertx.eventBus().consumer(Constants.LABEL_CONSUMER_DATA_DELETE, msg -> {
+        vertx.eventBus().consumer(Constants.ADDRESS_DATA_DELETE, msg -> {
 
             // the request payload (Json)
             JsonObject payload = (JsonObject) (msg.body());
 
             // parse the Json payload
-            final int expId = payload.getInteger(Constants.LABEL_EXPID).intValue();
-            final int datasetId = payload.getInteger(Constants.LABEL_DATASETID).intValue();
+            final int expId = payload.getInteger(Constants.KEY_EXPID).intValue();
+            final int datasetId = payload.getInteger(Constants.KEY_DATASETID).intValue();
 
             try {
                 this.deleteTrainingData(expId, datasetId);
@@ -287,76 +288,126 @@ public class DatabaseVerticle extends AbstractVerticle {
         });
 
         // count training data
-        vertx.eventBus().consumer(Constants.LABEL_CONSUMER_DATA_COUNT, msg -> {
+        vertx.eventBus().consumer(Constants.ADDRESS_DATA_COUNT, msg -> {
 
             // the request payload (Json)
             JsonObject payload = (JsonObject) (msg.body());
 
             // parse the Json payload
-            final int expId = payload.getInteger(Constants.LABEL_EXPID).intValue();
-            final int datasetId = payload.getInteger(Constants.LABEL_DATASETID).intValue();
+            final int expId = payload.getInteger(Constants.KEY_EXPID).intValue();
+            final int datasetId = payload.getInteger(Constants.KEY_DATASETID).intValue();
 
             // count training data records
             int counter = -1;
             try {
-                counter = this.countTrainingData(expId, datasetId, SQL_COUNT_TRAINING_DATA);
+                counter = this.executeCountQuery(expId, datasetId, SQL_COUNT_TRAINING_DATA);
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Error while trying to count training data rows in the database.", e);
             }
 
             // response
             JsonObject response = new JsonObject();
-            response.put(Constants.LABEL_COUNT, counter);
+            response.put(Constants.KEY_COUNT, counter);
             msg.reply(response);
             
         });
 
         // count columns in training data
-        vertx.eventBus().consumer(Constants.LABEL_CONSUMER_DATA_COUNT_COLUMNS, msg -> {
+        vertx.eventBus().consumer(Constants.ADDRESS_DATA_COUNT_DIMENSIONS, msg -> {
 
             // the request payload (Json)
             JsonObject payload = (JsonObject) (msg.body());
 
             // parse the Json payload
-            final int expId = payload.getInteger(Constants.LABEL_EXPID).intValue();
-            final int datasetId = payload.getInteger(Constants.LABEL_DATASETID).intValue();
+            final int expId = payload.getInteger(Constants.KEY_EXPID).intValue();
+            final int datasetId = payload.getInteger(Constants.KEY_DATASETID).intValue();
 
             // count training data records
             int counter = -1;
             try {
-                counter = this.countTrainingData(expId, datasetId, SQL_COUNT_COLUMNS_TRAINING_DATA);
+                counter = this.executeCountQuery(expId, datasetId, SQL_COUNT_COLUMNS_TRAINING_DATA);
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Error while trying to count training data rows in the database.", e);
             }
 
             // response
             JsonObject response = new JsonObject();
-            response.put(Constants.LABEL_COUNT, counter);
+            response.put(Constants.KEY_COUNT, counter);
             msg.reply(response);
             
         });
 
         // select training data
-        vertx.eventBus().consumer(Constants.LABEL_CONSUMER_DATA_SELECT, msg -> {
+        vertx.eventBus().consumer(Constants.ADDRESS_TRAINING_DATA_SELECT, msg -> {
 
             // the request payload (JSON)
             JsonObject payload = (JsonObject) (msg.body());
 
             // parse the JSON payload
-            final int expId = payload.getInteger(Constants.LABEL_EXPID).intValue();
-            final int datasetId = payload.getInteger(Constants.LABEL_DATASETID).intValue();
+            final int expId = payload.getInteger(Constants.KEY_EXPID).intValue();
+            final int datasetId = payload.getInteger(Constants.KEY_DATASETID).intValue();
 
             // select training data records
             JsonArray data = null;
             try {
                 data = this.selectTrainingData(expId, datasetId);
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Error while trying to get training data in the database.", e);
+                LOGGER.log(Level.SEVERE, "Error while trying to get training data from the database.", e);
             }
             
             // response
             JsonObject response = new JsonObject();
-            response.put(Constants.LABEL_DATA, data);
+            response.put(Constants.KEY_DATA, data);
+            msg.reply(response);
+
+        });
+
+        // select labels
+        vertx.eventBus().consumer(Constants.ADDRESS_LABELS_SELECT, msg -> {
+
+            // the request payload (JSON)
+            JsonObject payload = (JsonObject) (msg.body());
+
+            // parse the JSON payload
+            final int expId = payload.getInteger(Constants.KEY_EXPID).intValue();
+            final int datasetId = payload.getInteger(Constants.KEY_DATASETID).intValue();
+
+            // select labels records
+            JsonArray data = null;
+            try {
+                data = this.selectLabels(expId, datasetId);
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Error while trying to get labels from the database.", e);
+            }
+            
+            // response
+            JsonObject response = new JsonObject();
+            response.put(Constants.KEY_DATA, data);
+            msg.reply(response);
+
+        });
+
+        // select labels
+        vertx.eventBus().consumer(Constants.ADDRESS_LABELS_SELECT_DISTINCT, msg -> {
+
+            // the request payload (JSON)
+            JsonObject payload = (JsonObject) (msg.body());
+
+            // parse the JSON payload
+            final int expId = payload.getInteger(Constants.KEY_EXPID).intValue();
+            final int datasetId = payload.getInteger(Constants.KEY_DATASETID).intValue();
+
+            // select labels records
+            JsonArray data = null;
+            try {
+                data = this.selectDistinctLabels(expId, datasetId);
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Error while trying to get labels from the database.", e);
+            }
+            
+            // response
+            JsonObject response = new JsonObject();
+            response.put(Constants.KEY_DATA, data);
             msg.reply(response);
 
         });
@@ -393,26 +444,37 @@ public class DatabaseVerticle extends AbstractVerticle {
         // fetch the label map for the given experiment and dataset ids
         Map<String, Boolean> labelMap = ApplicationManager.getInstance().getLabels(expId, datasetId);
         
-        if (labelMap == null)
+        if (labelMap == null){
             return;
+        }
 
-        // iterator to iterate through the map
+        // iterator to iterate through the label map
         Iterator<Map.Entry<String, Boolean>> iter = labelMap.entrySet().iterator();
           
         // prepare a prepared statement for each batch of training data fetched for the given experiment and dataset id
         while(iter.hasNext()){
             Map.Entry<String, Boolean> label = iter.next();
 
-            // set satement parameters
-            prep.setInt(1, expId); // experiment id
-            prep.setInt(2, datasetId); // dataset id
-            prep.setString(3, label.getKey()); // get label name
-            prep.setBoolean(4, label.getValue()); // get label value
-            prep.setTimestamp(5, new Timestamp(timestamp)); // the timestamp returned by NMF marking when the data was fetched
+            if(label.getValue()) {
 
-            // add to batch
-            prep.addBatch();
+                // set satement parameters
+                prep.setInt(1, expId); // experiment id
+                prep.setInt(2, datasetId); // dataset id
+                prep.setTimestamp(3, new Timestamp(timestamp)); // the timestamp returned by NMF marking when the data was fetched
+                prep.setInt(4, Integer.parseInt(label.getKey())); // the label value
+                
+                // add to batch
+                prep.addBatch();
+
+                // successfully set the expected label
+                // can exit function
+                return;
+            }
+            
         }
+
+        // if code execution reaches here it means that not label was given for a training dataset input, log it as an error
+        LOGGER.log(Level.WARNING, "Expected label was not set so training dataset input will discarded as model training input");
     }
 
     /**
@@ -502,7 +564,7 @@ public class DatabaseVerticle extends AbstractVerticle {
         ps.close();
     }
 
-    private int countTrainingData(int expId, int datasetId, String querySQL) throws Exception {
+    private int executeCountQuery(int expId, int datasetId, String querySQL) throws Exception {
         // create the prepared statement
         PreparedStatement ps = this.conn.prepareStatement(querySQL);
 
@@ -523,7 +585,7 @@ public class DatabaseVerticle extends AbstractVerticle {
             return -1;
         }
     }
-    
+
     private JsonArray selectTrainingData(int expId, int datasetId) throws Exception {
         
         // create the prepared statement
@@ -541,6 +603,46 @@ public class DatabaseVerticle extends AbstractVerticle {
         // return the result
         return toJSON(rs);
 
+    }
+
+    private JsonArray selectLabels(int expId, int datasetId) throws Exception {
+        
+        // create the prepared statement
+        PreparedStatement ps = this.conn.prepareStatement(SQL_SELECT_LABELS);
+
+        // set statement parameters
+        ps.setInt(1, expId);
+        ps.setInt(2, datasetId);
+
+        // execute the select statement
+        ResultSet rs = ps.executeQuery();
+
+        // ps.close();
+
+        // return the result
+        return toJSON(rs);
+    }
+
+    private JsonArray selectDistinctLabels(int expId, int datasetId) throws Exception {
+        
+        // create the prepared statement
+        PreparedStatement ps = this.conn.prepareStatement(SQL_SELECT_DISTINCT_LABELS);
+
+        // set statement parameters
+        ps.setInt(1, expId);
+        ps.setInt(2, datasetId);
+
+        // execute the select statement
+        ResultSet rs = ps.executeQuery();
+
+        // build the result JSON
+        JsonArray resultJson = toJSON(rs);
+
+        // close the prepared statement
+        ps.close();
+
+        // return the result
+        return resultJson;
     }
 
     private JsonArray toJSON(ResultSet rs) {

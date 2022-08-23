@@ -109,42 +109,42 @@ public class MainVerticle extends AbstractVerticle {
         // https://vertx.io/docs/vertx-web-validation/java/
 
         // route for training data feed subscription
-        router.post(Constants.LABEL_ENDPOINT_DATA_SUBSCRIBE)
+        router.post(Constants.ENDPOINT_DATA_SUBSCRIBE)
                 .handler(BodyHandler.create())
                 .handler(this::trainingDataSubscribe);
 
         // route for training data feed unsubscription
-        router.post(Constants.LABEL_ENDPOINT_DATA_UNSUBSCRIBE)
+        router.post(Constants.ENDPOINT_DATA_UNSUBSCRIBE)
                 .handler(BodyHandler.create())
                 .handler(this::trainingDataUnsubscribe);
 
         // route for downloading training data feed 
-        router.post(Constants.LABEL_ENDPOINT_DATA_DOWNLOAD)
+        router.post(Constants.ENDPOINT_DATA_DOWNLOAD)
                 .handler(BodyHandler.create())
                 .handler(this::trainingDataDownload);
 
         // route for uploading custom training data feed 
-        router.post(Constants.LABEL_ENDPOINT_DATA_SAVE)
+        router.post(Constants.ENDPOINT_DATA_SAVE)
                 .handler(BodyHandler.create())
                 .handler(this::trainingDataSave);
 
         // route for deleting training data feed 
-        router.post(Constants.LABEL_ENDPOINT_DATA_DELETE)
+        router.post(Constants.ENDPOINT_DATA_DELETE)
                 .handler(BodyHandler.create())
                 .handler(this::trainingDataDelete);
 
         // route for train type model, the given algorithm is pass by parameter
-        router.post(Constants.LABEL_ENDPOINT_TRAINING)
+        router.post(Constants.ENDPOINT_TRAINING)
                 .handler(BodyHandler.create())
                 .handler(this::trainingModel);
 
         // route for train model using given algorithm
-        router.post(Constants.LABEL_ENDPOINT_TRAINING_ALGORITHM)
+        router.post(Constants.ENDPOINT_TRAINING_ALGORITHM)
                 .handler(BodyHandler.create())
                 .handler(this::trainingModel);
         
         // route for inference 
-        router.post(Constants.LABEL_ENDPOINT_INFERENCE)
+        router.post(Constants.ENDPOINT_INFERENCE)
                 .handler(BodyHandler.create())
                 .handler(this::inference);
 
@@ -163,7 +163,7 @@ public class MainVerticle extends AbstractVerticle {
 
         try {
             // forward request to event bus to be handled in the appropriate Verticle
-            vertx.eventBus().request(Constants.LABEL_CONSUMER_DATA_SUBSCRIBE, payload, reply -> {
+            vertx.eventBus().request(Constants.ADDRESS_DATA_SUBSCRIBE, payload, reply -> {
                 // return response from the verticle
                 ctx.request().response().end((String) reply.result().body());
             });
@@ -191,7 +191,7 @@ public class MainVerticle extends AbstractVerticle {
 
         try {
             // forward request to event bus to be handled in the appropriate Verticle
-            vertx.eventBus().request(Constants.LABEL_CONSUMER_DATA_UNSUBSCRIBE, payload, reply -> {
+            vertx.eventBus().request(Constants.ADDRESS_DATA_UNSUBSCRIBE, payload, reply -> {
                 // return response from the verticle
                 ctx.request().response().end((String) reply.result().body());
             });
@@ -218,7 +218,7 @@ public class MainVerticle extends AbstractVerticle {
 
         try {
             // forward request to event bus to be handled in the appropriate Verticle
-            vertx.eventBus().request(Constants.LABEL_CONSUMER_DATA_SAVE, payload, reply -> {
+            vertx.eventBus().request(Constants.ADDRESS_DATA_SAVE, payload, reply -> {
                 // return response from the verticle
                 ctx.request().response().end((String) reply.result().body());
             });
@@ -247,14 +247,15 @@ public class MainVerticle extends AbstractVerticle {
         try {
             
             // forward request to event bus to be handled in the appropriate Verticle
-            vertx.eventBus().request(Constants.LABEL_CONSUMER_DATA_SELECT, payload, reply -> {
+            vertx.eventBus().request(Constants.ADDRESS_TRAINING_DATA_SELECT, payload, reply -> {
                 JsonObject json = (JsonObject) reply.result().body();
 
                 json = prepareDownloadResponse(json);
-                json.put(Constants.LABEL_EXPID, payload.getInteger(Constants.LABEL_EXPID));
+                json.put(Constants.KEY_EXPID, payload.getInteger(Constants.KEY_EXPID));
+                json.put(Constants.KEY_DATASETID, payload.getInteger(Constants.KEY_DATASETID));
                 
                 // TODO: temporal code for the EM Session. Remove later
-                json.put(Constants.LABEL_DATASETID, payload.getInteger(Constants.LABEL_DATASETID) + 1);
+                // json.put(Constants.KEY_DATASETID, payload.getInteger(Constants.KEY_DATASETID) + 1);
                 
                 /*JsonArray jsonArray = new JsonArray();
                 JsonObject object = new JsonObject();
@@ -289,7 +290,7 @@ public class MainVerticle extends AbstractVerticle {
         JsonArray newData = new JsonArray();
         JsonArray finalResponse = new JsonArray();
 
-        JsonArray data = json.getJsonArray(Constants.LABEL_DATA);
+        JsonArray data = json.getJsonArray(Constants.KEY_DATA);
 
         // variable to control the number of columns
         String timestamp = "";
@@ -300,17 +301,17 @@ public class MainVerticle extends AbstractVerticle {
             // get the Json Object and store the value
             JsonObject object = data.getJsonObject(pos);
 
-            String cur_timestamp = object.getString(Constants.LABEL_TIMESTAMP);
+            String cur_timestamp = object.getString(Constants.KEY_TIMESTAMP);
             if (timestamp == "") {
                 timestamp = cur_timestamp;
             }
 
             // create a new JsonObject
             JsonObject newObject = new JsonObject();
-            newObject.put(Constants.LABEL_NAME, object.getValue("param_name"));
-            newObject.put(Constants.LABEL_VALUE, object.getValue(Constants.LABEL_VALUE));
-            newObject.put(Constants.LABEL_DATA_TYPE, object.getValue("data_type"));
-            newObject.put(Constants.LABEL_TIMESTAMP,  object.getLong(Constants.LABEL_TIMESTAMP));
+            newObject.put(Constants.KEY_NAME, object.getValue("param_name"));
+            newObject.put(Constants.KEY_VALUE, object.getValue(Constants.KEY_VALUE));
+            newObject.put(Constants.KEY_DATA_TYPE, object.getValue("data_type"));
+            newObject.put(Constants.KEY_TIMESTAMP, object.getLong(Constants.KEY_TIMESTAMP));
             
             // if colcount is equal to total columns, we add a new row
             if (!timestamp.equals(cur_timestamp)) {
@@ -333,7 +334,7 @@ public class MainVerticle extends AbstractVerticle {
         }
 
         JsonObject finalObject = new JsonObject();
-        finalObject.put(Constants.LABEL_DATA, finalResponse);
+        finalObject.put(Constants.KEY_DATA, finalResponse);
         
         return finalObject;
     }
@@ -349,7 +350,7 @@ public class MainVerticle extends AbstractVerticle {
 
         try {
             // forward request to event bus to be handled in the appropriate Verticle
-            vertx.eventBus().request(Constants.LABEL_CONSUMER_DATA_DELETE, payload, reply -> {
+            vertx.eventBus().request(Constants.ADDRESS_DATA_DELETE, payload, reply -> {
                 // return response from the verticle
                 ctx.request().response().end((String) reply.result().body());
             });
@@ -383,25 +384,22 @@ public class MainVerticle extends AbstractVerticle {
         // type is "classifier"
         // algorithm is "aode"
 
-        String type = ctx.pathParam(Constants.LABEL_TYPE);
-        String algorithm = ctx.pathParam(Constants.LABEL_ALGORITHM);        
+        String type = ctx.pathParam(Constants.KEY_TYPE);
+        String algorithm = ctx.pathParam(Constants.KEY_ALGORITHM);        
         if (algorithm != null)
-            payload.put(Constants.LABEL_ALGORITHM, algorithm);
+            payload.put(Constants.KEY_ALGORITHM, algorithm);
 
         // forward request to event bus
-        try {
-            vertx.eventBus().request(Constants.LABEL_CONSUMER_TRAINING + "." + type, payload, reply -> {                
-                JsonObject json = (JsonObject) reply.result().body();
-                /*if (json != null) {
-                    LOGGER.log(Level.INFO, "json body: " + json.getClass());
-                }*/                
+        try { 
+            // now make the training request
+            vertx.eventBus().request(Constants.BASE_ADDRESS_TRAINING + "." + type, payload, reply -> {                
+                JsonObject json = (JsonObject) reply.result().body();            
                 ctx.request().response().putHeader("Content-Type", "application/json; charset=utf-8").end(json.encode());
             });
-
         } catch (Exception e) {
             // error object
-            resMap.put(Constants.LABEL_RESPONSE, "error");
-            resMap.put(Constants.LABEL_MESSAGE, "unsupported or invalid training request");            
+            resMap.put(Constants.KEY_RESPONSE, "error");
+            resMap.put(Constants.KEY_MESSAGE, "unsupported or invalid training request");            
             ctx.request().response().end("Error message with JSON: " + (String) Json.encodePrettily(resMap));
         }
     }
@@ -424,15 +422,15 @@ public class MainVerticle extends AbstractVerticle {
 
         // forward request to event bus
         try {
-            vertx.eventBus().request(Constants.LABEL_CONSUMER_INFERENCE, payload, reply -> {
+            vertx.eventBus().request(Constants.BASE_ADDRESS_INFERENCE, payload, reply -> {
                 JsonObject json = (JsonObject) reply.result().body();
                 ctx.request().response().putHeader("Content-Type", "application/json; charset=utf-8").end(json.encode());
             });
 
         } catch (Exception e) {
             // error object
-            resMap.put(Constants.LABEL_RESPONSE, "error");
-            resMap.put(Constants.LABEL_MESSAGE, "unsupported or invalid inference request");
+            resMap.put(Constants.KEY_RESPONSE, "error");
+            resMap.put(Constants.KEY_MESSAGE, "unsupported or invalid inference request");
             ctx.request().response().end("Error message with JSON: " + (String) Json.encodePrettily(resMap));
         }
     }
