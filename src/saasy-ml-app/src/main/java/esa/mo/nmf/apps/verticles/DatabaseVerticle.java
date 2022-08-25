@@ -147,6 +147,8 @@ public class DatabaseVerticle extends AbstractVerticle {
             List<String> paramNames = new ArrayList<String>();
             List<Long> timestamps = new ArrayList<Long>();
 
+            // TODO: Labels are not being considered
+
             // the prepared statement
             PreparedStatement prep = null;
 

@@ -79,6 +79,7 @@ public class PipeLineClassifierJSAT extends PipeLineAbstractJSAT {
         // test the model
         List<Object> result = new ArrayList<Object>();
         for(DataPointPair<Integer> dpp : ((ClassificationDataSet)test).getAsDPPList()){
+            logger.info(String.valueOf(dpp.getPair().longValue()));
             int classify = model.classify(dpp.getDataPoint()).mostLikely();
             logger.info(dpp.getPair().longValue()+ " vs " + classify);
             result.add(classify);
