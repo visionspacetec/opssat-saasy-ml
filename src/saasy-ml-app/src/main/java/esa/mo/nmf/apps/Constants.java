@@ -36,6 +36,7 @@ public final class Constants {
     public static final String KEY_DIMENSIONS = "dimensions";
     public static final String KEY_MODEL_PATH = "model_path";
     public static final String KEY_INFERENCE = "inference";
+    public static final String KEY_ERROR = "error";
 
     // labels for the endpoints
     public static final String ENDPOINT_DATA_SUBSCRIBE = "/api/v1/training/data/subscribe";

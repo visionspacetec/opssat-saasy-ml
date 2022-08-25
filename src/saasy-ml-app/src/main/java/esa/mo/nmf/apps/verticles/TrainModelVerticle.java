@@ -70,6 +70,11 @@ public class TrainModelVerticle extends AbstractVerticle {
                     JsonObject distinctLabelsJson = (JsonObject) (distinctLabelsResponse.result().body());
                     final JsonArray distinctLabelsJsonArray = distinctLabelsJson.getJsonArray(Constants.KEY_DATA);
 
+                    // Return a message with a path to the serialized model
+                    JsonObject resp = new JsonObject();
+                    resp.put(Constants.KEY_TYPE, "classifier");
+                    resp.put(Constants.KEY_ALGORITHM, algorithm);
+
                     // check if we actually have expected labels
                     if (distinctLabelsJsonArray.size() > 0) {
 
@@ -143,8 +148,8 @@ public class TrainModelVerticle extends AbstractVerticle {
                                         // create the data points for training
                                         for (Map.Entry<Integer, JsonObject> entry : trainingDatasetMap.entrySet()) {
 
-                                            if(entry.getValue().containsKey(Constants.KEY_LABEL)){
-                                            
+                                            if (entry.getValue().containsKey(Constants.KEY_LABEL)) {
+                                                
                                                 // build the training data point array
                                                 // FIXME: training datapoints values are not always of type double
                                                 double[] trainingDatapointArray = new double[dimensions];
@@ -162,27 +167,34 @@ public class TrainModelVerticle extends AbstractVerticle {
                                             }
                                         }
 
-                                        // upload the training dataset
-                                        saasyml.setDataSet(train, null);
+                                        try {
+                                            // upload the training dataset
+                                            saasyml.setDataSet(train, null);
 
-                                        // enter ML pipeline for the given algorithm
-                                        // serialize and save the resulting model
-                                        saasyml.train();
+                                            // enter ML pipeline for the given algorithm
+                                            // serialize and save the resulting model
+                                            saasyml.train();
+                                            
+                                            // Return a message with a path to the serialized model
+                                            resp.put(Constants.KEY_MODEL_PATH, saasyml.getModelPathSerialized());
+                                        } catch (Exception e) {
+                                            resp.put(Constants.KEY_ERROR, e.toString());
+                                        }
 
-                                        // Return a message with a path to the serialized model
-                                        JsonObject resp = new JsonObject();
-                                        resp.put(Constants.KEY_TYPE, "classifier");
-                                        resp.put(Constants.KEY_ALGORITHM, algorithm);
-                                        resp.put(Constants.KEY_MODEL_PATH, saasyml.getModelPathSerialized());
-                                        msg.reply(resp);                                
+                                        msg.reply(resp);
+              
                                     });
                                 });
                             } else {
                                 LOGGER.log(Level.SEVERE, "No training dataset input to train classifier model");
+                                resp.put(Constants.KEY_ERROR,"No training dataset input to train classifier model");
+                                msg.reply(resp);
                             }
                         });
                     } else {
                         LOGGER.log(Level.SEVERE, "No expected labels to train classifier model");
+                        resp.put(Constants.KEY_ERROR,"No expected labels to train classifier model");
+                        msg.reply(resp);
                     }
                 });
 
