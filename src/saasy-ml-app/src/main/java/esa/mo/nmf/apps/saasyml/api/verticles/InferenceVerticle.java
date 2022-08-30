@@ -1,4 +1,4 @@
-package esa.mo.nmf.apps.verticles;
+package esa.mo.nmf.apps.saasyml.api.verticles;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -8,7 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import esa.mo.nmf.apps.Constants;
+import esa.mo.nmf.apps.saasyml.api.Constants;
 import esa.mo.nmf.apps.PropertiesManager;
 import esa.mo.nmf.apps.saasyml.common.IPipeLineLayer;
 import esa.mo.nmf.apps.saasyml.factories.MLPipeLineFactory;

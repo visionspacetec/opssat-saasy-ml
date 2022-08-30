@@ -1,4 +1,4 @@
-package esa.mo.nmf.apps.verticles;
+package esa.mo.nmf.apps.saasyml.api.verticles;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,7 +13,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.JsonArray;
 
 import esa.mo.nmf.apps.ApplicationManager;
-import esa.mo.nmf.apps.Constants;
+import esa.mo.nmf.apps.saasyml.api.Constants;
 
 public class FetchTrainingDataVerticle extends AbstractVerticle {
   

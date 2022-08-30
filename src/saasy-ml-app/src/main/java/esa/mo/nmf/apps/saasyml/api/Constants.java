@@ -1,4 +1,4 @@
-package esa.mo.nmf.apps;
+package esa.mo.nmf.apps.saasyml.api;
 
 public final class Constants {
 
