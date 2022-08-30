@@ -5,7 +5,7 @@ import java.util.logging.Logger;
 import esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl;
 import esa.mo.nmf.spacemoadapter.SpaceMOApdapterImpl;
 
-import esa.mo.nmf.apps.verticles.MainVerticle;
+import esa.mo.nmf.apps.saasyml.api.verticles.MainVerticle;
 
 
 /**

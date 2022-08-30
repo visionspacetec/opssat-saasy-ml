@@ -1,4 +1,4 @@
-package esa.mo.nmf.apps.verticles;
+package esa.mo.nmf.apps.saasyml.api.verticles;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
@@ -12,12 +12,11 @@ import io.vertx.core.json.JsonObject;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import esa.mo.nmf.apps.AppMCAdapter;
-import esa.mo.nmf.apps.Constants;
+import esa.mo.nmf.apps.saasyml.api.Constants;
 import esa.mo.nmf.apps.PropertiesManager;
 
 

@@ -1,4 +1,4 @@
-package esa.mo.nmf.apps.verticles;
+package esa.mo.nmf.apps.saasyml.api.verticles;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,7 +30,7 @@ import java.sql.Timestamp;
 import org.sqlite.SQLiteConfig;
 
 import esa.mo.nmf.apps.ApplicationManager;
-import esa.mo.nmf.apps.Constants;
+import esa.mo.nmf.apps.saasyml.api.Constants;
 import esa.mo.nmf.apps.PropertiesManager;
 
 public class DatabaseVerticle extends AbstractVerticle {

@@ -24,7 +24,7 @@ import org.ccsds.moims.mo.mc.aggregation.structures.AggregationParameterSetList;
 import org.ccsds.moims.mo.mc.parameter.consumer.ParameterStub;
 import org.ccsds.moims.mo.mc.structures.ObjectInstancePairList;
 
-import esa.mo.nmf.apps.exceptions.AddAggregationDidNotReturnAggregationId;
+import esa.mo.nmf.apps.saasyml.api.exceptions.AddAggregationDidNotReturnAggregationId;
 
 
 public class AggregationHandler {

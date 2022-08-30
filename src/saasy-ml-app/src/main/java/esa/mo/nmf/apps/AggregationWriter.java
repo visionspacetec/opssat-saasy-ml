@@ -11,6 +11,7 @@ import org.ccsds.moims.mo.mc.parameter.structures.ParameterValue;
 
 import esa.mo.helpertools.helpers.HelperAttributes;
 import esa.mo.mc.impl.provider.AggregationInstance;
+import esa.mo.nmf.apps.saasyml.api.Constants;
 import esa.mo.nmf.commonmoadapter.CompleteAggregationReceivedListener;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
