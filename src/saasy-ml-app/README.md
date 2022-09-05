@@ -168,6 +168,29 @@ Check that the process was indeed killed:
 
 Now the App can be redeployed.
 
+## Training data types
+Training data are stored into the database as Strings. This is so that different data types can be persisted. A `data_type` column records the parameter's type with an integer id representing a specific type.
+
+| **Id** | **MAL Type** | **Java Type**        |
+|--------|--------------|----------------------|
+| 2      | Boolean      | Boolean              |
+| 3      | Duration     | double               |
+| 4      | Float        | Float                |
+| 5      | Double       | Double               |
+| 7      | Octet        | Byte                 |
+| 8      | UOctet       | short                |
+| 9      | Short        | Short                |
+| 10     | UShort       | int                  |
+| 11     | Integer      | Integer              |
+| 12     | UInteger     | long                 |
+| 13     | Long         | Long                 |
+| 14     | ULong        | java.math.BigInteger |
+| 16     | Time         | long                 |
+| 17     | FineTime     | long                 |
+
+
+Early versions of this service will treat all stored parameter values as doubles when training the models. As a reference, see `HelperAttributes.attribute2double(Attribute in)` in package `esa.mo.helpertools.helpers`.
+
 ## API
 Ad-hoc documentation of the app's API endpoints.
 
@@ -306,19 +329,19 @@ Sample payload:
             {
                 "name": "PARAM_10",
                 "value": "1001",
-                "dataType": 1,
+                "dataType": 11,
                 "timestamp": 1656803525000
             },
             {
                 "name": "PARAM_20",
                 "value": "2001",
-                "dataType": 1,
+                "dataType": 11,
                 "timestamp": 1656803525000
             },
             {
                 "name": "PARAM_30",
                 "value": "3001",
-                "dataType": 1,
+                "dataType": 11,
                 "timestamp": 1656803525000
             }
         ],
@@ -326,19 +349,19 @@ Sample payload:
             {
                 "name": "PARAM_10",
                 "value": "1002",
-                "dataType": 1,
+                "dataType": 11,
                 "timestamp": 1656804525000
             },
             {
                 "name": "PARAM_20",
                 "value": "2002",
-                "dataType": 1,
+                "dataType": 11,
                 "timestamp": 1656804525000
             },
             {
                 "name": "PARAM_30",
                 "value": "3002",
-                "dataType": 1,
+                "dataType": 11,
                 "timestamp": 1656804525000
             }
         ],
@@ -346,19 +369,19 @@ Sample payload:
             {
                 "name": "PARAM_10",
                 "value": "1003",
-                "dataType": 1,
+                "dataType": 11,
                 "timestamp": 1656805525000
             },
             {
                 "name": "PARAM_20",
                 "value": "2003",
-                "dataType": 1,
+                "dataType": 11,
                 "timestamp": 1656805525000
             },
             {
                 "name": "PARAM_30",
                 "value": "3003",
-                "dataType": 1,
+                "dataType": 11,
                 "timestamp": 1656805525000
             }
         ]
@@ -392,19 +415,19 @@ Sample payload with label values (expected output) provided by the client:
             {
                 "name": "PARAM_10",
                 "value": "1001",
-                "dataType": 1,
+                "dataType": 11,
                 "timestamp": 1656803525000
             },
             {
                 "name": "PARAM_20",
                 "value": "2001",
-                "dataType": 1,
+                "dataType": 11,
                 "timestamp": 1656803525000
             },
             {
                 "name": "PARAM_30",
                 "value": "3001",
-                "dataType": 1,
+                "dataType": 11,
                 "timestamp": 1656803525000
             }
         ],
@@ -412,19 +435,19 @@ Sample payload with label values (expected output) provided by the client:
             {
                 "name": "PARAM_10",
                 "value": "1002",
-                "dataType": 1,
+                "dataType": 11,
                 "timestamp": 1656804525000
             },
             {
                 "name": "PARAM_20",
                 "value": "2002",
-                "dataType": 1,
+                "dataType": 11,
                 "timestamp": 1656804525000
             },
             {
                 "name": "PARAM_30",
                 "value": "3002",
-                "dataType": 1,
+                "dataType": 11,
                 "timestamp": 1656804525000
             }
         ],
@@ -432,19 +455,19 @@ Sample payload with label values (expected output) provided by the client:
             {
                 "name": "PARAM_10",
                 "value": "1003",
-                "dataType": 1,
+                "dataType": 11,
                 "timestamp": 1656805525000
             },
             {
                 "name": "PARAM_20",
                 "value": "2003",
-                "dataType": 1,
+                "dataType": 11,
                 "timestamp": 1656805525000
             },
             {
                 "name": "PARAM_30",
                 "value": "3003",
-                "dataType": 1,
+                "dataType": 11,
                 "timestamp": 1656805525000
             }
         ]

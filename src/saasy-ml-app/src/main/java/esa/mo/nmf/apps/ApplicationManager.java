@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.ccsds.moims.mo.mal.structures.LongList;
+
 import javafx.util.Pair;
 
 public class ApplicationManager {
@@ -15,6 +17,10 @@ public class ApplicationManager {
     // we need this because the response object received in the onReceivedData listener does not reference the parameter names
     private Map<Pair<Integer, Integer>, List<String>> paramNamesMap;
 
+    // map to track parameter ids for the requested data
+    // we need this because the response object received in the onReceivedData listener does not reference the parameter ids
+    private Map<Pair<Integer, Integer>, LongList> paramIdsMap;
+
     // map to track the label (expected output) for the requested data
     private Map<Pair<Integer, Integer>, Map<String, Boolean>> labelMap;
     
@@ -25,6 +31,7 @@ public class ApplicationManager {
     // hide the constructor
     private ApplicationManager() {
         this.paramNamesMap = new ConcurrentHashMap<Pair<Integer, Integer>, List<String>>();
+        this.paramIdsMap = new ConcurrentHashMap<Pair<Integer, Integer>, LongList>();
         this.labelMap = new ConcurrentHashMap<Pair<Integer, Integer>, Map<String, Boolean>>();
         this.aggregationHandlerMap = new ConcurrentHashMap<Pair<Integer, Integer>, AggregationHandler>();
     }
@@ -55,6 +62,14 @@ public class ApplicationManager {
 
     public List<String> getParamNames(int expId, int datasetId) {
         return this.paramNamesMap.get(new Pair<Integer, Integer>(expId, datasetId));
+    }
+
+    public void addParamIds(int expId, int datasetId, LongList paramIds) {
+        this.paramIdsMap.put(new Pair<Integer, Integer>(expId, datasetId), paramIds);
+    }
+
+    public LongList getParamIds(int expId, int datasetId) {
+        return this.paramIdsMap.get(new Pair<Integer, Integer>(expId, datasetId));
     }
 
     public void addLabels(int expId, int datasetId, Map<String, Boolean> labelMap) {
