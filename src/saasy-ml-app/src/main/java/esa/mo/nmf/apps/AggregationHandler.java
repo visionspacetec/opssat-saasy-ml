@@ -20,10 +20,8 @@ import org.ccsds.moims.mo.mc.aggregation.structures.AggregationDefinitionDetails
 import org.ccsds.moims.mo.mc.aggregation.structures.AggregationDefinitionDetailsList;
 import org.ccsds.moims.mo.mc.aggregation.structures.AggregationParameterSet;
 import org.ccsds.moims.mo.mc.aggregation.structures.AggregationParameterSetList;
-
 import org.ccsds.moims.mo.mc.parameter.consumer.ParameterStub;
 import org.ccsds.moims.mo.mc.structures.ObjectInstancePairList;
-
 import esa.mo.nmf.apps.exceptions.AddAggregationDidNotReturnAggregationId;
 
 
@@ -33,6 +31,11 @@ public class AggregationHandler {
     // parameters default value before first acquisition
     public static final String PARAMS_DEFAULT_VALUE = "null";
     
+    // the experiment id
+    private int expId;
+
+    // the dataset id
+    private int datasetId;
     
     // aggregation Id string
     private String aggIdStr;
@@ -59,6 +62,9 @@ public class AggregationHandler {
      * @param paramNames names of datapool parameters to sample
      */
     public AggregationHandler(int expId, int datasetId, double paramSamplingInterval, List<String> paramNames) throws Exception {
+        this.expId = expId;
+        this.datasetId = datasetId;
+
         this.paramSamplingInterval = paramSamplingInterval;
         this.paramNames = paramNames;
         
@@ -89,7 +95,11 @@ public class AggregationHandler {
     private void enableSupervisorParameterSubscription() throws Exception{
         // get parameter ids
         LongList paramIds = getParamIds();
-        
+
+        // keep track of object instance pair list
+        // we need this because the response object received in the onReceivedData listener does not reference the parameter names
+        ApplicationManager.getInstance().addParamIds(this.expId, this.datasetId, paramIds);
+
         // create (or update) and enable an aggregation for the parameters to fetch
         createOrUpdateAggForParams(paramIds);
   

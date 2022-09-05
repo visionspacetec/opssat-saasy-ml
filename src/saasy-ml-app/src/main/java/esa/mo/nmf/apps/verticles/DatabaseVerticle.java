@@ -33,6 +33,7 @@ import esa.mo.nmf.apps.ApplicationManager;
 import esa.mo.nmf.apps.Constants;
 import esa.mo.nmf.apps.PropertiesManager;
 
+
 public class DatabaseVerticle extends AbstractVerticle {
 
     // logger
