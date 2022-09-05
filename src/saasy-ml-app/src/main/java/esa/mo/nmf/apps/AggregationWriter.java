@@ -7,9 +7,15 @@ import java.util.logging.Logger;
 import javafx.util.Pair;
 
 import org.ccsds.moims.mo.mc.aggregation.structures.AggregationParameterValueList;
+import org.ccsds.moims.mo.mc.parameter.ParameterHelper;
+import org.ccsds.moims.mo.mc.parameter.structures.ParameterDefinitionDetails;
 import org.ccsds.moims.mo.mc.parameter.structures.ParameterValue;
 
+import esa.mo.com.impl.consumer.ArchiveConsumerServiceImpl;
+import esa.mo.com.impl.provider.ArchivePersistenceObject;
+import esa.mo.com.impl.util.HelperArchive;
 import esa.mo.helpertools.helpers.HelperAttributes;
+import esa.mo.mc.impl.consumer.ParameterConsumerServiceImpl;
 import esa.mo.mc.impl.provider.AggregationInstance;
 import esa.mo.nmf.apps.saasyml.api.Constants;
 import esa.mo.nmf.commonmoadapter.CompleteAggregationReceivedListener;
@@ -26,6 +32,10 @@ public class AggregationWriter implements CompleteAggregationReceivedListener {
     // the vertx object
     private Vertx vertx;
 
+    // services
+    private ArchiveConsumerServiceImpl archiveService;
+    private ParameterConsumerServiceImpl paramService;
+
     // make inaccessible the default constructor
     private AggregationWriter(){}
 
@@ -33,6 +43,8 @@ public class AggregationWriter implements CompleteAggregationReceivedListener {
     public AggregationWriter(Vertx vertx) { 
         try{
             this.vertx = vertx;
+            this.archiveService = AppMCAdapter.getInstance().getSupervisorSMA().getCOMServices().getArchiveService();
+            this.paramService = AppMCAdapter.getInstance().getSupervisorSMA().getMCServices().getParameterService();
 
         } catch(Exception e) {
             // log error
@@ -66,7 +78,7 @@ public class AggregationWriter implements CompleteAggregationReceivedListener {
         
             // get aggregation timestamp and parameter values
             Long timestamp = aggregationInstance.getTimestamp().getValue();
-            List<Pair<Integer, String>> paramValues = getParameterValues(aggregationInstance);
+            List<Pair<Integer, String>> paramValues = getParameterValues(expId, datasetId, aggregationInstance);
 
             // the payload json object that will be parsed to persist the training data into the database
             JsonObject payload = new JsonObject();
@@ -100,7 +112,7 @@ public class AggregationWriter implements CompleteAggregationReceivedListener {
         }
     }
     
-    public List<Pair<Integer, String>> getParameterValues(AggregationInstance aggregationInstance) {
+    public List<Pair<Integer, String>> getParameterValues(int expId, int datasetId, AggregationInstance aggregationInstance) {
 
         // the list that will contain all the param values
         List<Pair<Integer, String>> paramValues = new ArrayList<Pair<Integer, String>>();
@@ -113,12 +125,31 @@ public class AggregationWriter implements CompleteAggregationReceivedListener {
         for (int i = 0; i < aggParamValueList.size(); i++) {
             ParameterValue paramValue = aggParamValueList.get(i).getValue();
             
-            // get the parameter type short form and the string value
-            Integer paramTypeShortForm = paramValue.getTypeShortForm();
-            String paramValueStr = HelperAttributes.attribute2string(paramValue.getRawValue());
+            try {
+                ArchivePersistenceObject comObject = HelperArchive.getArchiveCOMObject(
+                    this.archiveService.getArchiveStub(),
+                    ParameterHelper.PARAMETERDEFINITION_OBJECT_TYPE, 
+                    this.paramService.getConnectionDetails().getDomain(), 
+                    ApplicationManager.getInstance().getParamIds(expId, datasetId).get(i));
 
-            // add to list a key-value pair
-            paramValues.add(new Pair<Integer, String>(paramTypeShortForm, paramValueStr));
+                if(comObject != null){
+                    // get the data type
+                    ParameterDefinitionDetails pDef = (ParameterDefinitionDetails) comObject.getObject();
+
+                    // get the string value of the parameter
+                    String paramValueStr = HelperAttributes.attribute2string(paramValue.getRawValue());
+
+                    // add to list a key-value pair
+                    paramValues.add(new Pair<Integer, String>(new Integer(pDef.getRawType().intValue()), paramValueStr));
+
+                }else{
+                    LOGGER.log(Level.SEVERE, "Failed to fetch the parameter COM object, training data will not be persisted.");
+                }
+
+            } catch (Exception e){
+                LOGGER.log(Level.WARNING, "Failed to fetch the parameter data type, training data will not be persisted.", e);
+            }
+
         }
 
         // return the list
