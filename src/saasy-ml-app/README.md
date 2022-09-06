@@ -9,6 +9,7 @@ An NMF App for the OPS-SAT spacecraft. The app uses ML to train AI models with t
 - [Long Install](#long-install)
 - [Run App](#run-app)
 - [Known Issue](#known-issue)
+- [Training Data Types](training-data-types)
 - [API](#api)
 - [References](#references)
 
@@ -168,7 +169,7 @@ Check that the process was indeed killed:
 
 Now the App can be redeployed.
 
-## Training data types
+## Training Data Types
 Training data are stored into the database as Strings. This is so that different data types can be persisted. A `data_type` column records the parameter's type with an integer id representing a specific type.
 
 | **Id** | **MAL Type** | **Java Type**        |
@@ -264,12 +265,12 @@ Make several of these requests with different values for `expId`, `datasetId`, `
     "training": [
         {
             "type": "classifier",
-            "algorithm": "aode",
+            "algorithm": "LogisticRegressionDCD",
             "thread" : false
         },
         {
             "type": "classifier",
-            "algorithm": "bagging"
+            "algorithm": "AROW"
         }
     ]
 }
@@ -389,11 +390,11 @@ Sample payload:
     "training": [
         {
             "type": "classifier",
-            "algorithm": "aode"
+            "algorithm": "LogisticRegressionDCD"
         },
         {
             "type": "classifier",
-            "algorithm": "bagging"
+            "algorithm": "AROW"
         }
     ]
 }
@@ -475,11 +476,11 @@ Sample payload with label values (expected output) provided by the client:
     "training": [
         {
             "type": "classifier",
-            "algorithm": "aode"
+            "algorithm": "LogisticRegressionDCD"
         },
         {
             "type": "classifier",
-            "algorithm": "bagging"
+            "algorithm": "AROW"
         }
     ]
 }
@@ -489,7 +490,7 @@ The training parameter is optional and used to auto-trigger training the model(s
 
 ### Delete data
 
-Make an POST request to the following endpoint:
+Make a POST request to the following endpoint:
 
 ```
 http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/data/delete
@@ -506,7 +507,7 @@ Sample payload:
 
 ### Train a model
 
-Make an POST request to the following endpoints:
+Make a POST request to the following endpoints:
 
 ```
 http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/:type/:algorithm
@@ -536,9 +537,23 @@ Sample payload:
 }
 ```
 
+### Fetch Models Metadata
+To fetch which trained models are avaible for a given experiment and dataset pair, make a POST request to the following endpoint:
+
+```
+http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/models
+```
+
+```json
+{
+    "expId": 123,
+    "datasetId": 1
+}
+```
+
 ### Inference
 
-Make an POST request to the following endpoints:
+Make a POST request to the following endpoint:
 
 ```
 http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/inference
@@ -549,45 +564,40 @@ Sample payload:
 ```json
 {
     "expId": 123,
+    "datasetId": 1,
     "data": [
         [
             {
                 "name": "GNC_0005",
                 "value": "1001",
-                "dataType": 1,
-                "timestamp": 1656803525000
+                "dataType": 11
             },
             {
                 "name": "GNC_0011",
                 "value": "2001",
-                "dataType": 1,
-                "timestamp": 1656803525000
+                "dataType": 11
             },
             {
                 "name": "GNC_0007",
                 "value": "3001",
-                "dataType": 1,
-                "timestamp": 1656803525000
+                "dataType": 11
             }
         ],
         [
             {
                 "name": "GNC_0005",
                 "value": "1002",
-                "dataType": 1,
-                "timestamp": 1656804525000
+                "dataType": 11
             },
             {
                 "name": "GNC_0011",
                 "value": "2002",
-                "dataType": 1,
-                "timestamp": 1656804525000
+                "dataType": 11
             },
             {
                 "name": "GNC_0007",
                 "value": "3002",
-                "dataType": 1,
-                "timestamp": 1656804525000
+                "dataType": 11
             }
         ]
     ],

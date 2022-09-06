@@ -147,6 +147,12 @@ public class MainVerticle extends AbstractVerticle {
                 .handler(BodyHandler.create())
                 .handler(this::inference);
 
+
+        // route for models metadata
+        router.post(Constants.ENDPOINT_MODELS)
+                .handler(BodyHandler.create())
+                .handler(this::models);
+
         return router;
     }
 
@@ -399,7 +405,7 @@ public class MainVerticle extends AbstractVerticle {
             // error object
             resMap.put(Constants.KEY_RESPONSE, "error");
             resMap.put(Constants.KEY_MESSAGE, "unsupported or invalid training request");            
-            ctx.request().response().end("Error message with JSON: " + (String) Json.encodePrettily(resMap));
+            ctx.request().response().end(Json.encodePrettily(resMap));
         }
     }
 
@@ -417,7 +423,7 @@ public class MainVerticle extends AbstractVerticle {
         JsonObject payload = ctx.getBodyAsJson();
 
         // get api request url payload
-        // e.g. /api/v1/inference/
+        // e.g. /api/v1/inference
 
         // forward request to event bus
         try {
@@ -430,7 +436,40 @@ public class MainVerticle extends AbstractVerticle {
             // error object
             resMap.put(Constants.KEY_RESPONSE, "error");
             resMap.put(Constants.KEY_MESSAGE, "unsupported or invalid inference request");
-            ctx.request().response().end("Error message with JSON: " + (String) Json.encodePrettily(resMap));
+            ctx.request().response().end(Json.encodePrettily(resMap));
+        }
+    }
+
+
+    /**
+     * fetch info on trained models
+     * 
+     * @param ctx
+     */
+    void models(RoutingContext ctx) {
+
+        // response map
+        Map<String, String> resMap = new HashMap<String, String>();
+
+        // get the payload
+        JsonObject payload = ctx.getBodyAsJson();
+
+        // forward request to event bus
+        try {
+            vertx.eventBus().request(Constants.ADDRESS_MODELS_SELECT, payload, reply -> {
+                JsonObject json = (JsonObject) reply.result().body();
+                ctx.request().response().putHeader("Content-Type", "application/json; charset=utf-8").end(json.encode());
+            });
+
+        } catch (Exception e) {
+            // error object
+            resMap.put(Constants.KEY_RESPONSE, "error");
+            resMap.put(Constants.KEY_MESSAGE, "unsupported or invalid models request");
+
+            // error response
+            ctx.request().response()
+                .putHeader("content-type", "application/json; charset=utf-8")
+                .end(Json.encodePrettily(resMap));
         }
     }
 

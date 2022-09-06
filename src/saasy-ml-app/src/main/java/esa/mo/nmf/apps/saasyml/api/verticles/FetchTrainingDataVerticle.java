@@ -31,7 +31,7 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
 
             // the request payload (Json)
             JsonObject payload = (JsonObject) (msg.body());
-            LOGGER.log(Level.INFO, "The POST "+Constants.ADDRESS_DATA_SUBSCRIBE+" request payload: " + payload.toString());
+            LOGGER.log(Level.INFO, "The POST " + Constants.ADDRESS_DATA_SUBSCRIBE + " request payload: " + payload.toString());
 
             // parse the Json payload
             final int expId = payload.getInteger(Constants.KEY_EXPID).intValue();
@@ -70,7 +70,7 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
                 ApplicationManager.getInstance().createAggregationHandler(expId, datasetId, interval, paramNameList,
                         true);
 
-                // check periodically when to stop fetching datam if "interations" is set and > 0
+                // check periodically when to stop fetching data if "interations" is set and > 0
                 if (iterations > 0) {
                     // register periodic timer
                     vertx.setPeriodic(500, id -> {
@@ -127,16 +127,9 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
                                                         t.getBoolean(Constants.KEY_THREAD));
 
                                                 // trigger training
-                                                // vertx.eventBus().send("saasyml.training." + type, trainPayload);
-                                                vertx.eventBus().request(Constants.BASE_ADDRESS_TRAINING + "." + type,
-                                                        trainPayload,
-                                                        trainReply -> {
-
-                                                            JsonObject trainResponse = (JsonObject) (trainReply.result()
-                                                                    .body());
-                                                            // msg.reply(trainResponse);
-
-                                                        });
+                                                // resulting model will be saved in the filesystem and referenced from the database
+                                                vertx.eventBus().send(Constants.BASE_ADDRESS_TRAINING + "." + type, trainPayload);
+                                                
                                             }
                                         }
 

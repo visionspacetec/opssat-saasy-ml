@@ -56,6 +56,15 @@ public class TrainModelVerticle extends AbstractVerticle {
                 serialize = payload.getBoolean("serialize");
             }*/
 
+            // the traine model will be serialized and saved as a file in the filesystem
+            // a reference to the file as well as some metadata will be stored in the database
+            // collect all metadata in a Json object
+            JsonObject modelMetadata = new JsonObject();
+            modelMetadata.put(Constants.KEY_EXPID, expId);
+            modelMetadata.put(Constants.KEY_DATASETID, datasetId);
+            modelMetadata.put(Constants.KEY_TYPE, "classifier");
+            modelMetadata.put(Constants.KEY_ALGORITHM, algorithm);
+
             // create the pipeline
             IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(expId, datasetId, thread, serialize, algorithm);
 
@@ -69,11 +78,6 @@ public class TrainModelVerticle extends AbstractVerticle {
                 vertx.eventBus().request(Constants.ADDRESS_LABELS_SELECT_DISTINCT, payload, distinctLabelsResponse -> {
                     JsonObject distinctLabelsJson = (JsonObject) (distinctLabelsResponse.result().body());
                     final JsonArray distinctLabelsJsonArray = distinctLabelsJson.getJsonArray(Constants.KEY_DATA);
-
-                    // Return a message with a path to the serialized model
-                    JsonObject resp = new JsonObject();
-                    resp.put(Constants.KEY_TYPE, "classifier");
-                    resp.put(Constants.KEY_ALGORITHM, algorithm);
 
                     // check if we actually have expected labels
                     if (distinctLabelsJsonArray.size() > 0) {
@@ -152,10 +156,14 @@ public class TrainModelVerticle extends AbstractVerticle {
                                                 
                                                 // build the training data point array
                                                 // FIXME: training datapoints values are not always of type double
+                                                // but maybe it's ok to always process as double?
+                                                // see esa.mo.helpertools.helpers.HelperAttributes.attribute2double(Attribute in)
                                                 double[] trainingDatapointArray = new double[dimensions];
 
                                                 for(int d = 0; d < dimensions; d++){
                                                     // FIXME: training datapoints values are not always of type double
+                                                    // but maybe it's ok to always process as double?
+                                                    // see esa.mo.helpertools.helpers.HelperAttributes.attribute2double(Attribute in
                                                     trainingDatapointArray[d] = Double.valueOf(entry.getValue().getJsonArray(Constants.KEY_DATA_POINT).getString(d));
                                                 }
 
@@ -175,27 +183,43 @@ public class TrainModelVerticle extends AbstractVerticle {
                                             // serialize and save the resulting model
                                             saasyml.train();
                                             
-                                            // Return a message with a path to the serialized model
-                                            resp.put(Constants.KEY_MODEL_PATH, saasyml.getModelPathSerialized());
+                                            // the path to the model file will be stored in the database
+                                            modelMetadata.put(Constants.KEY_FILEPATH, saasyml.getModelPathSerialized());
+
                                         } catch (Exception e) {
-                                            resp.put(Constants.KEY_ERROR, e.toString());
+                                            // the error message will be stored to the database
+                                            modelMetadata.put(Constants.KEY_ERROR, e.getMessage());
                                         }
 
-                                        msg.reply(resp);
-              
+                                        // save model file path or error message in the models metadata table
+                                        vertx.eventBus().send(Constants.ADDRESS_MODELS_SAVE, modelMetadata);
                                     });
                                 });
                             } else {
-                                LOGGER.log(Level.SEVERE, "No training dataset input to train classifier model");
-                                resp.put(Constants.KEY_ERROR,"No training dataset input to train classifier model");
-                                msg.reply(resp);
+                                // the error message
+                                String errorMsg = "No training dataset input was found to train classifier model.";
+
+                                // log error message
+                                LOGGER.log(Level.SEVERE, errorMsg);
+                                
+                                // save error message in the models metadata table
+                                modelMetadata.put(Constants.KEY_ERROR, errorMsg);
+                                vertx.eventBus().send(Constants.ADDRESS_MODELS_SAVE, modelMetadata);
                             }
                         });
                     } else {
-                        LOGGER.log(Level.SEVERE, "No expected labels to train classifier model");
-                        resp.put(Constants.KEY_ERROR,"No expected labels to train classifier model");
-                        msg.reply(resp);
+                        // the error message
+                        String errorMsg = "Missing expected labels to train classifier model.";
+
+                        // log error message
+                        LOGGER.log(Level.SEVERE, errorMsg);
+
+                        // save error message in the models metadata table
+                        modelMetadata.put(Constants.KEY_ERROR, errorMsg);
+                        vertx.eventBus().send(Constants.ADDRESS_MODELS_SAVE, modelMetadata);
                     }
+
+                    LOGGER.log(Level.INFO, "Trained model will be sored in the filesystem and referenced from the database once training is complete.");
                 });
 
             } catch (Exception e) {
@@ -205,12 +229,12 @@ public class TrainModelVerticle extends AbstractVerticle {
                 // log
                 LOGGER.log(Level.SEVERE, errorMsg, e);
 
-                // response: error
-                msg.reply(errorMsg);
+                // save error message in the models metadata table
+                modelMetadata.put(Constants.KEY_ERROR, errorMsg + ": " + e.getMessage());
+                vertx.eventBus().send(Constants.ADDRESS_MODELS_SAVE, modelMetadata);
             }
-
-            LOGGER.log(Level.INFO, "Finished training.classifier");
         });
+
 
         // train outlier
         vertx.eventBus().consumer(Constants.ADDRESS_TRAINING_OUTLIER, msg -> {

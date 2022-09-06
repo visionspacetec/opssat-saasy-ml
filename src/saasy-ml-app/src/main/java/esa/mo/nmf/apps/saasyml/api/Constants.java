@@ -37,6 +37,8 @@ public final class Constants {
     public static final String KEY_MODEL_PATH = "model_path";
     public static final String KEY_INFERENCE = "inference";
     public static final String KEY_ERROR = "error";
+    public static final String KEY_FILEPATH = "filepath";
+
 
     // labels for the endpoints
     public static final String ENDPOINT_DATA_SUBSCRIBE = "/api/v1/training/data/subscribe";
@@ -47,6 +49,7 @@ public final class Constants {
     public static final String ENDPOINT_TRAINING = "/api/v1/training/:type";
     public static final String ENDPOINT_TRAINING_ALGORITHM = ENDPOINT_TRAINING + "/:algorithm";
     public static final String ENDPOINT_INFERENCE = "/api/v1/inference";
+    public static final String ENDPOINT_MODELS = "/api/v1/models";
 
     // labels to consume the verticles
     public static final String BASE_ADDRESS_TRAINING = "saasyml.training";
@@ -64,6 +67,11 @@ public final class Constants {
     public static final String ADDRESS_LABELS_SELECT = BASE_ADDRESS_TRAINING + ".labels.select";
     public static final String ADDRESS_DATA_UNSUBSCRIBE = BASE_ADDRESS_TRAINING + ".data.unsubscribe";
     public static final String ADDRESS_DATA_SUBSCRIBE = BASE_ADDRESS_TRAINING + ".data.subscribe";
+
+    public static final String BASE_ADDRESS_MODELS = "saasyml.models";
+    public static final String ADDRESS_MODELS_SAVE = BASE_ADDRESS_MODELS + ".save";
+    public static final String ADDRESS_MODELS_SELECT = BASE_ADDRESS_MODELS + ".select";
+
 
     public static final String BASE_ADDRESS_INFERENCE = "saasyml.inference";
     public static final String ADDRESS_INFERENCE_CLASSIFIER = BASE_ADDRESS_INFERENCE + ".classifier";
