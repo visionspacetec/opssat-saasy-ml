@@ -71,6 +71,7 @@ public class TrainModelVerticle extends AbstractVerticle {
                     final JsonArray distinctLabelsJsonArray = distinctLabelsJson.getJsonArray(Constants.KEY_DATA);
 
                     // Return a message with a path to the serialized model
+                    // FIXME: remove resp in favor of storing in database
                     JsonObject resp = new JsonObject();
                     resp.put(Constants.KEY_TYPE, "classifier");
                     resp.put(Constants.KEY_ALGORITHM, algorithm);
@@ -152,10 +153,14 @@ public class TrainModelVerticle extends AbstractVerticle {
                                                 
                                                 // build the training data point array
                                                 // FIXME: training datapoints values are not always of type double
+                                                // but maybe it's ok to always process as double?
+                                                // see esa.mo.helpertools.helpers.HelperAttributes.attribute2double(Attribute in)
                                                 double[] trainingDatapointArray = new double[dimensions];
 
                                                 for(int d = 0; d < dimensions; d++){
                                                     // FIXME: training datapoints values are not always of type double
+                                                    // but maybe it's ok to always process as double?
+                                                    // see esa.mo.helpertools.helpers.HelperAttributes.attribute2double(Attribute in
                                                     trainingDatapointArray[d] = Double.valueOf(entry.getValue().getJsonArray(Constants.KEY_DATA_POINT).getString(d));
                                                 }
 
@@ -176,29 +181,40 @@ public class TrainModelVerticle extends AbstractVerticle {
                                             saasyml.train();
                                             
                                             // Return a message with a path to the serialized model
+                                            // FIXME: remove resp in favor of storing in database
                                             resp.put(Constants.KEY_MODEL_PATH, saasyml.getModelPathSerialized());
+
+
                                         } catch (Exception e) {
+                                            // FIXME: store result in model database.
                                             resp.put(Constants.KEY_ERROR, e.toString());
                                         }
 
+                                        // FIXME: remove reply and store result in model database.
                                         msg.reply(resp);
-              
                                     });
                                 });
                             } else {
-                                LOGGER.log(Level.SEVERE, "No training dataset input to train classifier model");
-                                resp.put(Constants.KEY_ERROR,"No training dataset input to train classifier model");
+                                // FIXME: store result in model database.
+                                String errorMsg = "No training dataset input was found to train classifier model.";
+                                LOGGER.log(Level.SEVERE, errorMsg);
+                                resp.put(Constants.KEY_ERROR, errorMsg);
                                 msg.reply(resp);
                             }
                         });
                     } else {
-                        LOGGER.log(Level.SEVERE, "No expected labels to train classifier model");
-                        resp.put(Constants.KEY_ERROR,"No expected labels to train classifier model");
+                        // FIXME: store result in model database.
+                        String errorMsg = "Missing expected labels to train classifier model.";
+                        LOGGER.log(Level.SEVERE, errorMsg);
+                        resp.put(Constants.KEY_ERROR, errorMsg);
                         msg.reply(resp);
                     }
+
+                    LOGGER.log(Level.INFO, "Trained model will be sored in the filesystem and referenced from the database when training is complete.");
                 });
 
             } catch (Exception e) {
+                // FIXME: store result in model database.
                 // the error message
                 String errorMsg = "Failed to get training data.";
 
@@ -206,10 +222,9 @@ public class TrainModelVerticle extends AbstractVerticle {
                 LOGGER.log(Level.SEVERE, errorMsg, e);
 
                 // response: error
+                // FIXME: remove response message and store result in model database.
                 msg.reply(errorMsg);
             }
-
-            LOGGER.log(Level.INFO, "Finished training.classifier");
         });
 
         // train outlier

@@ -9,6 +9,7 @@ An NMF App for the OPS-SAT spacecraft. The app uses ML to train AI models with t
 - [Long Install](#long-install)
 - [Run App](#run-app)
 - [Known Issue](#known-issue)
+- [Training Data Types](training-data-types)
 - [API](#api)
 - [References](#references)
 
@@ -168,7 +169,7 @@ Check that the process was indeed killed:
 
 Now the App can be redeployed.
 
-## Training data types
+## Training Data Types
 Training data are stored into the database as Strings. This is so that different data types can be persisted. A `data_type` column records the parameter's type with an integer id representing a specific type.
 
 | **Id** | **MAL Type** | **Java Type**        |
@@ -264,12 +265,12 @@ Make several of these requests with different values for `expId`, `datasetId`, `
     "training": [
         {
             "type": "classifier",
-            "algorithm": "aode",
+            "algorithm": "LogisticRegressionDCD",
             "thread" : false
         },
         {
             "type": "classifier",
-            "algorithm": "bagging"
+            "algorithm": "AROW"
         }
     ]
 }
@@ -389,11 +390,11 @@ Sample payload:
     "training": [
         {
             "type": "classifier",
-            "algorithm": "aode"
+            "algorithm": "LogisticRegressionDCD"
         },
         {
             "type": "classifier",
-            "algorithm": "bagging"
+            "algorithm": "AROW"
         }
     ]
 }
@@ -475,11 +476,11 @@ Sample payload with label values (expected output) provided by the client:
     "training": [
         {
             "type": "classifier",
-            "algorithm": "aode"
+            "algorithm": "LogisticRegressionDCD"
         },
         {
             "type": "classifier",
-            "algorithm": "bagging"
+            "algorithm": "AROW"
         }
     ]
 }
