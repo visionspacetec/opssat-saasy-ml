@@ -43,7 +43,7 @@ public abstract class PipeLineAbstractJSAT implements IPipeLineLayer{
     // to serialize the model
     protected boolean serialize = false;
     private String modelPath = "./models/";
-    private String formatDate = "yyyy-MM-dd hh-mm-ss";
+    private String formatDate = "yyyy-MM-dd_hh-mm-ss";
     private String modelFileName = modelPath + "E{EXPID}-D{DATASETID}-{MODEL_NAME}-{DATE}.model"; // {THREAD}
 
     // data set to train and test
