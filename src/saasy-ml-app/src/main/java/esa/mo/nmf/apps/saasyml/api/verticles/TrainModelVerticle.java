@@ -56,6 +56,15 @@ public class TrainModelVerticle extends AbstractVerticle {
                 serialize = payload.getBoolean("serialize");
             }*/
 
+            // the traine model will be serialized and saved as a file in the filesystem
+            // a reference to the file as well as some metadata will be stored in the database
+            // collect all metadata in a Json object
+            JsonObject modelMetadata = new JsonObject();
+            modelMetadata.put(Constants.KEY_EXPID, expId);
+            modelMetadata.put(Constants.KEY_DATASETID, datasetId);
+            modelMetadata.put(Constants.KEY_TYPE, "classifier");
+            modelMetadata.put(Constants.KEY_ALGORITHM, algorithm);
+
             // create the pipeline
             IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(expId, datasetId, thread, serialize, algorithm);
 
@@ -69,12 +78,6 @@ public class TrainModelVerticle extends AbstractVerticle {
                 vertx.eventBus().request(Constants.ADDRESS_LABELS_SELECT_DISTINCT, payload, distinctLabelsResponse -> {
                     JsonObject distinctLabelsJson = (JsonObject) (distinctLabelsResponse.result().body());
                     final JsonArray distinctLabelsJsonArray = distinctLabelsJson.getJsonArray(Constants.KEY_DATA);
-
-                    // Return a message with a path to the serialized model
-                    // FIXME: remove resp in favor of storing in database
-                    JsonObject resp = new JsonObject();
-                    resp.put(Constants.KEY_TYPE, "classifier");
-                    resp.put(Constants.KEY_ALGORITHM, algorithm);
 
                     // check if we actually have expected labels
                     if (distinctLabelsJsonArray.size() > 0) {
@@ -180,52 +183,58 @@ public class TrainModelVerticle extends AbstractVerticle {
                                             // serialize and save the resulting model
                                             saasyml.train();
                                             
-                                            // Return a message with a path to the serialized model
-                                            // FIXME: remove resp in favor of storing in database
-                                            resp.put(Constants.KEY_MODEL_PATH, saasyml.getModelPathSerialized());
-
+                                            // the path to the model file will be stored in the database
+                                            modelMetadata.put(Constants.KEY_FILEPATH, saasyml.getModelPathSerialized());
 
                                         } catch (Exception e) {
-                                            // FIXME: store result in model database.
-                                            resp.put(Constants.KEY_ERROR, e.toString());
+                                            // the error message will be stored to the database
+                                            modelMetadata.put(Constants.KEY_ERROR, e.getMessage());
                                         }
 
-                                        // FIXME: remove reply and store result in model database.
-                                        msg.reply(resp);
+                                        // save model file path or error message in the models metadata table
+                                        vertx.eventBus().send(Constants.ADDRESS_MODELS_SAVE, modelMetadata);
                                     });
                                 });
                             } else {
-                                // FIXME: store result in model database.
+                                // the error message
                                 String errorMsg = "No training dataset input was found to train classifier model.";
+
+                                // log error message
                                 LOGGER.log(Level.SEVERE, errorMsg);
-                                resp.put(Constants.KEY_ERROR, errorMsg);
-                                msg.reply(resp);
+                                
+                                // save error message in the models metadata table
+                                modelMetadata.put(Constants.KEY_ERROR, errorMsg);
+                                vertx.eventBus().send(Constants.ADDRESS_MODELS_SAVE, modelMetadata);
                             }
                         });
                     } else {
-                        // FIXME: store result in model database.
+                        // the error message
                         String errorMsg = "Missing expected labels to train classifier model.";
+
+                        // log error message
                         LOGGER.log(Level.SEVERE, errorMsg);
-                        resp.put(Constants.KEY_ERROR, errorMsg);
-                        msg.reply(resp);
+
+                        // save error message in the models metadata table
+                        modelMetadata.put(Constants.KEY_ERROR, errorMsg);
+                        vertx.eventBus().send(Constants.ADDRESS_MODELS_SAVE, modelMetadata);
                     }
 
-                    LOGGER.log(Level.INFO, "Trained model will be sored in the filesystem and referenced from the database when training is complete.");
+                    LOGGER.log(Level.INFO, "Trained model will be sored in the filesystem and referenced from the database once training is complete.");
                 });
 
             } catch (Exception e) {
-                // FIXME: store result in model database.
                 // the error message
                 String errorMsg = "Failed to get training data.";
 
                 // log
                 LOGGER.log(Level.SEVERE, errorMsg, e);
 
-                // response: error
-                // FIXME: remove response message and store result in model database.
-                msg.reply(errorMsg);
+                // save error message in the models metadata table
+                modelMetadata.put(Constants.KEY_ERROR, errorMsg + ": " + e.getMessage());
+                vertx.eventBus().send(Constants.ADDRESS_MODELS_SAVE, modelMetadata);
             }
         });
+
 
         // train outlier
         vertx.eventBus().consumer(Constants.ADDRESS_TRAINING_OUTLIER, msg -> {

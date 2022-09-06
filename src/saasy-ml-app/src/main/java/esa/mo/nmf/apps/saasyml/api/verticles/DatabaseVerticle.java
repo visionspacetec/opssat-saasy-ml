@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.Iterator;
-
-import javafx.application.Application;
 import javafx.util.Pair;
 
 import io.vertx.core.AbstractVerticle;
@@ -44,13 +42,16 @@ public class DatabaseVerticle extends AbstractVerticle {
     // sql query strings
     private final String SQL_INSERT_TRAINING_DATA = "INSERT INTO training_data(exp_id, dataset_id, param_name, data_type, value, timestamp) VALUES(?, ?, ?, ?, ?, ?)";
     private final String SQL_INSERT_LABELS = "INSERT INTO labels(exp_id, dataset_id, timestamp, label) VALUES(?, ?, ?, ?)";
+    private final String SQL_INSERT_MODELS = "INSERT INTO models(exp_id, dataset_id, timestamp, type, algorithm, filepath, error) VALUES(?, ?, ?, ?, ?, ?, ?)";
     private final String SQL_COUNT_TRAINING_DATA = "SELECT count(*) FROM  training_data WHERE exp_id = ? AND dataset_id = ?";
     private final String SQL_COUNT_COLUMNS_TRAINING_DATA = "SELECT count(*) FROM  training_data WHERE exp_id = ? AND dataset_id = ? AND param_name != 'label' GROUP BY timestamp LIMIT 1"; // "SELECT count(DISTINCT param_name) FROM training_data WHERE exp_id=? AND dataset_id=?" 
     private final String SQL_SELECT_TRAINING_DATA = "SELECT * FROM training_data WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp ASC";
     private final String SQL_SELECT_LABELS = "SELECT * FROM labels WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp ASC";
+    private final String SQL_SELECT_MODELS = "SELECT * FROM models WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp DESC";
     private final String SQL_SELECT_DISTINCT_LABELS = "SELECT DISTINCT label FROM labels  WHERE exp_id = ? AND dataset_id = ? ORDER BY label ASC";
     private final String SQL_DELETE_TRAINING_DATA = "DELETE FROM training_data WHERE exp_id = ? AND dataset_id = ?";
     private final String SQL_DELETE_LABELS = "DELETE FROM labels WHERE exp_id = ? AND dataset_id = ?";
+    
     private final String SQL_CREATE_TABLE_TRAINING_DATA = 
         "CREATE TABLE IF NOT EXISTS training_data(" +
             "exp_id INTEGER NOT NULL, " +
@@ -60,12 +61,24 @@ public class DatabaseVerticle extends AbstractVerticle {
             "value TEXT NOT NULL, " +
             "timestamp TIMESTAMP NOT NULL" +
         ")";
+
     private final String SQL_CREATE_TABLE_LABELS = 
         "CREATE TABLE IF NOT EXISTS labels(" +
             "exp_id INTEGER NOT NULL, " +
             "dataset_id INTEGER NOT NULL, " +
             "timestamp TIMESTAMP NOT NULL, " +
-            "label INTEGER NOT NULL " +
+            "label INTEGER NOT NULL" +
+        ")";
+
+    private final String SQL_CREATE_TABLE_MODELS = 
+        "CREATE TABLE IF NOT EXISTS models(" +
+            "exp_id INTEGER NOT NULL, " +
+            "dataset_id INTEGER NOT NULL, " +
+            "timestamp TIMESTAMP NOT NULL, " +
+            "type TEXT NOT NULL, " +
+            "algorithm TEXT NOT NULL, " +
+            "filepath TEXT, " +
+            "error TEXT" +
         ")";
 
     public Connection connect() throws Exception {
@@ -102,13 +115,21 @@ public class DatabaseVerticle extends AbstractVerticle {
                     }else {
                         LOGGER.log(Level.INFO, "The labels table already exists.");
                     }
+
+                    // check if the models table exists and create it if it does not.
+                    if(!this.modelsTableExists()) {
+                        this.createModelsTable();
+                        LOGGER.log(Level.INFO, "Created the models table.");
+                    }else {
+                        LOGGER.log(Level.INFO, "The models table already exists.");
+                    }
                     
                 }else {
                     this.conn = null;
                     throw new Exception("Failed to create database connection");
                 }
             } catch (Exception e) {
-                LOGGER.log(Level.INFO, "[Error] It was not possible to create the connection");
+                LOGGER.log(Level.SEVERE, "[Error] It was not possible to create the connection");
                 // close connection in case it is open despite the exception.
                 this.closeConnection();
             }            
@@ -125,7 +146,7 @@ public class DatabaseVerticle extends AbstractVerticle {
         try {
             this.connect();
         } catch (Exception e) {
-            LOGGER.log(Level.INFO, "Database connection initialization failed: training data will not persist.", e);
+            LOGGER.log(Level.SEVERE, "Database connection initialization failed: training data will not persist.", e);
         }
     }
 
@@ -390,6 +411,31 @@ public class DatabaseVerticle extends AbstractVerticle {
         });
 
         // select labels
+        vertx.eventBus().consumer(Constants.ADDRESS_MODELS_SELECT, msg -> {
+
+            // the request payload (JSON)
+            JsonObject payload = (JsonObject) (msg.body());
+
+            // parse the JSON payload
+            final int expId = payload.getInteger(Constants.KEY_EXPID).intValue();
+            final int datasetId = payload.getInteger(Constants.KEY_DATASETID).intValue();
+
+            // select models records
+            JsonArray data = null;
+            try {
+                data = this.selectModels(expId, datasetId);
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Error while trying to get models from the database.", e);
+            }
+            
+            // response
+            JsonObject response = new JsonObject();
+            response.put(Constants.KEY_DATA, data);
+            msg.reply(response);
+
+        });
+
+        // select labels
         vertx.eventBus().consumer(Constants.ADDRESS_LABELS_SELECT_DISTINCT, msg -> {
 
             // the request payload (JSON)
@@ -412,6 +458,54 @@ public class DatabaseVerticle extends AbstractVerticle {
             response.put(Constants.KEY_DATA, data);
             msg.reply(response);
 
+        });
+
+
+        // save model metadata
+        vertx.eventBus().consumer(Constants.ADDRESS_MODELS_SAVE, msg -> {
+
+            // the request payload (Json)
+            JsonObject payload = (JsonObject) (msg.body());
+
+            // parse the Json payload
+            final int expId = payload.getInteger(Constants.KEY_EXPID).intValue();
+            final int datasetId = payload.getInteger(Constants.KEY_DATASETID).intValue();
+            final String type = payload.getString(Constants.KEY_TYPE);
+            final String algorithm = payload.getString(Constants.KEY_ALGORITHM);
+            final String filepath = payload.getString(Constants.KEY_FILEPATH);
+            final String error = payload.getString(Constants.KEY_ERROR);
+
+            try {
+
+                // insert training data
+                PreparedStatement prep = this.conn.prepareStatement(
+                    SQL_INSERT_MODELS
+                );
+
+                // set satement parameters
+                prep.setInt(1, expId); // experiment id
+                prep.setInt(2, datasetId); // dataset id
+                prep.setTimestamp(3, new Timestamp(System.currentTimeMillis())); // the timestamp returned by NMF marking when the data was fetched
+                prep.setString(4, type); // the type of training algorithm that was used to train the model (e.g. classifier)
+                prep.setString(5, algorithm); // the training algorithm that was used to train the model (e.g. AROW)
+                prep.setString(6, filepath); // the model filepath (none if an error was thrown during training)
+                prep.setString(7, error); // the error message (if an error was thrown during training)
+                
+                prep.executeUpdate();
+                prep.close();
+                
+                // log and respond
+                String message = "Saved model metadata for (expId, datasetId) = (" + expId + ", " + datasetId + ")";
+                LOGGER.log(Level.SEVERE, message);
+                msg.reply(msg);
+
+            } catch (Exception e) {
+                String errorMsg ="Error while trying to save model metadata in the database.";
+                LOGGER.log(Level.SEVERE, errorMsg, e);
+
+                // response
+                msg.reply(errorMsg);
+            }
         });
     }
 
@@ -625,6 +719,25 @@ public class DatabaseVerticle extends AbstractVerticle {
         return toJSON(rs);
     }
 
+    private JsonArray selectModels(int expId, int datasetId) throws Exception {
+        
+        // create the prepared statement
+        PreparedStatement ps = this.conn.prepareStatement(SQL_SELECT_MODELS);
+
+        // set statement parameters
+        ps.setInt(1, expId);
+        ps.setInt(2, datasetId);
+
+        // execute the select statement
+        ResultSet rs = ps.executeQuery();
+
+        // ps.close();
+
+        // return the result
+        return toJSON(rs);
+    }
+
+
     private JsonArray selectDistinctLabels(int expId, int datasetId) throws Exception {
         
         // create the prepared statement
@@ -709,6 +822,29 @@ public class DatabaseVerticle extends AbstractVerticle {
 
         // execute the statement to create the table
         stmt.executeUpdate(SQL_CREATE_TABLE_LABELS);
+
+        // close the statement
+        stmt.close();
+    }
+
+    private boolean modelsTableExists() throws Exception {
+
+        // search for table macthing expected table name
+        DatabaseMetaData md = this.conn.getMetaData();
+        ResultSet tables = md.getTables(null, null, "models", null);
+
+        // return true if the table exists and false if it does not
+        return tables.next() ? true : false;
+    }
+
+
+    private void createModelsTable() throws Exception {
+
+        // create a statement
+        Statement stmt = this.conn.createStatement();
+
+        // execute the statement to create the table
+        stmt.executeUpdate(SQL_CREATE_TABLE_MODELS);
 
         // close the statement
         stmt.close();

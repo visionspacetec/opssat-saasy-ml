@@ -31,7 +31,7 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
 
             // the request payload (Json)
             JsonObject payload = (JsonObject) (msg.body());
-            LOGGER.log(Level.INFO, "The POST "+Constants.ADDRESS_DATA_SUBSCRIBE+" request payload: " + payload.toString());
+            LOGGER.log(Level.INFO, "The POST " + Constants.ADDRESS_DATA_SUBSCRIBE + " request payload: " + payload.toString());
 
             // parse the Json payload
             final int expId = payload.getInteger(Constants.KEY_EXPID).intValue();
@@ -128,7 +128,7 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
 
                                                 // trigger training
                                                 // resulting model will be saved in the filesystem and referenced from the database
-                                                vertx.eventBus().request(Constants.BASE_ADDRESS_TRAINING + "." + type, trainPayload);
+                                                vertx.eventBus().send(Constants.BASE_ADDRESS_TRAINING + "." + type, trainPayload);
                                                 
                                             }
                                         }
@@ -146,7 +146,7 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
                 }
 
                 // response: success
-                //msg.reply("Successfully subscribed to training data feed.");
+                msg.reply("Successfully subscribed to training data feed.");
 
             } catch (Exception e) {
                 // log
