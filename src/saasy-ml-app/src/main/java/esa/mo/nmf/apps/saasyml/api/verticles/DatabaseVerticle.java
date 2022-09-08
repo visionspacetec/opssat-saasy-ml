@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-import javafx.util.Pair;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Context;
@@ -86,6 +85,27 @@ public class DatabaseVerticle extends AbstractVerticle {
     private static final String TABLE_TRAINING_DATA = "training_data";
     private static final String TABLE_MODELS = "models";
     private static final String TABLE_LABELS = "labels";
+
+    /**
+     * Class to generate pair values
+     */
+    private class Pair<T, E> {
+        private T key;
+        private E value;
+
+        Pair(T key, E value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        public T getKey() {
+            return key;
+        }
+
+        public E getValue() {
+            return value;
+        }
+    }
 
     public Connection connect() throws Exception {
         if(this.conn == null || this.conn.isClosed())
