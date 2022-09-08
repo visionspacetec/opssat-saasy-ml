@@ -111,7 +111,7 @@ public class InferenceVerticle extends AbstractVerticle {
 
         // variables to generate the class randomly
         Random rand = new Random();
-        int classification = 2;
+        int classification = 1;
 
         // create the lists of tests
         List<DataSet> tests = new ArrayList<DataSet>();

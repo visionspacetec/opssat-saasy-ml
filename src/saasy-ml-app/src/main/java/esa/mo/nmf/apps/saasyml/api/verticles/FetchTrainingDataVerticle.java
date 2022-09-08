@@ -15,6 +15,10 @@ import io.vertx.core.json.JsonArray;
 import esa.mo.nmf.apps.ApplicationManager;
 import esa.mo.nmf.apps.saasyml.api.Constants;
 
+// TODO:
+// this class does not adhere to the Dependency Inversion Principle. 
+// 
+// - consider depend on abstractions
 public class FetchTrainingDataVerticle extends AbstractVerticle {
   
     // logger

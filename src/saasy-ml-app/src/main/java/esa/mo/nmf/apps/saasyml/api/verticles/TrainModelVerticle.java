@@ -56,7 +56,7 @@ public class TrainModelVerticle extends AbstractVerticle {
                 serialize = payload.getBoolean("serialize");
             }*/
 
-            // the traine model will be serialized and saved as a file in the filesystem
+            // the train model will be serialized and saved as a file in the filesystem
             // a reference to the file as well as some metadata will be stored in the database
             // collect all metadata in a Json object
             JsonObject modelMetadata = new JsonObject();
@@ -219,7 +219,10 @@ public class TrainModelVerticle extends AbstractVerticle {
                         vertx.eventBus().send(Constants.ADDRESS_MODELS_SAVE, modelMetadata);
                     }
 
-                    LOGGER.log(Level.INFO, "Trained model will be sored in the filesystem and referenced from the database once training is complete.");
+                    LOGGER.log(Level.INFO, "Trained model will be stored in the filesystem and referenced from the database once training is complete.");
+
+                    // response
+                    msg.reply("Successfully trained model. Request the endpoint models to see the final results.");
                 });
 
             } catch (Exception e) {

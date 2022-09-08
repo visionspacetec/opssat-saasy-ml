@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import javafx.util.Pair;
 
@@ -79,7 +80,12 @@ public class DatabaseVerticle extends AbstractVerticle {
             "algorithm TEXT NOT NULL, " +
             "filepath TEXT, " +
             "error TEXT" +
-        ")";
+                    ")";
+
+    // table names
+    private static final String TABLE_TRAINING_DATA = "training_data";
+    private static final String TABLE_MODELS = "models";
+    private static final String TABLE_LABELS = "labels";
 
     public Connection connect() throws Exception {
         if(this.conn == null || this.conn.isClosed())
@@ -99,29 +105,20 @@ public class DatabaseVerticle extends AbstractVerticle {
                 if (this.conn != null) {
                     // log error
                     LOGGER.log(Level.INFO, "Database connection created successfully.");
-    
-                    // check if training data table exists and create it if it does not.
-                    if(!this.trainingDataTableExists()) {
-                        this.createTrainingDataTable();
-                        LOGGER.log(Level.INFO, "Created the training data table.");
-                    }else {
-                        LOGGER.log(Level.INFO, "The training data table already exists.");
-                    }
 
-                    // check if the labels table exists and create it if it does not.
-                    if(!this.labelsTableExists()) {
-                        this.createLabelsTable();
-                        LOGGER.log(Level.INFO, "Created the labels table.");
-                    }else {
-                        LOGGER.log(Level.INFO, "The labels table already exists.");
-                    }
-
-                    // check if the models table exists and create it if it does not.
-                    if(!this.modelsTableExists()) {
-                        this.createModelsTable();
-                        LOGGER.log(Level.INFO, "Created the models table.");
-                    }else {
-                        LOGGER.log(Level.INFO, "The models table already exists.");
+                    List<Pair<String, String>> pairTableAndSQLCreate = Arrays.asList(
+                        new Pair<String, String>(TABLE_TRAINING_DATA, SQL_CREATE_TABLE_TRAINING_DATA), 
+                        new Pair<String, String>(TABLE_LABELS, SQL_CREATE_TABLE_LABELS), 
+                        new Pair<String, String>(TABLE_MODELS, SQL_CREATE_TABLE_MODELS));
+                    
+                    for (Pair<String, String> pair : pairTableAndSQLCreate) {    
+                        // check if training data table exists and create it if it does not.
+                        if(!this.tableExists(pair.getKey())) {
+                            this.createTable(pair.getValue());
+                            LOGGER.log(Level.INFO, String.format("Created the %s table.", pair.getKey()));
+                        }else {
+                            LOGGER.log(Level.INFO, String.format("The %s table already exists.", pair.getKey()));
+                        }
                     }
                     
                 }else {
@@ -495,9 +492,9 @@ public class DatabaseVerticle extends AbstractVerticle {
                 prep.close();
                 
                 // log and respond
-                String message = "Saved model metadata for (expId, datasetId) = (" + expId + ", " + datasetId + ")";
-                LOGGER.log(Level.SEVERE, message);
-                msg.reply(msg);
+                String message = String.format("Saved model metadata for (expId, datasetId) = (%d, %d)", expId, datasetId);
+                LOGGER.log(Level.INFO, message);
+                msg.reply(message);
 
             } catch (Exception e) {
                 String errorMsg ="Error while trying to save model metadata in the database.";
@@ -783,68 +780,23 @@ public class DatabaseVerticle extends AbstractVerticle {
         return json;
     }
 
-    private boolean trainingDataTableExists() throws Exception {
+    private boolean tableExists(String tableName) throws Exception {
 
         // search for table macthing expected table name
         DatabaseMetaData md = this.conn.getMetaData();
-        ResultSet tables = md.getTables(null, null, "training_data", null);
+        ResultSet tables = md.getTables(null, null, tableName, null);
 
         // return true if the table exists and false if it does not
         return tables.next() ? true : false;
     }
 
-    private void createTrainingDataTable() throws Exception {
+    private void createTable(String SQL_QUERY) throws Exception {
 
         // create a statement
         Statement stmt = this.conn.createStatement();
 
         // execute the statement to create the table
-        stmt.executeUpdate(SQL_CREATE_TABLE_TRAINING_DATA);
-
-        // close the statement
-        stmt.close();
-    }
-
-    private boolean labelsTableExists() throws Exception {
-
-        // search for table macthing expected table name
-        DatabaseMetaData md = this.conn.getMetaData();
-        ResultSet tables = md.getTables(null, null, "labels", null);
-
-        // return true if the table exists and false if it does not
-        return tables.next() ? true : false;
-    }
-
-    private void createLabelsTable() throws Exception {
-
-        // create a statement
-        Statement stmt = this.conn.createStatement();
-
-        // execute the statement to create the table
-        stmt.executeUpdate(SQL_CREATE_TABLE_LABELS);
-
-        // close the statement
-        stmt.close();
-    }
-
-    private boolean modelsTableExists() throws Exception {
-
-        // search for table macthing expected table name
-        DatabaseMetaData md = this.conn.getMetaData();
-        ResultSet tables = md.getTables(null, null, "models", null);
-
-        // return true if the table exists and false if it does not
-        return tables.next() ? true : false;
-    }
-
-
-    private void createModelsTable() throws Exception {
-
-        // create a statement
-        Statement stmt = this.conn.createStatement();
-
-        // execute the statement to create the table
-        stmt.executeUpdate(SQL_CREATE_TABLE_MODELS);
+        stmt.executeUpdate(SQL_QUERY);
 
         // close the statement
         stmt.close();
