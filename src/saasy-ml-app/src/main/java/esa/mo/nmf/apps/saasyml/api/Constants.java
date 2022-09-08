@@ -49,7 +49,7 @@ public final class Constants {
     public static final String ENDPOINT_TRAINING = "/api/v1/training/:type";
     public static final String ENDPOINT_TRAINING_ALGORITHM = ENDPOINT_TRAINING + "/:algorithm";
     public static final String ENDPOINT_INFERENCE = "/api/v1/inference";
-    public static final String ENDPOINT_MODELS = "/api/v1/models";
+    public static final String ENDPOINT_MODELS = "/api/v1/training/models";
 
     // labels to consume the verticles
     public static final String BASE_ADDRESS_TRAINING = "saasyml.training";
