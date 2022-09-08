@@ -538,10 +538,10 @@ Sample payload:
 ```
 
 ### Fetch Models Metadata
-To fetch which trained models are avaible for a given experiment and dataset pair, make a POST request to the following endpoint:
+To fetch which trained models are available for a given experiment and dataset pair, make a POST request to the following endpoint:
 
 ```
-http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/models
+http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/models
 ```
 
 ```json
