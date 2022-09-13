@@ -206,14 +206,6 @@ public class MainVerticle extends AbstractVerticle {
      */
     void trainingDataSubscribe(RoutingContext ctx) {
 
-        /*HttpServerResponse response = ctx.response();
-        response.setStatusCode(500).setStatusMessage("trainingDataSubscribe()");
-        response.end();*/
-        
-        throw new RuntimeException("something happened!");
-        
-        
-        /*
         // payload
         JsonObject payload = ctx.getBodyAsJson();
 
@@ -232,7 +224,7 @@ public class MainVerticle extends AbstractVerticle {
             ctx.request().response()
                 .putHeader("content-type", "application/json; charset=utf-8")
                 .end(Json.encodePrettily(responseMap));
-        } */
+        } 
     }
 
     /**
