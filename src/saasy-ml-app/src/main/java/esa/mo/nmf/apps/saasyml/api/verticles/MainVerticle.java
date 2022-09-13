@@ -2,7 +2,9 @@ package esa.mo.nmf.apps.saasyml.api.verticles;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.DeploymentOptions;
+import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
@@ -10,6 +12,8 @@ import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -18,6 +22,8 @@ import java.util.logging.Logger;
 import esa.mo.nmf.apps.AppMCAdapter;
 import esa.mo.nmf.apps.saasyml.api.Constants;
 import esa.mo.nmf.apps.PropertiesManager;
+
+
 
 
 /**
@@ -50,6 +56,8 @@ public class MainVerticle extends AbstractVerticle {
 
         // define router and api paths
         Router router = createRouterAndAPIPaths();
+
+        createFailureHandler(router);
 
         // create handler and listen port
         vertx.createHttpServer().requestHandler(router).listen(port);
@@ -156,6 +164,41 @@ public class MainVerticle extends AbstractVerticle {
         return router;
     }
 
+    
+    /**
+     * Function to create failure handler of the Router  
+     * 
+     * For each API endpoint, we define the failure handler
+     * 
+     * @return defined Router with API paths and failure handlers
+     */
+    private void createFailureHandler(Router router) {
+
+        router.post("/*").failureHandler(rc -> {
+            LOGGER.log(Level.SEVERE, "Handling failure");
+            
+            // to convert trace into a String:
+            StringWriter sw = new StringWriter();
+ 
+            // create a PrintWriter
+            PrintWriter pw = new PrintWriter(sw);
+
+            Throwable failure = rc.failure();
+            String message = "There is an Internal Error";
+            if (failure != null) {
+                message = failure.getMessage();
+                failure.printStackTrace(pw);
+                LOGGER.log(Level.SEVERE, sw.toString());
+            }
+    
+            HttpServerResponse response = rc.response();
+            response.setStatusCode(rc.statusCode()).setStatusMessage(message);
+            response.end();    
+        });
+
+    }
+
+
     /**
      * Function to Subscribe to training data feed
      * 
@@ -181,7 +224,7 @@ public class MainVerticle extends AbstractVerticle {
             ctx.request().response()
                 .putHeader("content-type", "application/json; charset=utf-8")
                 .end(Json.encodePrettily(responseMap));
-        }
+        } 
     }
 
     /**

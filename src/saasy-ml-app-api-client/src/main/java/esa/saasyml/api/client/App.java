@@ -48,8 +48,7 @@ public final class App {
             os.flush();
     
             if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                throw new RuntimeException("Failed : HTTP error code : "
-                    + conn.getResponseCode());
+                throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode() + ".\nError message: " + conn.getResponseMessage());
             }
     
             BufferedReader br = new BufferedReader(new InputStreamReader(
