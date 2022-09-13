@@ -41,15 +41,17 @@ public final class Constants {
 
 
     // labels for the endpoints
-    public static final String ENDPOINT_DATA_SUBSCRIBE = "/api/v1/training/data/subscribe";
-    public static final String ENDPOINT_DATA_UNSUBSCRIBE = "/api/v1/training/data/unsubscribe";
-    public static final String ENDPOINT_DATA_SAVE = "/api/v1/training/data/save";
-    public static final String ENDPOINT_DATA_DOWNLOAD = "/api/v1/training/data/download";
-    public static final String ENDPOINT_DATA_DELETE = "/api/v1/training/data/delete";
-    public static final String ENDPOINT_TRAINING = "/api/v1/training/:type";
+    public static final String ENDPOINT_API = "/api/";
+    public static final String ENDPOINT_VERSION = ENDPOINT_API + "v1/";
+    public static final String ENDPOINT_DATA_SUBSCRIBE = ENDPOINT_VERSION + "training/data/subscribe";
+    public static final String ENDPOINT_DATA_UNSUBSCRIBE = ENDPOINT_VERSION + "training/data/unsubscribe";
+    public static final String ENDPOINT_DATA_SAVE = ENDPOINT_VERSION + "training/data/save";
+    public static final String ENDPOINT_DATA_DOWNLOAD = ENDPOINT_VERSION + "training/data/download";
+    public static final String ENDPOINT_DATA_DELETE = ENDPOINT_VERSION + "training/data/delete";
+    public static final String ENDPOINT_TRAINING = ENDPOINT_VERSION + "training/:type";
     public static final String ENDPOINT_TRAINING_ALGORITHM = ENDPOINT_TRAINING + "/:algorithm";
-    public static final String ENDPOINT_INFERENCE = "/api/v1/inference";
-    public static final String ENDPOINT_MODELS = "/api/v1/training/models";
+    public static final String ENDPOINT_INFERENCE = ENDPOINT_VERSION + "inference";
+    public static final String ENDPOINT_MODELS = ENDPOINT_VERSION + "training/models";
 
     // labels to consume the verticles
     public static final String BASE_ADDRESS_TRAINING = "saasyml.training";

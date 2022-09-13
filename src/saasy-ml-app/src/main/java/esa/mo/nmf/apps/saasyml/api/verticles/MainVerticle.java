@@ -2,6 +2,7 @@ package esa.mo.nmf.apps.saasyml.api.verticles;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
@@ -18,6 +19,8 @@ import java.util.logging.Logger;
 import esa.mo.nmf.apps.AppMCAdapter;
 import esa.mo.nmf.apps.saasyml.api.Constants;
 import esa.mo.nmf.apps.PropertiesManager;
+
+
 
 
 /**
@@ -50,6 +53,8 @@ public class MainVerticle extends AbstractVerticle {
 
         // define router and api paths
         Router router = createRouterAndAPIPaths();
+
+        router = createFailureHandler(router);
 
         // create handler and listen port
         vertx.createHttpServer().requestHandler(router).listen(port);
@@ -156,6 +161,36 @@ public class MainVerticle extends AbstractVerticle {
         return router;
     }
 
+    
+    /**
+     * Function to create failure handler of the Router  
+     * 
+     * For each API endpoint, we define the failure handler
+     * 
+     * @return defined Router with API paths and failure handlers
+     */
+    private Router createFailureHandler(Router router) {
+
+        router.get(Constants.ENDPOINT_API).failureHandler(rc -> {
+            LOGGER.info("Handling failure");
+            
+            Throwable failure = rc.failure();
+            if (failure != null) {
+                LOGGER.log(Level.SEVERE, failure.toString() + " " + failure.getCause().toString());
+                failure.printStackTrace();
+            }
+    
+            HttpServerResponse response = rc.response();
+            response.setStatusCode(rc.statusCode());
+            response.setStatusMessage(failure.toString() + " " + failure.getCause().toString());
+            response.end();
+    
+        });
+
+        return router;
+    }
+
+
     /**
      * Function to Subscribe to training data feed
      * 
@@ -163,6 +198,9 @@ public class MainVerticle extends AbstractVerticle {
      */
     void trainingDataSubscribe(RoutingContext ctx) {
 
+        throw new RuntimeException("something happened!");
+        
+        /*
         // payload
         JsonObject payload = ctx.getBodyAsJson();
 
@@ -181,7 +219,7 @@ public class MainVerticle extends AbstractVerticle {
             ctx.request().response()
                 .putHeader("content-type", "application/json; charset=utf-8")
                 .end(Json.encodePrettily(responseMap));
-        }
+        } */
     }
 
     /**
