@@ -11,6 +11,8 @@ import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -171,18 +173,24 @@ public class MainVerticle extends AbstractVerticle {
      */
     private Router createFailureHandler(Router router) {
 
-        router.get(Constants.ENDPOINT_API).failureHandler(rc -> {
+        router.get(Constants.ENDPOINT_DATA_SUBSCRIBE).failureHandler(rc -> {
             LOGGER.info("Handling failure");
             
+            // to convert trace into a String:
+            StringWriter sw = new StringWriter();
+ 
+            // create a PrintWriter
+            PrintWriter pw = new PrintWriter(sw);
+
             Throwable failure = rc.failure();
             if (failure != null) {
-                LOGGER.log(Level.SEVERE, failure.toString() + " " + failure.getCause().toString());
-                failure.printStackTrace();
+                failure.printStackTrace(pw);
+                LOGGER.log(Level.SEVERE, sw.toString());
             }
     
             HttpServerResponse response = rc.response();
             response.setStatusCode(rc.statusCode());
-            response.setStatusMessage(failure.toString() + " " + failure.getCause().toString());
+            response.setStatusMessage(sw.toString());
             response.end();
     
         });
