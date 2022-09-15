@@ -1,0 +1,463 @@
+Sep 15, 2022 2:15:37 PM esa.mo.nmf.apps.SaaSyMLApp <init>
+INFO: Initializing the app.
+Sep 15, 2022 2:15:38 PM esa.mo.helpertools.helpers.HelperMisc loadProperties
+INFO: Loading properties file:/home/exp213/provider.properties
+Sep 15, 2022 2:15:38 PM esa.mo.helpertools.helpers.HelperMisc loadProperties
+INFO: Loading properties file:/home/exp213/settings.properties
+Sep 15, 2022 2:15:38 PM esa.mo.helpertools.helpers.HelperMisc loadProperties
+INFO: Loading properties file:/home/exp213/transport.properties
+Sep 15, 2022 2:15:39 PM esa.mo.com.impl.archive.db.DatabaseBackend startDatabaseDriver
+INFO: Attempting to establish a connection to the database:
+ >> jdbc:sqlite:comArchive.db
+Sep 15, 2022 2:15:43 PM org.ccsds.moims.mo.mal.transport.MALTransportFactory newFactory
+INFO: New transport factory registered with classname: de.dlr.gsoc.mo.malspp.transport.SPPTransportFactory
+Sep 15, 2022 2:15:43 PM org.ccsds.moims.mo.mal.transport.MALTransportFactory newFactory
+INFO: New transport factory registered with classname: esa.mo.mal.transport.tcpip.TCPIPTransportFactoryImpl
+Sep 15, 2022 2:15:44 PM org.ccsds.moims.mo.mal.encoding.MALElementStreamFactory newFactory
+INFO: New encoding factory registered with classname: esa.mo.mal.encoder.binary.fixed.FixedBinaryStreamFactory
+Sep 15, 2022 2:15:44 PM esa.mo.mal.transport.tcpip.TCPIPTransport createTransportAddress
+INFO: TCP/IP Transport address: 192.168.135.1:1025
+Sep 15, 2022 2:15:44 PM esa.mo.com.impl.provider.ArchiveProviderServiceImpl init
+INFO: Archive service READY
+Sep 15, 2022 2:15:44 PM esa.mo.com.impl.provider.EventProviderServiceImpl init
+INFO: Event service: READY
+Sep 15, 2022 2:15:44 PM esa.mo.com.impl.provider.ActivityTrackingProviderServiceImpl init
+INFO: Activity Tracking service READY
+Sep 15, 2022 2:15:45 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl init
+INFO: ArchiveSync service READY
+Sep 15, 2022 2:15:45 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl init
+INFO: Attempting to connect to Central Directory service at: maltcp://192.168.135.1:1024/nanosat-mo-supervisor-Directory
+Sep 15, 2022 2:15:45 PM esa.mo.mal.transport.gen.GENTransport manageCommunicationChannel
+INFO: Establishing connection to remote root URI: maltcp://192.168.135.1:1024
+Sep 15, 2022 2:15:45 PM esa.mo.mal.transport.tcpip.TCPIPConnectionPoolManager get
+INFO: The socket doesn't exist! Creating a new one...
+Sep 15, 2022 2:15:46 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl init
+INFO: The Central Directory service is operational!
+Sep 15, 2022 2:15:48 PM esa.mo.helpertools.clock.SystemClock setPlatformClockCallback
+INFO: Using system clock
+Sep 15, 2022 2:15:48 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl init
+INFO: Successfully connected to Platform services on: nanosat-mo-supervisor
+Sep 15, 2022 2:15:48 PM org.ccsds.moims.mo.mal.encoding.MALElementStreamFactory newFactory
+INFO: New encoding factory registered with classname: de.dlr.gsoc.mo.malspp.encoding.SPPElementStreamFactory
+Sep 15, 2022 2:15:50 PM esa.mo.mc.impl.provider.ParameterProviderServiceImpl init
+INFO: esa.nmf.parameters.storeInArchive = true
+Sep 15, 2022 2:15:50 PM esa.mo.mc.impl.provider.ParameterProviderServiceImpl init
+INFO: Parameter service READY
+Sep 15, 2022 2:15:51 PM esa.mo.mc.impl.provider.ActionProviderServiceImpl init
+INFO: Action service READY
+Sep 15, 2022 2:15:51 PM esa.mo.mc.impl.provider.AlertProviderServiceImpl init
+INFO: Alert service READY
+Sep 15, 2022 2:15:51 PM esa.mo.mc.impl.provider.AggregationProviderServiceImpl init
+INFO: esa.nmf.parameters.storeInArchive = true
+Sep 15, 2022 2:15:51 PM esa.mo.mc.impl.provider.AggregationProviderServiceImpl init
+INFO: Aggregation service READY
+Sep 15, 2022 2:15:51 PM esa.mo.common.impl.provider.DirectoryProviderServiceImpl init
+INFO: Directory service READY
+Sep 15, 2022 2:15:51 PM esa.mo.sm.impl.provider.HeartbeatProviderServiceImpl init
+INFO: Heartbeat service READY
+Sep 15, 2022 2:15:51 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl init
+INFO: Populating local Directory service...
+Sep 15, 2022 2:15:51 PM esa.mo.helpertools.helpers.HelperMisc loadProperties
+INFO: Loading properties file:/home/exp213/providerURIs.properties
+Sep 15, 2022 2:15:51 PM esa.mo.helpertools.helpers.HelperMisc loadProperties
+INFO: Loading properties file:/home/exp213/providerURIsSecondary.properties
+Sep 15, 2022 2:15:52 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl init
+INFO: Populating Central Directory service on URI: maltcp://192.168.135.1:1024/nanosat-mo-supervisor-Directory
+Sep 15, 2022 2:15:52 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl init
+INFO: Populated! And the connection to the Directory service has been successfully closed!
+Sep 15, 2022 2:15:52 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl init
+INFO: Loading previous configurations...
+Sep 15, 2022 2:15:54 PM esa.mo.nmf.MonitorAndControlNMFAdapter registerParameters
+INFO: Registering Parameters:
+Sep 15, 2022 2:15:54 PM esa.mo.nmf.MonitorAndControlNMFAdapter registerActions
+INFO: Registering Actions
+Sep 15, 2022 2:15:54 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl init
+INFO: NanoSat MO Connector initialized in 15.829 seconds!
+Sep 15, 2022 2:15:54 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl init
+INFO: URI: malspp:247/1237/11
+
+Sep 15, 2022 2:15:54 PM esa.mo.nmf.spacemoadapter.SpaceMOApdapterImpl getNMFProviderSummary
+INFO: Found nanosat-mo-supervisor provider
+Sep 15, 2022 2:15:58 PM esa.mo.common.impl.util.HelperCommon providerSummaryToConnectionConsumer
+WARNING: The service could not be found in the MAL factory. Maybe the Helper for that service was not initialized. The service key is: (area=7, service=1, version=1)
+Sep 15, 2022 2:15:58 PM esa.mo.common.impl.util.HelperCommon providerSummaryToConnectionConsumer
+WARNING: The service could not be found in the MAL factory. Maybe the Helper for that service was not initialized. The service key is: (area=7, service=3, version=1)
+Sep 15, 2022 2:15:58 PM esa.mo.common.impl.util.HelperCommon providerSummaryToConnectionConsumer
+WARNING: The service could not be found in the MAL factory. Maybe the Helper for that service was not initialized. The service key is: (area=7, service=5, version=1)
+Sep 15, 2022 2:15:58 PM esa.mo.helpertools.helpers.HelperMisc loadProperties
+INFO: Loading properties file:/home/exp213/consumer.properties
+Sep 15, 2022 2:15:59 PM esa.mo.helpertools.helpers.HelperMisc loadProperties
+INFO: Reloading properties file:/home/exp213/consumer.properties
+Sep 15, 2022 2:15:59 PM esa.mo.nmf.apps.SaaSyMLApp start
+INFO: Starting the app.
+log4j:WARN No appenders could be found for logger (io.vertx.core.logging.LoggerFactory).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+Sep 15, 2022 2:16:03 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 4 chunks in total!
+Sep 15, 2022 2:16:05 PM esa.mo.nmf.apps.PropertiesManager loadProperties
+INFO: Loaded configuration properties from file config.properties
+Sep 15, 2022 2:16:05 PM esa.mo.nmf.apps.saasyml.api.verticles.MainVerticle deployVerticles
+INFO: Deploying Verticles
+Sep 15, 2022 2:16:06 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle start
+INFO: Starting a Verticle instance with deployment id e2c357d4-d4be-491a-b92a-51ac25f74f8f.
+Sep 15, 2022 2:16:06 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle start
+INFO: Starting a Verticle instance with deployment id e2c357d4-d4be-491a-b92a-51ac25f74f8f.
+Sep 15, 2022 2:16:06 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle start
+INFO: Starting a Verticle instance with deployment id e2c357d4-d4be-491a-b92a-51ac25f74f8f.
+Sep 15, 2022 2:16:06 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle start
+INFO: Starting a Verticle instance with deployment id e2c357d4-d4be-491a-b92a-51ac25f74f8f.
+Sep 15, 2022 2:16:06 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle start
+INFO: Starting a Verticle instance with deployment id e2c357d4-d4be-491a-b92a-51ac25f74f8f.
+Sep 15, 2022 2:16:07 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle connect
+INFO: Database connection created successfully.
+Sep 15, 2022 2:16:07 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle connect
+INFO: Created the training_data table.
+Sep 15, 2022 2:16:07 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle connect
+INFO: Created the labels table.
+Sep 15, 2022 2:16:07 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle connect
+INFO: Created the models table.
+Sep 15, 2022 2:16:10 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:16:20 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:16:30 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:16:40 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:16:50 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:17:00 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:17:10 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:17:20 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Starting 
+cat: can't open '/tmp/exp503.pid': No such file or directory
+Sep 15, 2022 2:17:30 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:17:40 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:17:50 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Starting 
+cat: can't open '/tmp/exp166.pid': No such file or directory
+Sep 15, 2022 2:18:00 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:18:10 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:18:20 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:18:30 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:18:40 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:18:50 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:19:00 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:19:10 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:19:20 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:19:30 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:19:40 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:19:50 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:20:00 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:20:10 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:20:20 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:20:30 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:20:40 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:20:50 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:21:00 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:21:10 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:21:20 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:21:28 PM esa.mo.nmf.apps.saasyml.api.verticles.MainVerticle lambda$createFailureHandler$0
+SEVERE: Handling failure
+Sep 15, 2022 2:21:28 PM esa.mo.nmf.apps.saasyml.api.verticles.MainVerticle lambda$createFailureHandler$0
+SEVERE: io.vertx.core.json.DecodeException: Unexpected character ('\' (code 92)): was expecting double-quote to start field name
+ at [Source: (io.netty.buffer.ByteBufInputStream); line: 1, column: 4]
+	at io.vertx.core.json.jackson.JacksonCodec.fromParser(JacksonCodec.java:180)
+	at io.vertx.core.json.jackson.JacksonCodec.fromBuffer(JacksonCodec.java:74)
+	at io.vertx.core.json.Json.decodeValue(Json.java:119)
+	at io.vertx.core.json.Json.decodeValue(Json.java:107)
+	at io.vertx.ext.web.codec.impl.BodyCodecImpl.lambda$static$1(BodyCodecImpl.java:41)
+	at io.vertx.ext.web.impl.RoutingContextImpl.getBodyAsJson(RoutingContextImpl.java:325)
+	at io.vertx.ext.web.RoutingContext.getBodyAsJson(RoutingContext.java:327)
+	at esa.mo.nmf.apps.saasyml.api.verticles.MainVerticle.trainingDataSubscribe(MainVerticle.java:210)
+	at io.vertx.ext.web.impl.RouteState.handleContext(RouteState.java:1212)
+	at io.vertx.ext.web.impl.RoutingContextImplBase.iterateNext(RoutingContextImplBase.java:126)
+	at io.vertx.ext.web.impl.RoutingContextImpl.next(RoutingContextImpl.java:141)
+	at io.vertx.ext.web.handler.impl.BodyHandlerImpl$BHandler.doEnd(BodyHandlerImpl.java:313)
+	at io.vertx.ext.web.handler.impl.BodyHandlerImpl$BHandler.end(BodyHandlerImpl.java:290)
+	at io.vertx.ext.web.handler.impl.BodyHandlerImpl.lambda$handle$0(BodyHandlerImpl.java:86)
+	at io.vertx.core.impl.AbstractContext.dispatch(AbstractContext.java:100)
+	at io.vertx.core.impl.AbstractContext.dispatch(AbstractContext.java:63)
+	at io.vertx.core.http.impl.HttpEventHandler.handleEnd(HttpEventHandler.java:76)
+	at io.vertx.core.http.impl.Http1xServerRequest.onEnd(Http1xServerRequest.java:561)
+	at io.vertx.core.http.impl.Http1xServerRequest.handleEnd(Http1xServerRequest.java:544)
+	at io.vertx.core.impl.EventLoopContext.execute(EventLoopContext.java:71)
+	at io.vertx.core.impl.DuplicatedContext.execute(DuplicatedContext.java:163)
+	at io.vertx.core.http.impl.Http1xServerConnection.onEnd(Http1xServerConnection.java:191)
+	at io.vertx.core.http.impl.Http1xServerConnection.onContent(Http1xServerConnection.java:181)
+	at io.vertx.core.http.impl.Http1xServerConnection.handleOther(Http1xServerConnection.java:161)
+	at io.vertx.core.http.impl.Http1xServerConnection.handleMessage(Http1xServerConnection.java:149)
+	at io.vertx.core.net.impl.ConnectionBase.read(ConnectionBase.java:155)
+	at io.vertx.core.net.impl.VertxHandler.channelRead(VertxHandler.java:153)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:379)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:365)
+	at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:357)
+	at io.netty.channel.ChannelInboundHandlerAdapter.channelRead(ChannelInboundHandlerAdapter.java:93)
+	at io.netty.handler.codec.http.websocketx.extensions.WebSocketServerExtensionHandler.channelRead(WebSocketServerExtensionHandler.java:99)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:379)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:365)
+	at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:357)
+	at io.netty.handler.codec.ByteToMessageDecoder.fireChannelRead(ByteToMessageDecoder.java:327)
+	at io.netty.handler.codec.ByteToMessageDecoder.channelRead(ByteToMessageDecoder.java:299)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:379)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:365)
+	at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:357)
+	at io.netty.channel.DefaultChannelPipeline$HeadContext.channelRead(DefaultChannelPipeline.java:1410)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:379)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:365)
+	at io.netty.channel.DefaultChannelPipeline.fireChannelRead(DefaultChannelPipeline.java:919)
+	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:166)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:722)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:658)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:584)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:496)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:986)
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: com.fasterxml.jackson.core.JsonParseException: Unexpected character ('\' (code 92)): was expecting double-quote to start field name
+ at [Source: (io.netty.buffer.ByteBufInputStream); line: 1, column: 4]
+	at com.fasterxml.jackson.core.JsonParser._constructError(JsonParser.java:2391)
+	at com.fasterxml.jackson.core.base.ParserMinimalBase._reportError(ParserMinimalBase.java:735)
+	at com.fasterxml.jackson.core.base.ParserMinimalBase._reportUnexpectedChar(ParserMinimalBase.java:659)
+	at com.fasterxml.jackson.core.json.UTF8StreamJsonParser._handleOddName(UTF8StreamJsonParser.java:2096)
+	at com.fasterxml.jackson.core.json.UTF8StreamJsonParser._parseName(UTF8StreamJsonParser.java:1746)
+	at com.fasterxml.jackson.core.json.UTF8StreamJsonParser.nextFieldName(UTF8StreamJsonParser.java:1075)
+	at io.vertx.core.json.jackson.JacksonCodec.parseObject(JacksonCodec.java:213)
+	at io.vertx.core.json.jackson.JacksonCodec.parseAny(JacksonCodec.java:193)
+	at io.vertx.core.json.jackson.JacksonCodec.fromParser(JacksonCodec.java:177)
+	... 52 more
+
+Sep 15, 2022 2:21:30 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:21:40 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:21:50 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:22:00 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:22:10 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:22:20 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:22:30 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:22:40 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:22:50 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:23:00 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:23:10 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:23:20 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:23:30 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:23:40 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:23:50 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:24:00 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:24:10 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:24:20 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:24:30 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:24:40 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:24:50 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:25:00 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:25:04 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$2
+INFO: The POST saasyml.training.data.subscribe request payload: {"expId":123,"datasetId":1,"iterations":10,"interval":2,"params":["GNC_0005","GNC_0011","GNC_0007"]}
+Sep 15, 2022 2:25:10 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:25:20 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:25:30 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:25:40 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:25:50 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:26:00 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:26:10 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:26:20 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:26:30 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:26:40 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:26:50 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:27:00 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:27:10 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:27:20 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:27:30 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:27:40 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:27:50 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:28:00 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:28:10 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:28:20 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:28:30 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:28:40 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:28:50 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:29:00 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:29:10 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:29:20 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:29:30 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:29:40 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:29:50 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:30:00 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:30:10 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:30:20 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:30:30 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:30:40 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:30:50 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:31:00 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:31:10 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:31:20 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:31:30 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:31:40 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:31:50 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:32:00 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:32:10 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:32:14 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$2
+INFO: The POST saasyml.training.data.subscribe request payload: {"expId":123,"datasetId":1,"iterations":10,"interval":2,"params":["GNC_0005","GNC_0011","GNC_0007"]}
+Sep 15, 2022 2:32:20 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:32:30 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:32:40 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:32:50 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:33:00 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:33:10 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:33:20 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:33:30 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:33:40 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:33:50 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:34:00 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:34:08 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: The POST request payload: {"expId":123,"datasetId":1}
+Sep 15, 2022 2:34:10 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:34:20 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:34:30 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:34:40 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:34:50 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:35:00 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:35:10 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:35:20 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:35:30 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:35:40 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Sep 15, 2022 2:35:45 PM esa.mo.nmf.nanosatmoconnector.CloseAppEventListener onDataReceived
+INFO: New StopApp Event Received! For provider: 'App: exp213' (Related link: 1,237)
+Sep 15, 2022 2:35:46 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl closeGracefully
+INFO: Publishing event to uri: maltcp://192.168.135.1:1025/exp213-Event
+Sep 15, 2022 2:35:46 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl closeGracefully
+INFO: Triggering the closeAppAdapter of the app business logic...
+Sep 15, 2022 2:35:46 PM esa.mo.nmf.apps.AppMCAdapter onClose
+INFO: Closed application successfully.
+Sep 15, 2022 2:35:46 PM esa.mo.mal.transport.gen.GENEndpoint receiveMessage
+WARNING: GENEndpoint (null) Discarding message active(false) listener(esa.mo.mal.impl.MessageReceive@e3dcae) TCPIPMessage {URIFrom:maltcp://192.168.135.1:1024/nanosat-mo-supervisor-AggregationInternalBrokerURITo:maltcp://192.168.135.1:1025/-1872322660}
+Sep 15, 2022 2:35:46 PM esa.mo.mal.transport.tcpip.TCPIPTransport close
+INFO: Closing TCPIPTransport...
+Sep 15, 2022 2:35:46 PM esa.mo.mal.transport.tcpip.TCPIPConnectionPoolManager close
+INFO: Closing client sockets...
+Sep 15, 2022 2:35:47 PM esa.mo.mal.transport.gen.util.GENMessagePoller run
+INFO: Client closing connection: maltcp://192.168.135.1:1024
+Sep 15, 2022 2:35:47 PM esa.mo.mal.transport.gen.sending.GENConcurrentMessageSender terminate
+INFO: Terminating all processing threads for sender for URI:maltcp://192.168.135.1:1024
+Sep 15, 2022 2:35:47 PM esa.mo.mal.transport.gen.GENTransport processIncomingMessage
+WARNING: GEN Message handler NOT FOUND exp213-EventInternalBroker : 
+Sep 15, 2022 2:35:47 PM de.dlr.gsoc.mo.malspp.transport.SPPTransport$2 run
+INFO: The Space Packet receive thread has been interrupted.
+Sep 15, 2022 2:35:47 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl closeGracefully
+INFO: Success! The currently running Java Virtual Machine will now terminate. (App closed in: 1,577 ms)
+
+Sep 15, 2022 2:35:47 PM esa.mo.mal.transport.gen.GENTransport returnErrorMessage
+WARNING: GEN Unable to return error number ({0}) as no endpoint supplied : {1}
