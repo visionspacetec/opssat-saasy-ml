@@ -295,9 +295,9 @@ Sample payload:
 }
 ```
 
-### Download a training data feed
+### Download the training data 
 
-Download to the data feed with a POST request to the following endpoint:
+Download the training data with a POST request to the following endpoint:
 
 ```
 http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/data/download
