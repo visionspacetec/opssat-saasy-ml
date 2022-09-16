@@ -50,8 +50,8 @@ public final class Constants {
     public static final String ENDPOINT_DATA_DELETE = ENDPOINT_VERSION + "training/data/delete";
     public static final String ENDPOINT_TRAINING = ENDPOINT_VERSION + "training/:type";
     public static final String ENDPOINT_TRAINING_ALGORITHM = ENDPOINT_TRAINING + "/:algorithm";
+    public static final String ENDPOINT_TRAINING_MODELS = ENDPOINT_VERSION + "training/models";
     public static final String ENDPOINT_INFERENCE = ENDPOINT_VERSION + "inference";
-    public static final String ENDPOINT_MODELS = ENDPOINT_VERSION + "training/models";
 
     // labels to consume the verticles
     public static final String BASE_ADDRESS_TRAINING = "saasyml.training";

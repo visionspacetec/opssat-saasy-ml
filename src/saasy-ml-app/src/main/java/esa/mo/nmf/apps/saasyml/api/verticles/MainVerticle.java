@@ -149,17 +149,17 @@ public class MainVerticle extends AbstractVerticle {
         router.post(Constants.ENDPOINT_TRAINING_ALGORITHM)
                 .handler(BodyHandler.create())
                 .handler(this::trainingModel);
+
+        // route for models metadata
+        router.post(Constants.ENDPOINT_TRAINING_MODELS)
+                .handler(BodyHandler.create())
+                .handler(this::fetchModels);
+                
         
         // route for inference 
         router.post(Constants.ENDPOINT_INFERENCE)
                 .handler(BodyHandler.create())
                 .handler(this::inference);
-
-
-        // route for models metadata
-        router.post(Constants.ENDPOINT_MODELS)
-                .handler(BodyHandler.create())
-                .handler(this::models);
 
         return router;
     }
@@ -534,30 +534,40 @@ public class MainVerticle extends AbstractVerticle {
      * 
      * @param ctx
      */
-    void models(RoutingContext ctx) {
+    void fetchModels(RoutingContext ctx) {
 
         // response map
-        Map<String, String> resMap = new HashMap<String, String>();
+        Map<String, Object> responseMap = new HashMap<String, Object>();
 
         // get the payload
         JsonObject payload = ctx.getBodyAsJson();
+        
+        LOGGER.log(Level.INFO, "Inside enpoind model");
 
         // forward request to event bus
         try {
             vertx.eventBus().request(Constants.ADDRESS_MODELS_SELECT, payload, reply -> {
                 JsonObject json = (JsonObject) reply.result().body();
-                ctx.request().response().putHeader("Content-Type", "application/json; charset=utf-8").end(json.encode());
+
+                LOGGER.log(Level.INFO, "Select all data");
+                LOGGER.log(Level.INFO, json.toString());
+                
+                // return response from the verticle
+                responseMap.put(Constants.KEY_RESPONSE, json);
+
+                ctx.request().response()
+                    .putHeader("content-type", "application/json; charset=utf-8")
+                    .end(Json.encodePrettily(responseMap));
+                    
             });
 
-        } catch (Exception e) {
-            // error object
-            resMap.put(Constants.KEY_RESPONSE, "error");
-            resMap.put(Constants.KEY_MESSAGE, "unsupported or invalid models request");
+            LOGGER.log(Level.INFO, "Finish");
 
-            // error response
-            ctx.request().response()
-                .putHeader("content-type", "application/json; charset=utf-8")
-                .end(Json.encodePrettily(resMap));
+        } catch (Exception e) {            
+            // error object
+            responseMap.put(Constants.KEY_RESPONSE, "error");
+            responseMap.put(Constants.KEY_MESSAGE, "unsupported or invalid models request");
+            ctx.request().response().end(Json.encodePrettily(responseMap));
         }
     }
 
