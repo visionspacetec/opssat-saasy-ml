@@ -312,6 +312,9 @@ public class MainVerticle extends AbstractVerticle {
     void trainingDataDownload(RoutingContext ctx) {
         // payload
         JsonObject payload = ctx.getBodyAsJson();
+        
+        // response
+        Map<String, Object> responseMap = new HashMap<String, Object>();
 
         try {
             
@@ -337,20 +340,23 @@ public class MainVerticle extends AbstractVerticle {
                 // And replace for this code:
                 // json.put(Constants.LABEL_DATASETID, payload.getInteger(Constants.LABEL_DATASETID));
 
+                // return response from the verticle
+                responseMap.put(Constants.KEY_RESPONSE, json);
+
                 ctx.request().response()
-                    .putHeader("Content-Type", "application/json; charset=utf-8")
-                    .end(json.encode());
+                    .putHeader("content-type", "application/json; charset=utf-8")
+                    .end(Json.encodePrettily(responseMap));
             });
 
         } catch (Exception e) {
             // error response message
-            Map<String, String> responseMap = new HashMap<String, String>();
-            responseMap.put("message", "error while saving training data.");
+            responseMap.put(Constants.KEY_RESPONSE, "error");
+            responseMap.put(Constants.KEY_MESSAGE, "error while download the training data.");
 
             // error response
             ctx.request().response()
-                .putHeader("content-type", "application/json; charset=utf-8")
-                .end(Json.encodePrettily(responseMap));
+                    .putHeader("content-type", "application/json; charset=utf-8")
+                    .end(Json.encodePrettily(responseMap));
         }
     }
 
