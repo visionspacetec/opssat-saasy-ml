@@ -151,11 +151,10 @@ public class MainVerticle extends AbstractVerticle {
                 .handler(this::trainingModel);
 
         // route for models metadata
-        router.post(Constants.ENDPOINT_TRAINING_MODELS)
+        router.post(Constants.ENDPOINT_MODELS)
                 .handler(BodyHandler.create())
                 .handler(this::fetchModels);
                 
-        
         // route for inference 
         router.post(Constants.ENDPOINT_INFERENCE)
                 .handler(BodyHandler.create())
@@ -536,21 +535,16 @@ public class MainVerticle extends AbstractVerticle {
      */
     void fetchModels(RoutingContext ctx) {
 
-        // response map
-        Map<String, Object> responseMap = new HashMap<String, Object>();
-
         // get the payload
         JsonObject payload = ctx.getBodyAsJson();
-        
-        LOGGER.log(Level.INFO, "Inside enpoind model");
 
+        // response map
+        Map<String, Object> responseMap = new HashMap<String, Object>();
+        
         // forward request to event bus
         try {
             vertx.eventBus().request(Constants.ADDRESS_MODELS_SELECT, payload, reply -> {
                 JsonObject json = (JsonObject) reply.result().body();
-
-                LOGGER.log(Level.INFO, "Select all data");
-                LOGGER.log(Level.INFO, json.toString());
                 
                 // return response from the verticle
                 responseMap.put(Constants.KEY_RESPONSE, json);
@@ -560,14 +554,13 @@ public class MainVerticle extends AbstractVerticle {
                     .end(Json.encodePrettily(responseMap));
                     
             });
-
-            LOGGER.log(Level.INFO, "Finish");
-
         } catch (Exception e) {            
             // error object
             responseMap.put(Constants.KEY_RESPONSE, "error");
             responseMap.put(Constants.KEY_MESSAGE, "unsupported or invalid models request");
-            ctx.request().response().end(Json.encodePrettily(responseMap));
+            ctx.request().response()
+                .putHeader("content-type", "application/json; charset=utf-8")
+                .end(Json.encodePrettily(responseMap));
         }
     }
 
