@@ -220,9 +220,6 @@ public class TrainModelVerticle extends AbstractVerticle {
                     }
 
                     LOGGER.log(Level.INFO, "Trained model will be stored in the filesystem and referenced from the database once training is complete.");
-
-                    // response
-                    msg.reply("Successfully trained model. Request the endpoint models to see the final results.");
                 });
 
             } catch (Exception e) {
@@ -236,6 +233,9 @@ public class TrainModelVerticle extends AbstractVerticle {
                 modelMetadata.put(Constants.KEY_ERROR, errorMsg + ": " + e.getMessage());
                 vertx.eventBus().send(Constants.ADDRESS_MODELS_SAVE, modelMetadata);
             }
+
+            // response
+            msg.reply("Training the model(s) has been triggered. Query the " + Constants.ENDPOINT_MODELS + " endpoint for training status.");
         });
 
 
