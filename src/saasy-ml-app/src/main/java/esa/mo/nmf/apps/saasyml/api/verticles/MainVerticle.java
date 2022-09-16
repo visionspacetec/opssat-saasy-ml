@@ -149,17 +149,16 @@ public class MainVerticle extends AbstractVerticle {
         router.post(Constants.ENDPOINT_TRAINING_ALGORITHM)
                 .handler(BodyHandler.create())
                 .handler(this::trainingModel);
-        
-        // route for inference 
-        router.post(Constants.ENDPOINT_INFERENCE)
-                .handler(BodyHandler.create())
-                .handler(this::inference);
-
 
         // route for models metadata
         router.post(Constants.ENDPOINT_MODELS)
                 .handler(BodyHandler.create())
-                .handler(this::models);
+                .handler(this::fetchModels);
+                
+        // route for inference 
+        router.post(Constants.ENDPOINT_INFERENCE)
+                .handler(BodyHandler.create())
+                .handler(this::inference);
 
         return router;
     }
@@ -209,16 +208,23 @@ public class MainVerticle extends AbstractVerticle {
         // payload
         JsonObject payload = ctx.getBodyAsJson();
 
+        // response map
+        Map<String, String> responseMap = new HashMap<String, String>();
+
         try {
             // forward request to event bus to be handled in the appropriate Verticle
             vertx.eventBus().request(Constants.ADDRESS_DATA_SUBSCRIBE, payload, reply -> {
                 // return response from the verticle
-                ctx.request().response().end((String) reply.result().body());
+                responseMap.put(Constants.KEY_RESPONSE, reply.result().body().toString());
+
+                ctx.request().response()
+                    .putHeader("content-type", "application/json; charset=utf-8")
+                    .end(Json.encodePrettily(responseMap));
             });
         } catch (Exception e) {
             // error response message
-            Map<String, String> responseMap = new HashMap<String, String>();
-            responseMap.put("message", "error while subscribing to a training data feed.");
+            responseMap.put(Constants.KEY_RESPONSE, "error");
+            responseMap.put(Constants.KEY_MESSAGE, "error while subscribing to a training data feed.");
 
             // error response
             ctx.request().response()
@@ -237,16 +243,23 @@ public class MainVerticle extends AbstractVerticle {
         // payload
         JsonObject payload = ctx.getBodyAsJson();
 
+        // response 
+        Map<String, String> responseMap = new HashMap<String, String>();
+
         try {
             // forward request to event bus to be handled in the appropriate Verticle
             vertx.eventBus().request(Constants.ADDRESS_DATA_UNSUBSCRIBE, payload, reply -> {
                 // return response from the verticle
-                ctx.request().response().end((String) reply.result().body());
+                responseMap.put(Constants.KEY_RESPONSE, reply.result().body().toString());
+
+                ctx.request().response()
+                    .putHeader("content-type", "application/json; charset=utf-8")
+                    .end(Json.encodePrettily(responseMap));
             });
         } catch (Exception e) {
             // error response message
-            Map<String, String> responseMap = new HashMap<String, String>();
-            responseMap.put("message", "error while unsubscribing to a training data feed.");
+            responseMap.put(Constants.KEY_RESPONSE, "error");
+            responseMap.put(Constants.KEY_MESSAGE, "error while unsubscribing to a training data feed.");
 
             // error response
             ctx.request().response()
@@ -264,17 +277,24 @@ public class MainVerticle extends AbstractVerticle {
         // payload
         JsonObject payload = ctx.getBodyAsJson();
 
+        // response
+        Map<String, String> responseMap = new HashMap<String, String>();
+
         try {
             // forward request to event bus to be handled in the appropriate Verticle
             vertx.eventBus().request(Constants.ADDRESS_DATA_SAVE, payload, reply -> {
                 // return response from the verticle
-                ctx.request().response().end((String) reply.result().body());
+                responseMap.put(Constants.KEY_RESPONSE, reply.result().body().toString());
+
+                ctx.request().response()
+                    .putHeader("content-type", "application/json; charset=utf-8")
+                    .end(Json.encodePrettily(responseMap));
             });
 
         } catch (Exception e) {
             // error response message
-            Map<String, String> responseMap = new HashMap<String, String>();
-            responseMap.put("message", "error while saving training data.");
+            responseMap.put(Constants.KEY_RESPONSE, "error");
+            responseMap.put(Constants.KEY_MESSAGE, "error while saving training data.");
 
             // error response
             ctx.request().response()
@@ -291,6 +311,9 @@ public class MainVerticle extends AbstractVerticle {
     void trainingDataDownload(RoutingContext ctx) {
         // payload
         JsonObject payload = ctx.getBodyAsJson();
+        
+        // response
+        Map<String, Object> responseMap = new HashMap<String, Object>();
 
         try {
             
@@ -316,20 +339,23 @@ public class MainVerticle extends AbstractVerticle {
                 // And replace for this code:
                 // json.put(Constants.LABEL_DATASETID, payload.getInteger(Constants.LABEL_DATASETID));
 
+                // return response from the verticle
+                responseMap.put(Constants.KEY_RESPONSE, json);
+
                 ctx.request().response()
-                    .putHeader("Content-Type", "application/json; charset=utf-8")
-                    .end(json.encode());
+                    .putHeader("content-type", "application/json; charset=utf-8")
+                    .end(Json.encodePrettily(responseMap));
             });
 
         } catch (Exception e) {
             // error response message
-            Map<String, String> responseMap = new HashMap<String, String>();
-            responseMap.put("message", "error while saving training data.");
+            responseMap.put(Constants.KEY_RESPONSE, "error");
+            responseMap.put(Constants.KEY_MESSAGE, "error while download the training data.");
 
             // error response
             ctx.request().response()
-                .putHeader("content-type", "application/json; charset=utf-8")
-                .end(Json.encodePrettily(responseMap));
+                    .putHeader("content-type", "application/json; charset=utf-8")
+                    .end(Json.encodePrettily(responseMap));
         }
     }
 
@@ -396,17 +422,25 @@ public class MainVerticle extends AbstractVerticle {
         // payload
         JsonObject payload = ctx.getBodyAsJson();
 
+        // response
+        Map<String, String> responseMap = new HashMap<String, String>();
+
         try {
             // forward request to event bus to be handled in the appropriate Verticle
             vertx.eventBus().request(Constants.ADDRESS_DATA_DELETE, payload, reply -> {
                 // return response from the verticle
-                ctx.request().response().end((String) reply.result().body());
+                responseMap.put(Constants.KEY_RESPONSE, reply.result().body().toString());
+
+                ctx.request().response()
+                    .putHeader("content-type", "application/json; charset=utf-8")
+                    .end(Json.encodePrettily(responseMap));
             });
 
         } catch (Exception e) {
             // error response message
-            Map<String, String> responseMap = new HashMap<String, String>();
-            responseMap.put("message", "error while deleting training data.");
+            responseMap.put(Constants.KEY_RESPONSE, "error");
+            responseMap.put(Constants.KEY_MESSAGE, "error while deleting training data.");
+            
             // error response
             ctx.request().response()
                 .putHeader("content-type", "application/json; charset=utf-8")
@@ -419,13 +453,13 @@ public class MainVerticle extends AbstractVerticle {
      * 
      * @param ctx body context of the request
      */
-    void trainingModel(RoutingContext ctx) {
-
-        // response map
-        Map<String, String> resMap = new HashMap<String, String>();
+    void trainingModel(RoutingContext ctx) { 
 
         // get the payload
         JsonObject payload = ctx.getBodyAsJson();
+
+        // response map
+        Map<String, String> responseMap = new HashMap<String, String>();
 
         // get api request url params
         // e.g. /api/v1/training/classifier/classifier.bayesian.aode
@@ -441,14 +475,21 @@ public class MainVerticle extends AbstractVerticle {
         try { 
             // now make the training request
             vertx.eventBus().request(Constants.BASE_ADDRESS_TRAINING + "." + type, payload, reply -> {                
-                JsonObject json = (JsonObject) reply.result().body();            
-                ctx.request().response().putHeader("Content-Type", "application/json; charset=utf-8").end(json.encode());
+                // return response from the verticle
+                responseMap.put(Constants.KEY_RESPONSE, reply.result().body().toString());
+
+                ctx.request().response()
+                    .putHeader("content-type", "application/json; charset=utf-8")
+                    .end(Json.encodePrettily(responseMap));
             });
         } catch (Exception e) {
             // error object
-            resMap.put(Constants.KEY_RESPONSE, "error");
-            resMap.put(Constants.KEY_MESSAGE, "unsupported or invalid training request");            
-            ctx.request().response().end(Json.encodePrettily(resMap));
+            responseMap.put(Constants.KEY_RESPONSE, "error");
+            responseMap.put(Constants.KEY_MESSAGE, "unsupported or invalid training request");            
+            
+            ctx.request().response()
+                .putHeader("content-type", "application/json; charset=utf-8")
+                .end(Json.encodePrettily(responseMap));
         }
     }
 
@@ -459,11 +500,11 @@ public class MainVerticle extends AbstractVerticle {
      */
     void inference(RoutingContext ctx) {
 
-        // response map
-        Map<String, String> resMap = new HashMap<String, String>();
-
         // get the payload
         JsonObject payload = ctx.getBodyAsJson();
+
+        // response map
+        Map<String, String> responseMap = new HashMap<String, String>();
 
         // get api request url payload
         // e.g. /api/v1/inference
@@ -472,14 +513,17 @@ public class MainVerticle extends AbstractVerticle {
         try {
             vertx.eventBus().request(Constants.BASE_ADDRESS_INFERENCE, payload, reply -> {
                 JsonObject json = (JsonObject) reply.result().body();
-                ctx.request().response().putHeader("Content-Type", "application/json; charset=utf-8").end(json.encode());
+
+                ctx.request().response()
+                    .putHeader("Content-Type", "application/json; charset=utf-8")
+                    .end(json.encode());
             });
 
         } catch (Exception e) {
             // error object
-            resMap.put(Constants.KEY_RESPONSE, "error");
-            resMap.put(Constants.KEY_MESSAGE, "unsupported or invalid inference request");
-            ctx.request().response().end(Json.encodePrettily(resMap));
+            responseMap.put(Constants.KEY_RESPONSE, "error");
+            responseMap.put(Constants.KEY_MESSAGE, "unsupported or invalid inference request");
+            ctx.request().response().end(Json.encodePrettily(responseMap));
         }
     }
 
@@ -489,30 +533,34 @@ public class MainVerticle extends AbstractVerticle {
      * 
      * @param ctx
      */
-    void models(RoutingContext ctx) {
-
-        // response map
-        Map<String, String> resMap = new HashMap<String, String>();
+    void fetchModels(RoutingContext ctx) {
 
         // get the payload
         JsonObject payload = ctx.getBodyAsJson();
 
+        // response map
+        Map<String, Object> responseMap = new HashMap<String, Object>();
+        
         // forward request to event bus
         try {
             vertx.eventBus().request(Constants.ADDRESS_MODELS_SELECT, payload, reply -> {
                 JsonObject json = (JsonObject) reply.result().body();
-                ctx.request().response().putHeader("Content-Type", "application/json; charset=utf-8").end(json.encode());
+                
+                // return response from the verticle
+                responseMap.put(Constants.KEY_RESPONSE, json);
+
+                ctx.request().response()
+                    .putHeader("content-type", "application/json; charset=utf-8")
+                    .end(Json.encodePrettily(responseMap));
+                    
             });
-
-        } catch (Exception e) {
+        } catch (Exception e) {            
             // error object
-            resMap.put(Constants.KEY_RESPONSE, "error");
-            resMap.put(Constants.KEY_MESSAGE, "unsupported or invalid models request");
-
-            // error response
+            responseMap.put(Constants.KEY_RESPONSE, "error");
+            responseMap.put(Constants.KEY_MESSAGE, "unsupported or invalid models request");
             ctx.request().response()
                 .putHeader("content-type", "application/json; charset=utf-8")
-                .end(Json.encodePrettily(resMap));
+                .end(Json.encodePrettily(responseMap));
         }
     }
 
