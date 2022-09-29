@@ -1,0 +1,14 @@
+osops@OSDRS:/chroot/sftpuser/home/exp213/toESOC> java -jar saasy-ml-app-api-client-0.1.0.jar -server http://192.168.166.1:9999/api/v1/training/data/subscribe/ -payload '{ \"expId\": 123, \"datasetId\": 1, \"iterations\": 10, \"interval\": 2, \"params\": [\"GNC_0005\", \"GNC_0011\", \"GNC_0007\"] }'
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+
+http://192.168.166.1:9999/api/v1/training/data/subscribe/
+{ \"expId\": 123, \"datasetId\": 1, \"iterations\": 10, \"interval\": 2, \"params\": [\"GNC_0005\", \"GNC_0011\", \"GNC_0007\"] }
+java.lang.RuntimeException: Failed : HTTP error code : 500
+	at esa.saasyml.api.client.App.readFromUrl(App.java:52)
+	at esa.saasyml.api.client.App.main(App.java:147)
+
+Help of use:
+$ java -jar saasy-ml-app-api-client-0.1.0-SNAPSHOT-jar-with-dependencies.jar -server [URL] -payload [JSON] (optional -payloadFile [JSON_FILE])
+

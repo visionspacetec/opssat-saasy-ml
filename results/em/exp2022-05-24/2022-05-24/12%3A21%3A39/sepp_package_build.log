@@ -1,9 +1,0 @@
-Stage 1: PASSED
-	 File uploaded to CI toolchain.
-	 package_name: exp213
-	 package_version: 2.0-1
-	 package_maintainer: CesarGuzman
-Stage 2: PASSED	
-	 Submitted files were OK.
-Stage 3: PASSED	
-	 Package was successfully built.
