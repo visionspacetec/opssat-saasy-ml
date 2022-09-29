@@ -62,7 +62,7 @@ public class TrainModelVerticle extends AbstractVerticle {
             JsonObject modelMetadata = new JsonObject();
             modelMetadata.put(Constants.KEY_EXPID, expId);
             modelMetadata.put(Constants.KEY_DATASETID, datasetId);
-            modelMetadata.put(Constants.KEY_TYPE, "classifier");
+            modelMetadata.put(Constants.KEY_TYPE, Constants.KEY_MODEL_CLASSIFIER);
             modelMetadata.put(Constants.KEY_ALGORITHM, algorithm);
 
             // create the pipeline

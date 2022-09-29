@@ -153,7 +153,7 @@ public class MainVerticle extends AbstractVerticle {
         // route for models metadata
         router.post(Constants.ENDPOINT_MODELS)
                 .handler(BodyHandler.create())
-                .handler(this::fetchModels);
+                .handler(this::fetchTrainingModels);
                 
         // route for inference 
         router.post(Constants.ENDPOINT_INFERENCE)
@@ -533,19 +533,28 @@ public class MainVerticle extends AbstractVerticle {
      * 
      * @param ctx
      */
-    void fetchModels(RoutingContext ctx) {
-
+    void fetchTrainingModels(RoutingContext ctx) {
         // get the payload
         JsonObject payload = ctx.getBodyAsJson();
 
-        // response map
+        LOGGER.log(Level.INFO, "[TRACE LOG] Fetch training models");
+
+        // response 
         Map<String, Object> responseMap = new HashMap<String, Object>();
         
-        // forward request to event bus
         try {
+
+            // forward request to event bus
             vertx.eventBus().request(Constants.ADDRESS_MODELS_SELECT, payload, reply -> {
                 JsonObject json = (JsonObject) reply.result().body();
-                
+
+                // With the format to inference, we add the expId outside. To see all the fields of the dataset, we should execute with formatToInference = false
+                if (payload.containsKey(Constants.KEY_FORMAT_TO_INFERENCE)
+                && payload.getBoolean(Constants.KEY_FORMAT_TO_INFERENCE).booleanValue())
+                {
+                    json.put(Constants.KEY_EXPID, payload.getInteger(Constants.KEY_EXPID));
+                }
+
                 // return response from the verticle
                 responseMap.put(Constants.KEY_RESPONSE, json);
 
@@ -554,10 +563,12 @@ public class MainVerticle extends AbstractVerticle {
                     .end(Json.encodePrettily(responseMap));
                     
             });
-        } catch (Exception e) {            
-            // error object
+        } catch (Exception e) {   
+            // error response message
             responseMap.put(Constants.KEY_RESPONSE, "error");
             responseMap.put(Constants.KEY_MESSAGE, "unsupported or invalid models request");
+
+            // error response
             ctx.request().response()
                 .putHeader("content-type", "application/json; charset=utf-8")
                 .end(Json.encodePrettily(responseMap));
