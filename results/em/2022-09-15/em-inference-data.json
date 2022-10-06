@@ -1,0 +1,45 @@
+{
+    "expId": 213,
+    "data": [
+        [
+            {
+                "name": "GNC_0005",
+                "value": "1002",
+                "dataType": 4
+            },
+            {
+                "name": "GNC_0011",
+                "value": "2002",
+                "dataType": 4
+            },
+            {
+                "name": "GNC_0007",
+                "value": "3002",
+                "dataType": 4
+            }
+        ],
+        [
+            {
+                "name": "GNC_0005",
+                "value": "1003",
+                "dataType": 4
+            },
+            {
+                "name": "GNC_0011",
+                "value": "2003",
+                "dataType": 4
+            },
+            {
+                "name": "GNC_0007",
+                "value": "3003",
+                "dataType": 4
+            }
+        ]
+    ],
+    "models": [
+        {
+            "type": "Classifier",
+            "filepath": "./models/E213-D1-aode-2022-10-03_11-19-57.model"
+        }
+    ]
+}

@@ -4,7 +4,6 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.DeploymentOptions;
-import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
@@ -153,7 +152,7 @@ public class MainVerticle extends AbstractVerticle {
         // route for models metadata
         router.post(Constants.ENDPOINT_MODELS)
                 .handler(BodyHandler.create())
-                .handler(this::fetchModels);
+                .handler(this::fetchTrainingModels);
                 
         // route for inference 
         router.post(Constants.ENDPOINT_INFERENCE)
@@ -493,6 +492,47 @@ public class MainVerticle extends AbstractVerticle {
         }
     }
 
+
+    /**
+     * fetch info on trained models
+     * 
+     * @param ctx
+     */
+    void fetchTrainingModels(RoutingContext ctx) {
+        // get the payload
+        JsonObject payload = ctx.getBodyAsJson();
+
+        LOGGER.log(Level.INFO, "[TRACE LOG] Fetch training models");
+
+        // response 
+        Map<String, Object> responseMap = new HashMap<String, Object>();
+        
+        try {
+
+            // forward request to event bus
+            vertx.eventBus().request(Constants.ADDRESS_MODELS_SELECT, payload, reply -> {
+                JsonObject json = (JsonObject) reply.result().body();
+
+                // return response from the verticle
+                responseMap.put(Constants.KEY_RESPONSE, json);
+
+                ctx.request().response()
+                    .putHeader("content-type", "application/json; charset=utf-8")
+                    .end(Json.encodePrettily(responseMap));
+                    
+            });
+        } catch (Exception e) {   
+            // error response message
+            responseMap.put(Constants.KEY_RESPONSE, "error");
+            responseMap.put(Constants.KEY_MESSAGE, "unsupported or invalid models request");
+
+            // error response
+            ctx.request().response()
+                .putHeader("content-type", "application/json; charset=utf-8")
+                .end(Json.encodePrettily(responseMap));
+        }
+    }
+
     /**
      * use a trained model to execute an inference
      * 
@@ -524,43 +564,6 @@ public class MainVerticle extends AbstractVerticle {
             responseMap.put(Constants.KEY_RESPONSE, "error");
             responseMap.put(Constants.KEY_MESSAGE, "unsupported or invalid inference request");
             ctx.request().response().end(Json.encodePrettily(responseMap));
-        }
-    }
-
-
-    /**
-     * fetch info on trained models
-     * 
-     * @param ctx
-     */
-    void fetchModels(RoutingContext ctx) {
-
-        // get the payload
-        JsonObject payload = ctx.getBodyAsJson();
-
-        // response map
-        Map<String, Object> responseMap = new HashMap<String, Object>();
-        
-        // forward request to event bus
-        try {
-            vertx.eventBus().request(Constants.ADDRESS_MODELS_SELECT, payload, reply -> {
-                JsonObject json = (JsonObject) reply.result().body();
-                
-                // return response from the verticle
-                responseMap.put(Constants.KEY_RESPONSE, json);
-
-                ctx.request().response()
-                    .putHeader("content-type", "application/json; charset=utf-8")
-                    .end(Json.encodePrettily(responseMap));
-                    
-            });
-        } catch (Exception e) {            
-            // error object
-            responseMap.put(Constants.KEY_RESPONSE, "error");
-            responseMap.put(Constants.KEY_MESSAGE, "unsupported or invalid models request");
-            ctx.request().response()
-                .putHeader("content-type", "application/json; charset=utf-8")
-                .end(Json.encodePrettily(responseMap));
         }
     }
 

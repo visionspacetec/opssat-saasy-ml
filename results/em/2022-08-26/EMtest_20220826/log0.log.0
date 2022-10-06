@@ -1,0 +1,132 @@
+Aug 26, 2022 1:39:38 PM esa.mo.nmf.apps.SaaSyMLApp <init>
+INFO: Initializing the app.
+Aug 26, 2022 1:39:40 PM esa.mo.helpertools.helpers.HelperMisc loadProperties
+INFO: Loading properties file:/home/exp213/provider.properties
+Aug 26, 2022 1:39:40 PM esa.mo.helpertools.helpers.HelperMisc loadProperties
+INFO: Loading properties file:/home/exp213/settings.properties
+Aug 26, 2022 1:39:40 PM esa.mo.helpertools.helpers.HelperMisc loadProperties
+INFO: Loading properties file:/home/exp213/transport.properties
+Aug 26, 2022 1:39:41 PM esa.mo.com.impl.archive.db.DatabaseBackend startDatabaseDriver
+INFO: Attempting to establish a connection to the database:
+ >> jdbc:sqlite:comArchive.db
+Aug 26, 2022 1:39:44 PM org.ccsds.moims.mo.mal.transport.MALTransportFactory newFactory
+INFO: New transport factory registered with classname: de.dlr.gsoc.mo.malspp.transport.SPPTransportFactory
+Aug 26, 2022 1:39:45 PM org.ccsds.moims.mo.mal.transport.MALTransportFactory newFactory
+INFO: New transport factory registered with classname: esa.mo.mal.transport.tcpip.TCPIPTransportFactoryImpl
+Aug 26, 2022 1:39:45 PM org.ccsds.moims.mo.mal.encoding.MALElementStreamFactory newFactory
+INFO: New encoding factory registered with classname: esa.mo.mal.encoder.binary.fixed.FixedBinaryStreamFactory
+Aug 26, 2022 1:39:45 PM esa.mo.mal.transport.tcpip.TCPIPTransport createTransportAddress
+INFO: TCP/IP Transport address: 192.168.135.1:1025
+Aug 26, 2022 1:39:45 PM esa.mo.com.impl.provider.ArchiveProviderServiceImpl init
+INFO: Archive service READY
+Aug 26, 2022 1:39:46 PM esa.mo.com.impl.provider.EventProviderServiceImpl init
+INFO: Event service: READY
+Aug 26, 2022 1:39:46 PM esa.mo.com.impl.provider.ActivityTrackingProviderServiceImpl init
+INFO: Activity Tracking service READY
+Aug 26, 2022 1:39:46 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl init
+INFO: ArchiveSync service READY
+Aug 26, 2022 1:39:46 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl init
+INFO: Attempting to connect to Central Directory service at: maltcp://192.168.135.1:1024/nanosat-mo-supervisor-Directory
+Aug 26, 2022 1:39:47 PM esa.mo.mal.transport.gen.GENTransport manageCommunicationChannel
+INFO: Establishing connection to remote root URI: maltcp://192.168.135.1:1024
+Aug 26, 2022 1:39:47 PM esa.mo.mal.transport.tcpip.TCPIPConnectionPoolManager get
+INFO: The socket doesn't exist! Creating a new one...
+Aug 26, 2022 1:39:48 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl init
+INFO: The Central Directory service is operational!
+Aug 26, 2022 1:39:48 PM org.ccsds.moims.mo.mal.encoding.MALElementStreamFactory newFactory
+INFO: New encoding factory registered with classname: de.dlr.gsoc.mo.malspp.encoding.SPPElementStreamFactory
+Aug 26, 2022 1:39:50 PM esa.mo.helpertools.clock.SystemClock setPlatformClockCallback
+INFO: Using system clock
+Aug 26, 2022 1:39:50 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl init
+INFO: Successfully connected to Platform services on: nanosat-mo-supervisor
+Aug 26, 2022 1:39:52 PM esa.mo.mc.impl.provider.ParameterProviderServiceImpl init
+INFO: esa.nmf.parameters.storeInArchive = true
+Aug 26, 2022 1:39:52 PM esa.mo.mc.impl.provider.ParameterProviderServiceImpl init
+INFO: Parameter service READY
+Aug 26, 2022 1:39:52 PM esa.mo.mc.impl.provider.ActionProviderServiceImpl init
+INFO: Action service READY
+Aug 26, 2022 1:39:52 PM esa.mo.mc.impl.provider.AlertProviderServiceImpl init
+INFO: Alert service READY
+Aug 26, 2022 1:39:52 PM esa.mo.mc.impl.provider.AggregationProviderServiceImpl init
+INFO: esa.nmf.parameters.storeInArchive = true
+Aug 26, 2022 1:39:52 PM esa.mo.mc.impl.provider.AggregationProviderServiceImpl init
+INFO: Aggregation service READY
+Aug 26, 2022 1:39:52 PM esa.mo.common.impl.provider.DirectoryProviderServiceImpl init
+INFO: Directory service READY
+Aug 26, 2022 1:39:52 PM esa.mo.sm.impl.provider.HeartbeatProviderServiceImpl init
+INFO: Heartbeat service READY
+Aug 26, 2022 1:39:52 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl init
+INFO: Populating local Directory service...
+Aug 26, 2022 1:39:53 PM esa.mo.helpertools.helpers.HelperMisc loadProperties
+INFO: Loading properties file:/home/exp213/providerURIs.properties
+Aug 26, 2022 1:39:53 PM esa.mo.helpertools.helpers.HelperMisc loadProperties
+INFO: Loading properties file:/home/exp213/providerURIsSecondary.properties
+Aug 26, 2022 1:39:53 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl init
+INFO: Populating Central Directory service on URI: maltcp://192.168.135.1:1024/nanosat-mo-supervisor-Directory
+Aug 26, 2022 1:39:53 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl init
+INFO: Populated! And the connection to the Directory service has been successfully closed!
+Aug 26, 2022 1:39:53 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl init
+INFO: Loading previous configurations...
+Aug 26, 2022 1:39:54 PM esa.mo.nmf.MonitorAndControlNMFAdapter registerParameters
+INFO: Registering Parameters:
+Aug 26, 2022 1:39:54 PM esa.mo.nmf.MonitorAndControlNMFAdapter registerActions
+INFO: Registering Actions
+Aug 26, 2022 1:39:54 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl init
+INFO: NanoSat MO Connector initialized in 14.327 seconds!
+Aug 26, 2022 1:39:54 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl init
+INFO: URI: malspp:247/1237/11
+
+Aug 26, 2022 1:39:54 PM esa.mo.nmf.spacemoadapter.SpaceMOApdapterImpl getNMFProviderSummary
+INFO: Found nanosat-mo-supervisor provider
+Aug 26, 2022 1:39:55 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 3 chunks in total!
+Aug 26, 2022 1:40:00 PM esa.mo.common.impl.util.HelperCommon providerSummaryToConnectionConsumer
+WARNING: The service could not be found in the MAL factory. Maybe the Helper for that service was not initialized. The service key is: (area=7, service=1, version=1)
+Aug 26, 2022 1:40:00 PM esa.mo.common.impl.util.HelperCommon providerSummaryToConnectionConsumer
+WARNING: The service could not be found in the MAL factory. Maybe the Helper for that service was not initialized. The service key is: (area=7, service=3, version=1)
+Aug 26, 2022 1:40:00 PM esa.mo.common.impl.util.HelperCommon providerSummaryToConnectionConsumer
+WARNING: The service could not be found in the MAL factory. Maybe the Helper for that service was not initialized. The service key is: (area=7, service=5, version=1)
+Aug 26, 2022 1:40:00 PM esa.mo.helpertools.helpers.HelperMisc loadProperties
+INFO: Loading properties file:/home/exp213/consumer.properties
+Aug 26, 2022 1:40:01 PM esa.mo.helpertools.helpers.HelperMisc loadProperties
+INFO: Reloading properties file:/home/exp213/consumer.properties
+Aug 26, 2022 1:40:01 PM esa.mo.nmf.apps.SaaSyMLApp start
+INFO: Starting the app.
+Aug 26, 2022 1:40:04 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Aug 26, 2022 1:40:14 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Aug 26, 2022 1:40:24 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Aug 26, 2022 1:40:34 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Aug 26, 2022 1:40:44 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Aug 26, 2022 1:40:54 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Aug 26, 2022 1:41:04 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Aug 26, 2022 1:41:14 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Aug 26, 2022 1:41:24 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Aug 26, 2022 1:41:34 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Aug 26, 2022 1:41:44 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Aug 26, 2022 1:41:54 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Aug 26, 2022 1:42:04 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Aug 26, 2022 1:42:14 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Aug 26, 2022 1:42:24 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Aug 26, 2022 1:42:34 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Aug 26, 2022 1:42:44 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Aug 26, 2022 1:42:54 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Aug 26, 2022 1:43:04 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!

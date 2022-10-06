@@ -13,6 +13,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.JsonArray;
 
 import esa.mo.nmf.apps.ApplicationManager;
+import esa.mo.nmf.apps.PropertiesManager;
 import esa.mo.nmf.apps.saasyml.api.Constants;
 
 // TODO:
@@ -35,7 +36,7 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
 
             // the request payload (Json)
             JsonObject payload = (JsonObject) (msg.body());
-            LOGGER.log(Level.INFO, "The POST " + Constants.ADDRESS_DATA_SUBSCRIBE + " request payload: " + payload.toString());
+            LOGGER.log(Level.INFO, String.format("The POST %s request payload: %s", Constants.ADDRESS_DATA_SUBSCRIBE, payload.toString()));
 
             // parse the Json payload
             final int expId = payload.getInteger(Constants.KEY_EXPID).intValue();
@@ -58,6 +59,8 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
             // create list of training data param names from JsonArray
             List<String> paramNameList = createArrayFromJsonArray(payload.getJsonArray(Constants.KEY_PARAMS));
 
+            LOGGER.log(Level.INFO, "[TRACE LOG] JSON payload parsed");
+
             // build Json payload object with just expId and datasetId
             // this will be used for the training data count request
             JsonObject payloadCount = new JsonObject();
@@ -66,18 +69,35 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
 
             try {
 
+                LOGGER.log(Level.INFO, "[TRACE LOG] Before addParamNames");
+
                 // keep track of param names
                 // we need this because the response object received in the onReceivedData listener does not reference the parameter names
                 ApplicationManager.getInstance().addParamNames(expId, datasetId, paramNameList);
 
-                // create aggregation handler and subscribe the parameter feed
-                ApplicationManager.getInstance().createAggregationHandler(expId, datasetId, interval, paramNameList,
-                        true);
+                LOGGER.log(Level.INFO, "[TRACE LOG] After addParamNames");
+
+                try {
+                        
+                    LOGGER.log(Level.INFO, "[TRACE LOG] Before createAggregationHandler");
+                    
+                    // create aggregation handler and subscribe the parameter feed
+                    ApplicationManager.getInstance().createAggregationHandler(expId, datasetId, interval, paramNameList,
+                            true);
+
+                    LOGGER.log(Level.INFO, String.format("[TRACE LOG] Created aggregation handler"));
+                } catch (Exception e) {
+                    LOGGER.log(Level.SEVERE, String.format("[TRACE LOG] Exception creating aggregation handler", e));
+                }
 
                 // check periodically when to stop fetching data if "interations" is set and > 0
                 if (iterations > 0) {
+
+                    // set the periodic timer            
+                    int periodicTimer = PropertiesManager.getInstance().getFetchTrainingDataVerticlePeriodicTimer();
+                    
                     // register periodic timer
-                    vertx.setPeriodic(500, id -> {
+                    vertx.setPeriodic(periodicTimer, id -> {
                         vertx.eventBus().request(Constants.ADDRESS_DATA_COUNT, payloadCount, reply -> {
                             JsonObject response = (JsonObject) (reply.result().body());
 
@@ -101,9 +121,15 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
                                     // target number of training dataset has been achieved
                                     // unsubscribe from the training data feed
                                     try {
-                                        // disable parameter feed
-                                        ApplicationManager.getInstance().enableSupervisorParametersSubscription(expId,
-                                                datasetId, false);
+                                        try {
+                                            // disable parameter feed
+                                            ApplicationManager.getInstance().enableSupervisorParametersSubscription(expId,
+                                            datasetId, false);
+                        
+                                            LOGGER.log(Level.INFO, String.format("[TRACE LOG] Disabled parameter feed"));
+                                        } catch (Exception e) {
+                                            LOGGER.log(Level.SEVERE, String.format("[TRACE LOG] Exception  Disable parameter feed", e));
+                                        }
 
                                         // remove the aggregation handler from the map
                                         ApplicationManager.getInstance().removeAggregationHandler(expId, datasetId);
@@ -136,6 +162,8 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
                                                 
                                             }
                                         }
+
+                                        LOGGER.log(Level.INFO, String.format("[TRACE LOG] Stop periodic check"));
 
                                         // can now stop this periodic check
                                         vertx.cancelTimer(id);

@@ -541,15 +541,19 @@ Sample payload:
 To fetch which trained models are available for a given experiment and dataset pair, make a POST request to the following endpoint:
 
 ```
-http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/models
+http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/download/models
 ```
 
 ```json
 {
     "expId": 123,
-    "datasetId": 1
+    "datasetId": 1,
+    "formatToInference": true
 }
 ```
+
+Note that the `formatToInference` attribute is optional. It formats a valid output for inference. 
+
 
 ### Inference
 
@@ -603,12 +607,12 @@ Sample payload:
     ],
     "models": [
         {
-            "path": "FULL-PATH-OF-SERIALIZED-THE-MODEL",
+            "filepath": "FULL-PATH-OF-SERIALIZED-THE-MODEL",
             "type": "Classifier",
             "thread" : true
         },
         {
-            "path": "FULL-PATH-OF-SERIALIZED-THE-MODEL",
+            "filepath": "FULL-PATH-OF-SERIALIZED-THE-MODEL",
             "type": "Classifier"
         }
     ]

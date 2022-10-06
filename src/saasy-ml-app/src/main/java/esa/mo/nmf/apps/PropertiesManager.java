@@ -9,25 +9,25 @@ import java.util.logging.Logger;
 
 public class PropertiesManager {
     private static final Logger LOGGER = Logger.getLogger(PropertiesManager.class.getName());
-    
+
     // path to the application configuration file
     private static final String PROPERTIES_FILE_PATH = "config.properties";
-    
+
     // configuration properties holder
     private Properties properties;
-    
+
     // singleton instance
     private static PropertiesManager instance;
     private static Object mutex = new Object();
-    
+
     /**
      * Hide constructor.
      */
-    private PropertiesManager(){
+    private PropertiesManager() {
         // load properties file
         loadProperties();
     }
-    
+
     /**
      * Returns the PropertiesManager instance of the application.
      * Singleton.
@@ -40,7 +40,7 @@ public class PropertiesManager {
         // this can improve the method’s overall performance by as much as 25 percent.
         // source: https://www.journaldev.com/171/thread-safety-in-java-singleton-classes
         PropertiesManager result = instance;
-        
+
         // enforce Singleton design pattern
         if (result == null) {
             synchronized (mutex) {
@@ -49,11 +49,11 @@ public class PropertiesManager {
                     instance = result = new PropertiesManager();
             }
         }
-        
+
         // return singleton instance
         return result;
     }
-    
+
     /**
      * Loads the properties from the configuration file.
      */
@@ -68,7 +68,7 @@ public class PropertiesManager {
 
         LOGGER.log(Level.INFO, String.format("Loaded configuration properties from file %s", PROPERTIES_FILE_PATH));
     }
-    
+
     /**
      * Searches for the property with the specified key in the application's properties.
      *
@@ -80,21 +80,25 @@ public class PropertiesManager {
         String property = this.properties.getProperty(key, defaultValue);
         if (property == null) {
             LOGGER.log(Level.SEVERE,
-            String.format("Couldn't find property with key %s, returning null", key));
+                    String.format("Couldn't find property with key %s, returning null", key));
         }
         return property;
     }
 
     public String getProperty(String key) {
-        return getProperty(key,  null);
+        return getProperty(key, null);
     }
 
-    public int getPort( ){
+    public int getPort() {
         return Integer.parseInt(getProperty("port", "9999"));
     }
 
     public int getVerticalInstanceCount(String verticalClassName) {
         return Integer.parseInt(getProperty("vertical.instance.count." + verticalClassName, "1"));
+    }
+
+    public int getFetchTrainingDataVerticlePeriodicTimer() {
+         return Integer.parseInt(getProperty("vertical.instance.FetchTrainingDataVerticle.PeriodicTimer"));
     }
 
     public String getDatabaseDriver() {

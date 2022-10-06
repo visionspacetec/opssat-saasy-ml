@@ -29,6 +29,7 @@ import org.sqlite.SQLiteConfig;
 
 import esa.mo.nmf.apps.ApplicationManager;
 import esa.mo.nmf.apps.saasyml.api.Constants;
+import esa.mo.nmf.apps.saasyml.api.utils.Pair;
 import esa.mo.nmf.apps.PropertiesManager;
 
 public class DatabaseVerticle extends AbstractVerticle {
@@ -47,7 +48,8 @@ public class DatabaseVerticle extends AbstractVerticle {
     private final String SQL_COUNT_COLUMNS_TRAINING_DATA = "SELECT count(*) FROM  training_data WHERE exp_id = ? AND dataset_id = ? AND param_name != 'label' GROUP BY timestamp LIMIT 1"; // "SELECT count(DISTINCT param_name) FROM training_data WHERE exp_id=? AND dataset_id=?" 
     private final String SQL_SELECT_TRAINING_DATA = "SELECT * FROM training_data WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp ASC";
     private final String SQL_SELECT_LABELS = "SELECT * FROM labels WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp ASC";
-    private final String SQL_SELECT_MODELS = "SELECT * FROM models WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp DESC";
+    private final String SQL_SELECT_MODELS = "SELECT exp_id as expId, dataset_id as datasetId, timestamp, type, algorithm, filepath, error FROM models WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp DESC";
+    private final String SQL_SELECT_MODELS_TO_INFERENCE = "SELECT type, filepath, error FROM models WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp DESC";
     private final String SQL_SELECT_DISTINCT_LABELS = "SELECT DISTINCT label FROM labels  WHERE exp_id = ? AND dataset_id = ? ORDER BY label ASC";
     private final String SQL_DELETE_TRAINING_DATA = "DELETE FROM training_data WHERE exp_id = ? AND dataset_id = ?";
     private final String SQL_DELETE_LABELS = "DELETE FROM labels WHERE exp_id = ? AND dataset_id = ?";
@@ -85,27 +87,6 @@ public class DatabaseVerticle extends AbstractVerticle {
     private static final String TABLE_TRAINING_DATA = "training_data";
     private static final String TABLE_MODELS = "models";
     private static final String TABLE_LABELS = "labels";
-
-    /**
-     * Class to generate pair values
-     */
-    private class Pair<T, E> {
-        private T key;
-        private E value;
-
-        Pair(T key, E value) {
-            this.key = key;
-            this.value = value;
-        }
-
-        public T getKey() {
-            return key;
-        }
-
-        public E getValue() {
-            return value;
-        }
-    }
 
     public Connection connect() throws Exception {
         if(this.conn == null || this.conn.isClosed())
@@ -437,17 +418,29 @@ public class DatabaseVerticle extends AbstractVerticle {
             final int expId = payload.getInteger(Constants.KEY_EXPID).intValue();
             final int datasetId = payload.getInteger(Constants.KEY_DATASETID).intValue();
 
+            // response
+            JsonObject response = new JsonObject();
+
+            // determine the query to perform between "select all the data in the models" or "select the needed to the inference"
+            // With format to inference, we add the expId outside. To see all the fields of the dataset, we should execute with formatToInference = false
+            String SQL_QUERY = SQL_SELECT_MODELS;            
+            if (payload.containsKey(Constants.KEY_FORMAT_TO_INFERENCE)
+                && payload.getBoolean(Constants.KEY_FORMAT_TO_INFERENCE).booleanValue())
+            {
+                SQL_QUERY = SQL_SELECT_MODELS_TO_INFERENCE;
+                response.put(Constants.KEY_EXPID, payload.getInteger(Constants.KEY_EXPID));
+            }
+
             // select models records
-            JsonArray data = null;
+            JsonArray models = null;
             try {
-                data = this.selectModels(expId, datasetId);
+                models = this.selectQueryByExpIdAndDatasetId(expId, datasetId, SQL_QUERY);
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Error while trying to get models from the database.", e);
             }
             
-            // response
-            JsonObject response = new JsonObject();
-            response.put(Constants.KEY_DATA, data);
+            response.put(Constants.KEY_MODELS, models);
+
             msg.reply(response);
 
         });
@@ -736,10 +729,10 @@ public class DatabaseVerticle extends AbstractVerticle {
         return toJSON(rs);
     }
 
-    private JsonArray selectModels(int expId, int datasetId) throws Exception {
+    private JsonArray selectQueryByExpIdAndDatasetId(int expId, int datasetId, String SQL_QUERY) throws Exception {
         
         // create the prepared statement
-        PreparedStatement ps = this.conn.prepareStatement(SQL_SELECT_MODELS);
+        PreparedStatement ps = this.conn.prepareStatement(SQL_QUERY);
 
         // set statement parameters
         ps.setInt(1, expId);
@@ -789,7 +782,9 @@ public class DatabaseVerticle extends AbstractVerticle {
                 JsonObject obj = new JsonObject();
     
                 for (int i = 1; i <= numColumns; i++) {
-                    obj.put(rsmd.getColumnName(i), rs.getObject(i));
+                    if (rs.getObject(i) != null){
+                        obj.put(rsmd.getColumnName(i), rs.getObject(i));
+                    }
                 }
                 json.add(obj);
             }

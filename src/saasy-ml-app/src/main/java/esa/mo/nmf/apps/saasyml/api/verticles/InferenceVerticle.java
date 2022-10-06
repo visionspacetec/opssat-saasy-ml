@@ -35,7 +35,7 @@ public class InferenceVerticle extends AbstractVerticle {
             try{
                 // the request payload (Json)
                 JsonObject payload = (JsonObject) (msg.body());
-                LOGGER.log(Level.INFO, "Started "+Constants.BASE_ADDRESS_INFERENCE);
+                LOGGER.log(Level.INFO, "Started " + Constants.BASE_ADDRESS_INFERENCE);
 
                 // parse the Json payload
                 final int expId = payload.getInteger(Constants.KEY_EXPID).intValue();
@@ -44,14 +44,14 @@ public class InferenceVerticle extends AbstractVerticle {
                 final JsonArray models = payload.getJsonArray(Constants.KEY_MODELS);
 
                 // prepare the test data of the classifier
-                DataSet[] test = prepareClassifierOneTestData(data);
+                DataSet[] testDataset = prepareClassifierOneTestData(data);
 
                 // for each model 
                 Iterator<Object> iter = models.iterator();
                 while (iter.hasNext()) {
                     JsonObject model = (JsonObject) iter.next();
 
-                    String path = model.getString(Constants.KEY_PATH);
+                    String filePath = model.getString(Constants.KEY_FILEPATH);
                     String type = model.getString(Constants.KEY_TYPE);
                     boolean thread = PropertiesManager.getInstance().getThread();
                     if (model.containsKey(Constants.KEY_THREAD) && model.getBoolean(Constants.KEY_THREAD) != null) {
@@ -64,13 +64,13 @@ public class InferenceVerticle extends AbstractVerticle {
                     IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(expId, datasetId, thread, serialize, "test-" + type, typeModel);
 
                     // set the full path of the model
-                    saasyml.setModelPathSerialized(path);
+                    saasyml.setModelPathSerialized(filePath);
 
                     // for each test data
-                    for (DataSet t : test) {
+                    for (DataSet test : testDataset) {
 
                         // set the test data
-                        saasyml.setDataSet(null, t);
+                        saasyml.setDataSet(null, test);
 
                         // do the inference
                         List<Object> objects = saasyml.inference();
@@ -117,8 +117,7 @@ public class InferenceVerticle extends AbstractVerticle {
         List<DataSet> tests = new ArrayList<DataSet>();
 
         int total_columns = ((JsonArray) data.getValue(0)).size();
-        tests.add(new ClassificationDataSet(total_columns, new CategoricalData[0],
-                new CategoricalData(classification)));
+        tests.add(new ClassificationDataSet(total_columns, new CategoricalData[0], new CategoricalData(classification)));
         int index = 0;
 
         // fetch data

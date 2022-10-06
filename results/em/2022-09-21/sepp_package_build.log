@@ -1,0 +1,14 @@
+Stage 1: PASSED
+	 File uploaded to CI toolchain.
+	 package_name: exp213
+	 package_version: 2.1
+	 package_maintainer: CesarGuzman
+Stage 2: WARNING	
+	 Collected 2 error(s) during App-validation
+	 Errors:
+	 Sep 21, 2022 5:35:07 PM properties.MainCheck main
+SEVERE: The user is set wrongly, expected exp213
+Sep 21, 2022 5:35:07 PM properties.MainCheck main
+SEVERE: The set APID is incorrect, expected 1237
+Sep 21, 2022 5:35:07 PM properties.MainCheck main
+INFO: Found 2 errors.
