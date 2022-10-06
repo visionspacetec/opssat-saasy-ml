@@ -69,17 +69,23 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
 
             try {
 
+                LOGGER.log(Level.INFO, "[TRACE LOG] Before addParamNames");
+
                 // keep track of param names
                 // we need this because the response object received in the onReceivedData listener does not reference the parameter names
                 ApplicationManager.getInstance().addParamNames(expId, datasetId, paramNameList);
 
+                LOGGER.log(Level.INFO, "[TRACE LOG] After addParamNames");
+
                 try {
+                        
+                    LOGGER.log(Level.INFO, "[TRACE LOG] Before createAggregationHandler");
                     
                     // create aggregation handler and subscribe the parameter feed
                     ApplicationManager.getInstance().createAggregationHandler(expId, datasetId, interval, paramNameList,
                             true);
 
-                    LOGGER.log(Level.INFO, String.format("[TRACE LOG] Creating aggregation handler"));
+                    LOGGER.log(Level.INFO, String.format("[TRACE LOG] Created aggregation handler"));
                 } catch (Exception e) {
                     LOGGER.log(Level.SEVERE, String.format("[TRACE LOG] Exception creating aggregation handler", e));
                 }
@@ -120,7 +126,7 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
                                             ApplicationManager.getInstance().enableSupervisorParametersSubscription(expId,
                                             datasetId, false);
                         
-                                            LOGGER.log(Level.INFO, String.format("[TRACE LOG] Disable parameter feed"));
+                                            LOGGER.log(Level.INFO, String.format("[TRACE LOG] Disabled parameter feed"));
                                         } catch (Exception e) {
                                             LOGGER.log(Level.SEVERE, String.format("[TRACE LOG] Exception  Disable parameter feed", e));
                                         }

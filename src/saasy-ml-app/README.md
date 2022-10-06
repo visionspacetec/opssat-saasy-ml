@@ -607,12 +607,12 @@ Sample payload:
     ],
     "models": [
         {
-            "path": "FULL-PATH-OF-SERIALIZED-THE-MODEL",
+            "filepath": "FULL-PATH-OF-SERIALIZED-THE-MODEL",
             "type": "Classifier",
             "thread" : true
         },
         {
-            "path": "FULL-PATH-OF-SERIALIZED-THE-MODEL",
+            "filepath": "FULL-PATH-OF-SERIALIZED-THE-MODEL",
             "type": "Classifier"
         }
     ]

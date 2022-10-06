@@ -29,6 +29,7 @@ import org.sqlite.SQLiteConfig;
 
 import esa.mo.nmf.apps.ApplicationManager;
 import esa.mo.nmf.apps.saasyml.api.Constants;
+import esa.mo.nmf.apps.saasyml.api.utils.Pair;
 import esa.mo.nmf.apps.PropertiesManager;
 
 public class DatabaseVerticle extends AbstractVerticle {
@@ -86,27 +87,6 @@ public class DatabaseVerticle extends AbstractVerticle {
     private static final String TABLE_TRAINING_DATA = "training_data";
     private static final String TABLE_MODELS = "models";
     private static final String TABLE_LABELS = "labels";
-
-    /**
-     * Class to generate pair values
-     */
-    private class Pair<T, E> {
-        private T key;
-        private E value;
-
-        Pair(T key, E value) {
-            this.key = key;
-            this.value = value;
-        }
-
-        public T getKey() {
-            return key;
-        }
-
-        public E getValue() {
-            return value;
-        }
-    }
 
     public Connection connect() throws Exception {
         if(this.conn == null || this.conn.isClosed())
@@ -438,25 +418,29 @@ public class DatabaseVerticle extends AbstractVerticle {
             final int expId = payload.getInteger(Constants.KEY_EXPID).intValue();
             final int datasetId = payload.getInteger(Constants.KEY_DATASETID).intValue();
 
-            // determine the query to perform between select all the data in the models or select the needed to the inference
+            // response
+            JsonObject response = new JsonObject();
+
+            // determine the query to perform between "select all the data in the models" or "select the needed to the inference"
+            // With format to inference, we add the expId outside. To see all the fields of the dataset, we should execute with formatToInference = false
             String SQL_QUERY = SQL_SELECT_MODELS;            
             if (payload.containsKey(Constants.KEY_FORMAT_TO_INFERENCE)
                 && payload.getBoolean(Constants.KEY_FORMAT_TO_INFERENCE).booleanValue())
             {
                 SQL_QUERY = SQL_SELECT_MODELS_TO_INFERENCE;
+                response.put(Constants.KEY_EXPID, payload.getInteger(Constants.KEY_EXPID));
             }
 
             // select models records
-            JsonArray data = null;
+            JsonArray models = null;
             try {
-                data = this.selectQueryByExpIdAndDatasetId(expId, datasetId, SQL_QUERY);
-            } catch (Exception e) { 
+                models = this.selectQueryByExpIdAndDatasetId(expId, datasetId, SQL_QUERY);
+            } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Error while trying to get models from the database.", e);
             }
             
-            // response
-            JsonObject response = new JsonObject();
-            response.put(Constants.KEY_MODELS, data);
+            response.put(Constants.KEY_MODELS, models);
+
             msg.reply(response);
 
         });

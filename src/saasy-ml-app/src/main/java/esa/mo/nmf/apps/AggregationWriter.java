@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.util.Pair;
 
 import org.ccsds.moims.mo.mc.aggregation.structures.AggregationParameterValueList;
 import org.ccsds.moims.mo.mc.parameter.ParameterHelper;
@@ -18,6 +17,7 @@ import esa.mo.helpertools.helpers.HelperAttributes;
 import esa.mo.mc.impl.consumer.ParameterConsumerServiceImpl;
 import esa.mo.mc.impl.provider.AggregationInstance;
 import esa.mo.nmf.apps.saasyml.api.Constants;
+import esa.mo.nmf.apps.saasyml.api.utils.Pair;
 import esa.mo.nmf.commonmoadapter.CompleteAggregationReceivedListener;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;

@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.ccsds.moims.mo.mal.structures.LongList;
 
-import javafx.util.Pair;
+import esa.mo.nmf.apps.saasyml.api.utils.Pair;
 
 public class ApplicationManager {
 
