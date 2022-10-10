@@ -1,0 +1,158 @@
+
+http://localhost:9998/api/v1/training/data/download/
+{ "expId": 213, "datasetId": 1 }
+
+Output from sever: 
+
+{
+  "response" : {
+    "data" : [ [ {
+      "name" : "GNC_0005",
+      "value" : "-1450.9",
+      "dataType" : 4,
+      "timestamp" : 1665144644069
+    }, {
+      "name" : "GNC_0011",
+      "value" : "1236.2",
+      "dataType" : 4,
+      "timestamp" : 1665144644069
+    }, {
+      "name" : "GNC_0007",
+      "value" : "2982.0",
+      "dataType" : 4,
+      "timestamp" : 1665144644069
+    } ], [ {
+      "name" : "GNC_0005",
+      "value" : "-1450.9",
+      "dataType" : 4,
+      "timestamp" : 1665144646199
+    }, {
+      "name" : "GNC_0011",
+      "value" : "1236.2",
+      "dataType" : 4,
+      "timestamp" : 1665144646199
+    }, {
+      "name" : "GNC_0007",
+      "value" : "2982.0",
+      "dataType" : 4,
+      "timestamp" : 1665144646199
+    } ], [ {
+      "name" : "GNC_0005",
+      "value" : "-1450.9",
+      "dataType" : 4,
+      "timestamp" : 1665144648198
+    }, {
+      "name" : "GNC_0011",
+      "value" : "1236.2",
+      "dataType" : 4,
+      "timestamp" : 1665144648198
+    }, {
+      "name" : "GNC_0007",
+      "value" : "2982.0",
+      "dataType" : 4,
+      "timestamp" : 1665144648198
+    } ], [ {
+      "name" : "GNC_0005",
+      "value" : "-1450.9",
+      "dataType" : 4,
+      "timestamp" : 1665144650198
+    }, {
+      "name" : "GNC_0011",
+      "value" : "1236.2",
+      "dataType" : 4,
+      "timestamp" : 1665144650198
+    }, {
+      "name" : "GNC_0007",
+      "value" : "2982.0",
+      "dataType" : 4,
+      "timestamp" : 1665144650198
+    } ], [ {
+      "name" : "GNC_0005",
+      "value" : "-1450.9",
+      "dataType" : 4,
+      "timestamp" : 1665144652202
+    }, {
+      "name" : "GNC_0011",
+      "value" : "1236.2",
+      "dataType" : 4,
+      "timestamp" : 1665144652202
+    }, {
+      "name" : "GNC_0007",
+      "value" : "2982.0",
+      "dataType" : 4,
+      "timestamp" : 1665144652202
+    } ], [ {
+      "name" : "GNC_0005",
+      "value" : "-1450.9",
+      "dataType" : 4,
+      "timestamp" : 1665144654353
+    }, {
+      "name" : "GNC_0011",
+      "value" : "1236.2",
+      "dataType" : 4,
+      "timestamp" : 1665144654353
+    }, {
+      "name" : "GNC_0007",
+      "value" : "2982.0",
+      "dataType" : 4,
+      "timestamp" : 1665144654353
+    } ], [ {
+      "name" : "GNC_0005",
+      "value" : "-1450.9",
+      "dataType" : 4,
+      "timestamp" : 1665144656198
+    }, {
+      "name" : "GNC_0011",
+      "value" : "1236.2",
+      "dataType" : 4,
+      "timestamp" : 1665144656198
+    }, {
+      "name" : "GNC_0007",
+      "value" : "2982.0",
+      "dataType" : 4,
+      "timestamp" : 1665144656198
+    } ], [ {
+      "name" : "GNC_0005",
+      "value" : "-1450.9",
+      "dataType" : 4,
+      "timestamp" : 1665144658198
+    }, {
+      "name" : "GNC_0011",
+      "value" : "1236.2",
+      "dataType" : 4,
+      "timestamp" : 1665144658198
+    }, {
+      "name" : "GNC_0007",
+      "value" : "2982.0",
+      "dataType" : 4,
+      "timestamp" : 1665144658198
+    } ], [ {
+      "name" : "GNC_0005",
+      "value" : "-1450.9",
+      "dataType" : 4,
+      "timestamp" : 1665144660198
+    }, {
+      "name" : "GNC_0011",
+      "value" : "1236.2",
+      "dataType" : 4,
+      "timestamp" : 1665144660198
+    }, {
+      "name" : "GNC_0007",
+      "value" : "2982.0",
+      "dataType" : 4,
+      "timestamp" : 1665144660198
+    } ] ],
+    "expId" : 213,
+    "datasetId" : 1
+  }
+}
+
+Help of use:
+$ java -jar saasy-ml-app-api-client-0.1.0-SNAPSHOT-jar-with-dependencies.jar -server [URL] -payload [JSON] (optional -payloadFile [JSON_FILE])
+
+
+
+real    0m0.582s
+user    0m0.000s
+sys     0m0.000s
+
