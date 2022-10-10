@@ -5,7 +5,7 @@ SET NMF_SDK_PACKAGE_DIR=<FULL_PATH>\opssat-saasy-ml-nanosat-mo-framework\sdk\sdk
 SET DEL_DATABASE_FLAG=%1
 if "%~1"=="" SET DEL_DATABASE_FLAG=0
 
-if %DEL_DATABASE_FLAG%==1 CALL rm %NMF_SDK_PACKAGE_DIR%\target\nmf-sdk-2.1.0-SNAPSHOT\home\saasy-ml\SaaSyML*
+if %DEL_DATABASE_FLAG%==1 DEL %NMF_SDK_PACKAGE_DIR%\target\nmf-sdk-2.1.0-SNAPSHOT\home\saasy-ml\SaaSyML*
 
 :: Start Supervisor
 START "NMF Supervisor" /D %NMF_SDK_PACKAGE_DIR%\target\nmf-sdk-2.1.0-SNAPSHOT\home\nmf\nanosat-mo-supervisor-sim "nanosat-mo-supervisor-sim.bat"
