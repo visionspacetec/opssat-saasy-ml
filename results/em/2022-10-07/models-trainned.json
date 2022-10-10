@@ -1,0 +1,62 @@
+{
+    "response": {
+        "models": [
+            {
+                "expId": 213,
+                "datasetId": 2,
+                "timestamp": 1665147270884,
+                "type": "Classifier",
+                "algorithm": "SDCA",
+                "filepath": "./models/E213-D2-SDCA-2022-10-07_12-54-30.model"
+            },
+            {
+                "expId": 213,
+                "datasetId": 2,
+                "timestamp": 1665147253225,
+                "type": "Classifier",
+                "algorithm": "SPA",
+                "filepath": "./models/E213-D2-SPA-2022-10-07_12-54-13.model"
+            },
+            {
+                "expId": 213,
+                "datasetId": 2,
+                "timestamp": 1665147096206,
+                "type": "Classifier",
+                "algorithm": "LogisticRegressionDCD",
+                "filepath": "./models/E213-D2-LogisticRegressionDCD-2022-10-07_12-51-36.model"
+            },
+            {
+                "expId": 213,
+                "datasetId": 2,
+                "timestamp": 1665147087169,
+                "type": "Classifier",
+                "algorithm": "LoggisticRegressionDCD",
+                "filepath": "./models/E213-D2-LoggisticRegressionDCD-2022-10-07_12-51-27.model"
+            },
+            {
+                "expId": 213,
+                "datasetId": 2,
+                "timestamp": 1665147027795,
+                "type": "Classifier",
+                "algorithm": "LinearSGD",
+                "filepath": "./models/E213-D2-LinearSGD-2022-10-07_12-50-27.model"
+            },
+            {
+                "expId": 213,
+                "datasetId": 2,
+                "timestamp": 1665145446452,
+                "type": "Classifier",
+                "algorithm": "aode",
+                "filepath": "./models/E213-D2-aode-2022-10-07_12-24-06.model"
+            },
+            {
+                "expId": 213,
+                "datasetId": 2,
+                "timestamp": 1665145392486,
+                "type": "Classifier",
+                "algorithm": "aode",
+                "filepath": "./models/E213-D2-aode-2022-10-07_12-23-12.model"
+            }
+        ]
+    }
+}

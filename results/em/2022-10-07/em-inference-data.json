@@ -1,0 +1,66 @@
+{
+    "expId": 213,
+    "data": [
+        [
+            {
+                "name": "GNC_0005",
+                "value": "1002",
+                "dataType": 4
+            },
+            {
+                "name": "GNC_0011",
+                "value": "2002",
+                "dataType": 4
+            },
+            {
+                "name": "GNC_0007",
+                "value": "3002",
+                "dataType": 4
+            }
+        ],
+        [
+            {
+                "name": "GNC_0005",
+                "value": "1003",
+                "dataType": 4
+            },
+            {
+                "name": "GNC_0011",
+                "value": "2003",
+                "dataType": 4
+            },
+            {
+                "name": "GNC_0007",
+                "value": "3003",
+                "dataType": 4
+            }
+        ]
+    ],
+	"models": [
+        {
+            "type": "Classifier",
+            "filepath": "./models/E213-D2-SDCA-2022-10-07_12-54-30.model"
+        },
+        {
+            "type": "Classifier",
+            "filepath": "./models/E213-D2-SPA-2022-10-07_12-54-13.model"
+        },
+        {
+            "type": "Classifier",
+            "filepath": "./models/E213-D2-LogisticRegressionDCD-2022-10-07_12-51-36.model"
+        },
+        {
+            "type": "Classifier",
+            "filepath": "./models/E213-D2-LinearSGD-2022-10-07_12-50-27.model"
+        },
+        {
+            "type": "Classifier",
+            "filepath": "./models/E213-D2-aode-2022-10-07_12-24-06.model"
+        },
+        {
+            "type": "Classifier",
+            "filepath": "./models/E213-D2-aode-2022-10-07_12-23-12.model"
+        }
+    ]
+
+}
