@@ -19,8 +19,5 @@ CALL mvn clean install
 CD %NMF_SDK_PACKAGE_DIR%
 CALL mvn clean install
 
-:: Start Supervisor
-if %RUN_FLAG%==1 START "NMF Supervisor" /D %NMF_SDK_PACKAGE_DIR%\target\nmf-sdk-2.1.0-SNAPSHOT\home\nmf\nanosat-mo-supervisor-sim "nanosat-mo-supervisor-sim.bat"
-
-:: Start Consumer Test Tool
-if %RUN_FLAG%==1 START "Consumer Test Tool" /MIN /D %NMF_SDK_PACKAGE_DIR%\target\nmf-sdk-2.1.0-SNAPSHOT\home\nmf\consumer-test-tool "consumer-test-tool.bat"
+:: Start Supervisor and Consumer Test Tool
+if %RUN_FLAG%==1 START "NMF Supervisor" /D %PROJECT_DIR%\ "run.bat"
