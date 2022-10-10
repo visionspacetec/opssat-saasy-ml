@@ -1,0 +1,14 @@
+:: Set variables
+SET NMF_SDK_PACKAGE_DIR=<FULL_PATH>\opssat-saasy-ml-nanosat-mo-framework\sdk\sdk-package
+
+:: Set delete database flag variable in case we want to delete the database
+SET DEL_DATABASE_FLAG=%1
+if "%~1"=="" SET DEL_DATABASE_FLAG=0
+
+if %DEL_DATABASE_FLAG%==1 CALL rm %NMF_SDK_PACKAGE_DIR%\target\nmf-sdk-2.1.0-SNAPSHOT\home\saasy-ml\SaaSyML*
+
+:: Start Supervisor
+START "NMF Supervisor" /D %NMF_SDK_PACKAGE_DIR%\target\nmf-sdk-2.1.0-SNAPSHOT\home\nmf\nanosat-mo-supervisor-sim "nanosat-mo-supervisor-sim.bat"
+
+:: Start Consumer Test Tool
+START "Consumer Test Tool" /MIN /D %NMF_SDK_PACKAGE_DIR%\target\nmf-sdk-2.1.0-SNAPSHOT\home\nmf\consumer-test-tool "consumer-test-tool.bat"

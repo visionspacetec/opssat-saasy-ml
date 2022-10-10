@@ -29,7 +29,7 @@ public final class App {
     private App() {
     }
     
-    public static void readFromUrl(String serverAddress, String payload) throws Exception {
+    public static void readFromUrl(String serverAddress, String payload, String outputFile) throws Exception {
 
         try {
 
@@ -53,7 +53,7 @@ public final class App {
     
             BufferedReader br = new BufferedReader(new InputStreamReader(
                     (conn.getInputStream())));
-            BufferedWriter writer = new BufferedWriter(new FileWriter(new File("em-train-data-17-08-2022.json")));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(new File(outputFile)));
     
             String output;
             System.out.println("\nOutput from sever: \n");
@@ -85,8 +85,12 @@ public final class App {
      */
     public static void main(String[] args) {
 
+        String payload = "";
+        String serverAddress = "";
+        String outputFile = "em-train-data.json";
+
         // how to use information
-        String howToUse = "$ java -jar saasy-ml-app-api-client-0.1.0-SNAPSHOT-jar-with-dependencies.jar -server [URL] -payload [JSON] (optional -payloadFile [JSON_FILE])";
+        String howToUse = "$ java -jar saasy-ml-app-api-client-0.1.1-SNAPSHOT-jar-with-dependencies.jar -server [URL] -payload [JSON] (optional -payloadFile [JSON_FILE]) -output [FILE_OUTPUT]";
 
         // we stored all in a tuple <o, v>, where o is an option and v is a set or values (tests)
         final Map<String, String> params = new HashMap<>();
@@ -108,8 +112,6 @@ public final class App {
             }
         }
 
-        String serverAddress = "";
-
         // if it is empty or it does not containt the server address
         if (params.isEmpty() || !params.containsKey("server")) {
             serverAddress = "http://localhost:9999/api/v1/training/data/subscribe/";
@@ -118,10 +120,15 @@ public final class App {
             serverAddress = params.get("server");
         }
 
+        // get the output file
+        if (params.containsKey("output")) {
+            outputFile = params.get("output");
+        }
+
+        // get the payload
         if (!params.containsKey("payload") && !params.containsKey("payloadFile")) {
             System.out.println("Payload can not be empty");
         } else {
-            String payload = "";
             
             if (params.containsKey("payload")) {
                 payload = params.get("payload");
@@ -138,12 +145,13 @@ public final class App {
             logger.info("************* Test API requests **************");
             logger.info("- server address: "+serverAddress);
             logger.info("- payload: "+ payload);
+            logger.info("- output file: "+ outputFile);
             logger.info("************* ************************************ ****\n");
             
-            try{
+            try {
     
-                logger.info("\nTest #1:");
-                readFromUrl(serverAddress, payload);
+                // we call the test 
+                readFromUrl(serverAddress, payload, outputFile);
                 logger.info("\nTest completed.");
     
             } catch(Exception e){

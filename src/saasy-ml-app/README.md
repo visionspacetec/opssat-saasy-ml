@@ -44,7 +44,7 @@ OS name: "linux", version: "5.10.16.3-microsoft-standard-wsl2", arch: "amd64", f
     $ cd opssat-saasy-ml/src/saasy-ml-app
     ```
 
-2. Copy **build.bat.template** to a new **build.bat** file and modify the <FULL_PATH> to match the environment
+2. Copy **build.bat.template** to a new **build.bat** file and **run.bat.template** to a new **run.bat** and modify the <FULL_PATH> in both files to match the environment
 
     ```powershell
     :: Set variables
@@ -64,7 +64,7 @@ OS name: "linux", version: "5.10.16.3-microsoft-standard-wsl2", arch: "amd64", f
     </copy>
     ```
 
-5. Execute **./build.bat** to build all the Apps or **./build.bat 1** to build the Apps and execute the Supervisor and CTT.
+5. Execute **./build.bat** to build all the Apps or **./build.bat 1** to build the Apps and execute the Supervisor and CTT, or **./run.bat** to only execute the Supervisor and CTT, or **./run.bat 1** to remove the Database and execute the Supervisor and CTT.
 
 
 ## Long Install
