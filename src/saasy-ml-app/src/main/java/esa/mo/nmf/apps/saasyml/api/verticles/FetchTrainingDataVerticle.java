@@ -57,13 +57,16 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
                 ApplicationManager.getInstance().addLabelPlugin(expId, datasetId, "null");
                 
             }
-            else if(payload.containsKey(Constants.KEY_LABELS_PLUGIN)){
-                // identifier for plugin to calculate the expected label 
-                if(ApplicationManager.getInstance().getLabels(expId, datasetId) != null){
-                    ApplicationManager.getInstance().getLabels(expId, datasetId).clear();
+            else {
+                if (payload.containsKey(Constants.KEY_LABELS_PLUGIN)) {
+                    // identifier for plugin to calculate the expected label 
+                    if (ApplicationManager.getInstance().getLabels(expId, datasetId) != null) {
+                        ApplicationManager.getInstance().getLabels(expId, datasetId).clear();
+                    }
+                    ApplicationManager.getInstance().addLabelPlugin(expId, datasetId,
+                            payload.getString(Constants.KEY_LABELS_PLUGIN));
                 }
-                ApplicationManager.getInstance().addLabelPlugin(expId, datasetId, payload.getString(Constants.KEY_LABELS_PLUGIN));
-            }
+            } 
 
             // create list of training data param names from JsonArray
             List<String> paramNameList = createArrayFromJsonArray(payload.getJsonArray(Constants.KEY_PARAMS));
@@ -127,8 +130,6 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
                             } else {
                                 int startedCount = payloadCount.getInteger(Constants.KEY_STARTED_COUNT).intValue();
                                 int count = response.getInteger(Constants.KEY_COUNT).intValue() - startedCount;
-                                            
-                                LOGGER.log(Level.INFO, "started count vs count : "+startedCount+" vs "+ count);
 
                                 // get training data row count
                                 // fixme: dividing by paramNameList.size() will break if the number of params change from one data fetching session to another for

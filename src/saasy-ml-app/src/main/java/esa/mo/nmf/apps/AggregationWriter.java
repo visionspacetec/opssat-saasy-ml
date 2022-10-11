@@ -164,12 +164,7 @@ public class AggregationWriter implements CompleteAggregationReceivedListener {
                         ApplicationManager.getInstance().addLabels(expId, datasetId, expectedLabelsMap);
                     }
                 }
-            } else {
-                if(ApplicationManager.getInstance().getLabels(expId, datasetId) != null){
-                    ApplicationManager.getInstance().getLabels(expId, datasetId).clear();
-                }
             }
-
             
             // send the payload to the database verticle
             this.vertx.eventBus().send(Constants.ADDRESS_DATA_SAVE, payload);   
