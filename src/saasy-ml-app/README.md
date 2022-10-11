@@ -105,10 +105,19 @@ Do a `mvn clean install` of the following projects in `opssat-saasy-ml/src/saasy
     If in step 2 the app was cloned to a different folder name than the default **opssat-saasy-ml**, then the following copy configuration in **sdk/sdk-package/pom.xml** must be updated:
 
     ```xml
+    <!-- SaaSyML: resource and config files -->
     <copy todir="${esa.nmf.sdk.assembly.outputdir}/home/saasy-ml">
-    <fileset dir="${basedir}/src/main/resources/space-common"/>
-    <fileset dir="${basedir}/src/main/resources/space-app-root"/>
-    <fileset dir="${basedir}/../../../opssat-saasy-ml/src/saasy-ml-app/conf"/>
+      <fileset dir="${basedir}/src/main/resources/space-common"/>
+      <fileset dir="${basedir}/src/main/resources/space-app-root"/>
+      <fileset dir="${basedir}/../../../opssat-saasy-ml/src/saasy-ml-app/conf"/>
+    </copy>
+    <!-- SaaSyML: plugins directory -->
+    <mkdir dir="${esa.nmf.sdk.assembly.outputdir}/home/saasy-ml/plugins"/>
+    <copy todir="${esa.nmf.sdk.assembly.outputdir}/home/saasy-ml/plugins">
+      <fileset dir="${basedir}/../../../opssat-saasy-ml/src/saasy-ml-app/plugins">
+        <include name="*.jar"/>
+        <include name="*.zip"/>
+      </fileset>
     </copy>
     ```
 
