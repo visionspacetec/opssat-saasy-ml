@@ -34,6 +34,7 @@ public final class Constants {
     public static final String KEY_LABELS_PLUGIN = "labelsPlugin";
     public static final String KEY_PARAMS = "params";
     public static final String KEY_COUNT = "count";
+    public static final String KEY_STARTED_COUNT = "startedCount";
     public static final String KEY_DIMENSIONS = "dimensions";
     public static final String KEY_MODEL_PATH = "model_path";
     public static final String KEY_INFERENCE = "inference";

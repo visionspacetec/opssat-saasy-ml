@@ -136,12 +136,12 @@
       <scope>compile</scope>
     </dependency>
 
-    <!-- Thanks for using https://jar-download.com -->
+    <!-- Thanks for using https://jar-download.com 
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-base</artifactId>
       <version>11</version>
-    </dependency>    
+    </dependency>  -->  
 
   </dependencies>
   <build>

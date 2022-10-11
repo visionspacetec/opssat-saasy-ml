@@ -116,7 +116,7 @@ public class AggregationWriter implements CompleteAggregationReceivedListener {
                         pluginParamInputMap.put(paramNames.get(i), new Double(paramValues.get(i).getValue()));
                     } catch (Exception e) {
                         labelPlugin = null;
-                        LOGGER.log(Level.SEVERE, "The expected labels plugin cannot be incoked because the fetched parameter values are uncastable to the Double type", e);
+                        LOGGER.log(Level.SEVERE, "The expected labels plugin cannot be invoked because the fetched parameter values are uncastable to the Double type", e);
                     }  
                 }                              
 

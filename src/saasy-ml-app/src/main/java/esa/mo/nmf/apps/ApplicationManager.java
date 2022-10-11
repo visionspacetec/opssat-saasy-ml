@@ -84,12 +84,13 @@ public class ApplicationManager {
         return this.labelMap.get(new Pair<Integer, Integer>(expId, datasetId));
     }
 
-    public void addLabelPlugin(int expId, int datasetId, String labelPlugin) {
+    public synchronized void addLabelPlugin(int expId, int datasetId, String labelPlugin) {
         this.labelPluginMap.put(new Pair<Integer, Integer>(expId, datasetId), labelPlugin);
     }
 
     public String getLabelPlugin(int expId, int datasetId) {
-        return this.labelPluginMap.get(new Pair<Integer, Integer>(expId, datasetId));
+        String labelPlugin = this.labelPluginMap.get(new Pair<Integer, Integer>(expId, datasetId));
+        return labelPlugin.equals("null")?null:labelPlugin;
     }
 
     public void addAggregationHandler(int expId, int datasetId, AggregationHandler aggregationHandler) {
