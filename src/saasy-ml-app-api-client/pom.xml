@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>int.esa.saasy.ml.app.api.client</groupId>
     <artifactId>saasy-ml-app-api-client</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.1.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>API test client</name>
     <description>App to work as a Machine Learning PipeLine</description>
