@@ -1,6 +1,8 @@
 #!/bin/sh
 echo "Running test download train data"
 
+sleep 1
+
 # experimenter id 213
 
 # datasetId 1
