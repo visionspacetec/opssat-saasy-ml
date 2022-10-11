@@ -5,6 +5,7 @@ An NMF App for the OPS-SAT spacecraft. The app uses ML to train AI models with t
 # Table of Content
 
 - [Requirements](#requirements)
+- [Prerequisite Install](#prerequisite-install)
 - [Quick Install](#quick-install)
 - [Long Install](#long-install)
 - [Run App](#run-app)
@@ -34,6 +35,12 @@ Default locale: en, platform encoding: UTF-8
 OS name: "linux", version: "5.10.16.3-microsoft-standard-wsl2", arch: "amd64", family: "unix"
 ```
 
+## Prequisite Install
+Do a `mvn clean install` of the following projects in `opssat-saasy-ml/src/saasy-ml-app`:
+- saasy-ml-layer-pipeline
+- saasy-ml-app-plugins-api
+- saasy-ml-app-plugins
+
 ## Quick Install
 
 1. Clone the SaaSyML App and NMF repositories
@@ -57,10 +64,19 @@ OS name: "linux", version: "5.10.16.3-microsoft-standard-wsl2", arch: "amd64", f
 4. Modify the **sdk/sdk-package/pom.xml** copy instruction to match the environment's location
 
     ```xml
+    <!-- SaaSyML: resource and config files -->
     <copy todir="${esa.nmf.sdk.assembly.outputdir}/home/saasy-ml">
       <fileset dir="${basedir}/src/main/resources/space-common"/>
       <fileset dir="${basedir}/src/main/resources/space-app-root"/>
       <fileset dir="${basedir}/../../../opssat-saasy-ml/src/saasy-ml-app/conf"/>
+    </copy>
+    <!-- SaaSyML: plugins directory -->
+    <mkdir dir="${esa.nmf.sdk.assembly.outputdir}/home/saasy-ml/plugins"/>
+    <copy todir="${esa.nmf.sdk.assembly.outputdir}/home/saasy-ml/plugins">
+      <fileset dir="${basedir}/../../../opssat-saasy-ml/src/saasy-ml-app/plugins">
+        <include name="*.jar"/>
+        <include name="*.zip"/>
+      </fileset>
     </copy>
     ```
 
@@ -240,11 +256,8 @@ Sample payload with label values calculated by a plugin given fetched parameters
     "datasetId": 1,
     "iterations": 10,
     "interval": 2,
-    "labelsPlugin": {
-        "params": ["GNC_0001", "GNC_0002", "GNC_0003"],
-        "class": "esa.mo.nmf.apps.MyCustomLabelsPlugin"
-    },
-    "params": ["GNC_0005", "GNC_0011", "GNC_0007"]
+    "labelsPlugin": "esa.mo.nmf.apps.saasyml.plugins.CameraStateLabels",
+    "params": ["CADC0884", "CADC0886", "CADC0888", "CADC0890", "CADC0892", "CADC0894"]
 }
 ```
 
@@ -402,6 +415,8 @@ Sample payload:
 
 Sample payload with label values (expected output) provided by the client:
 
+**TODO:** This is not supported.
+
 ```json
 {
     "expId": 123,
@@ -536,6 +551,8 @@ Sample payload:
     "algorithm": "AROW"
 }
 ```
+
+**TODO:** filter out parameters from training.
 
 ### Fetch Models Metadata
 To fetch which trained models are available for a given experiment and dataset pair, make a POST request to the following endpoint:

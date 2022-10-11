@@ -54,6 +54,17 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
             {
                 final Map<String, Boolean> labelMap = createLabelMapFromJsonObject(payload.getJsonObject(Constants.KEY_LABELS));
                 ApplicationManager.getInstance().addLabels(expId, datasetId, labelMap);
+                if(ApplicationManager.getInstance().getLabelPlugin(expId, datasetId) != null){
+                    ApplicationManager.getInstance().addLabelPlugin(expId, datasetId, null);
+                }
+                
+            }
+            else if(payload.containsKey(Constants.KEY_LABELS_PLUGIN)){
+                // identifier for plugin to calculate the expected label 
+                if(ApplicationManager.getInstance().getLabels(expId, datasetId) != null){
+                    ApplicationManager.getInstance().getLabels(expId, datasetId).clear();
+                }
+                ApplicationManager.getInstance().addLabelPlugin(expId, datasetId, payload.getString(Constants.KEY_LABELS_PLUGIN));
             }
 
             // create list of training data param names from JsonArray
@@ -108,7 +119,7 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
 
                             } else {
                                 // get training data row count
-                                // fixme: dividing by paramNameList.size() will break if the number of params change during from one data fetching session to another for
+                                // fixme: dividing by paramNameList.size() will break if the number of params change from one data fetching session to another for
                                 // the same expId and datasetId
                                 int counter = response.getInteger(Constants.KEY_COUNT).intValue() / paramNameList.size();
 

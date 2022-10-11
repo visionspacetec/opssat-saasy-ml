@@ -31,6 +31,7 @@ public final class Constants {
     public static final String KEY_ITERATIONS = "iterations";
     public static final String KEY_LABEL = "label";
     public static final String KEY_LABELS = "labels";
+    public static final String KEY_LABELS_PLUGIN = "labelsPlugin";
     public static final String KEY_PARAMS = "params";
     public static final String KEY_COUNT = "count";
     public static final String KEY_DIMENSIONS = "dimensions";

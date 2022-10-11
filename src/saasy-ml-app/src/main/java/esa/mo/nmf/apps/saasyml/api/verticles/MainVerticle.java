@@ -17,12 +17,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import esa.mo.nmf.apps.AppMCAdapter;
 import esa.mo.nmf.apps.saasyml.api.Constants;
 import esa.mo.nmf.apps.PropertiesManager;
 
-
+import org.pf4j.DefaultPluginManager;
+import org.pf4j.PluginManager;
 
 
 /**
@@ -36,16 +39,28 @@ import esa.mo.nmf.apps.PropertiesManager;
 public class MainVerticle extends AbstractVerticle {
     private static final Logger LOGGER = Logger.getLogger(MainVerticle.class.getName());
 
+    // the plugin manager
+    private PluginManager pluginManager;
+
     // constructor
     public MainVerticle() {
         vertx = Vertx.vertx();
+
+        // load the plugins
+        Path pluginsDir = Paths.get("plugins");
+        this.pluginManager = new DefaultPluginManager(pluginsDir);
+        
     }
 
     @Override
     public void start() throws Exception {
 
+        // load and start the plugins
+        pluginManager.loadPlugins();
+        pluginManager.startPlugins();
+
         // add data received listener
-        AppMCAdapter.getInstance().addDataReceivedListener(vertx);
+        AppMCAdapter.getInstance().addDataReceivedListener(vertx, pluginManager);
 
         // set app http server port
         int port = PropertiesManager.getInstance().getPort();
@@ -61,6 +76,13 @@ public class MainVerticle extends AbstractVerticle {
         // create handler and listen port
         vertx.createHttpServer().requestHandler(router).listen(port);
 
+    }
+
+    @Override
+    public void stop() throws Exception {
+        // stop and unload the plugins
+        pluginManager.stopPlugins();
+        pluginManager.unloadPlugins();
     }
 
     /**
