@@ -54,7 +54,19 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
             {
                 final Map<String, Boolean> labelMap = createLabelMapFromJsonObject(payload.getJsonObject(Constants.KEY_LABELS));
                 ApplicationManager.getInstance().addLabels(expId, datasetId, labelMap);
+                ApplicationManager.getInstance().addLabelPlugin(expId, datasetId, "null");
+                
             }
+            else {
+                if (payload.containsKey(Constants.KEY_LABELS_PLUGIN)) {
+                    // identifier for plugin to calculate the expected label 
+                    if (ApplicationManager.getInstance().getLabels(expId, datasetId) != null) {
+                        ApplicationManager.getInstance().getLabels(expId, datasetId).clear();
+                    }
+                    ApplicationManager.getInstance().addLabelPlugin(expId, datasetId,
+                            payload.getString(Constants.KEY_LABELS_PLUGIN));
+                }
+            } 
 
             // create list of training data param names from JsonArray
             List<String> paramNameList = createArrayFromJsonArray(payload.getJsonArray(Constants.KEY_PARAMS));
@@ -95,6 +107,15 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
 
                     // set the periodic timer            
                     int periodicTimer = PropertiesManager.getInstance().getFetchTrainingDataVerticlePeriodicTimer();
+
+                    
+                    vertx.eventBus().request(Constants.ADDRESS_DATA_COUNT, payloadCount, reply -> {
+                        JsonObject response = (JsonObject) (reply.result().body());
+
+                        if (response.containsKey(Constants.KEY_COUNT)) {
+                            payloadCount.put(Constants.KEY_STARTED_COUNT, response.getInteger(Constants.KEY_COUNT).intValue());
+                        }
+                    });
                     
                     // register periodic timer
                     vertx.setPeriodic(periodicTimer, id -> {
@@ -107,10 +128,13 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
                                 vertx.cancelTimer(id);
 
                             } else {
+                                int startedCount = payloadCount.getInteger(Constants.KEY_STARTED_COUNT).intValue();
+                                int count = response.getInteger(Constants.KEY_COUNT).intValue() - startedCount;
+
                                 // get training data row count
-                                // fixme: dividing by paramNameList.size() will break if the number of params change during from one data fetching session to another for
+                                // fixme: dividing by paramNameList.size() will break if the number of params change from one data fetching session to another for
                                 // the same expId and datasetId
-                                int counter = response.getInteger(Constants.KEY_COUNT).intValue() / paramNameList.size();
+                                int counter = count / paramNameList.size();
 
                                 // the counter is set to -1 if there was an error while attempting to query the database
                                 // stop timer if  this happens
