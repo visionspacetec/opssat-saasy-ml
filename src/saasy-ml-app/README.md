@@ -5,7 +5,6 @@ An NMF App for the OPS-SAT spacecraft. The app uses ML to train AI models with t
 # Table of Content
 
 - [Requirements](#requirements)
-- [Prerequisite Install](#prerequisite-install)
 - [Quick Install](#quick-install)
 - [Long Install](#long-install)
 - [Run App](#run-app)
@@ -34,12 +33,6 @@ Java version: 1.8.0_312, vendor: Private Build
 Default locale: en, platform encoding: UTF-8
 OS name: "linux", version: "5.10.16.3-microsoft-standard-wsl2", arch: "amd64", family: "unix"
 ```
-
-## Prequisite Install
-Do a `mvn clean install` of the following projects in `opssat-saasy-ml/src/saasy-ml-app`:
-- saasy-ml-layer-pipeline
-- saasy-ml-app-plugins-api
-- saasy-ml-app-plugins
 
 ## Quick Install
 

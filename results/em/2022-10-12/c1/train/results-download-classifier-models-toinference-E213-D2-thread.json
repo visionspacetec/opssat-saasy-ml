@@ -1,0 +1,55 @@
+{
+    "response": {
+        "expId": 213,
+        "models": [
+            {
+                "type": "Classifier",
+                "filepath": "./models/E213-D2-ALMA2-2022-10-12_02-21-18.model"
+            },
+            {
+                "type": "Classifier",
+                "filepath": "./models/E213-D2-StochasticMultinomialLogisticRegression-2022-10-12_02-21-17.model"
+            },
+            {
+                "type": "Classifier",
+                "filepath": "./models/E213-D2-PassiveAggressive-2022-10-12_02-21-17.model"
+            },
+            {
+                "type": "Classifier",
+                "filepath": "./models/E213-D2-NewGLMNET-2022-10-12_02-21-16.model"
+            },
+            {
+                "type": "Classifier",
+                "filepath": "./models/E213-D2-LinearSGD-2022-10-12_02-21-16.model"
+            },
+            {
+                "type": "Classifier",
+                "filepath": "./models/E213-D2-LogisticRegressionDCD-2022-10-12_02-21-15.model"
+            },
+            {
+                "type": "Classifier",
+                "filepath": "./models/E213-D2-NewGLMNET-2022-10-12_02-20-12.model"
+            },
+            {
+                "type": "Classifier",
+                "filepath": "./models/E213-D2-ALMA2-2022-10-12_02-20-12.model"
+            },
+            {
+                "type": "Classifier",
+                "filepath": "./models/E213-D2-StochasticMultinomialLogisticRegression-2022-10-12_02-20-12.model"
+            },
+            {
+                "type": "Classifier",
+                "filepath": "./models/E213-D2-PassiveAggressive-2022-10-12_02-20-11.model"
+            },
+            {
+                "type": "Classifier",
+                "filepath": "./models/E213-D2-LogisticRegressionDCD-2022-10-12_02-20-09.model"
+            },
+            {
+                "type": "Classifier",
+                "filepath": "./models/E213-D2-LinearSGD-2022-10-12_02-20-09.model"
+            }
+        ]
+    }
+}
