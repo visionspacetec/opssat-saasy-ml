@@ -1,0 +1,969 @@
+Oct 12, 2022 2:32:36 PM esa.mo.nmf.apps.SaaSyMLApp <init>
+INFO: Initializing the app.
+Oct 12, 2022 2:32:37 PM esa.mo.helpertools.helpers.HelperMisc loadProperties
+INFO: Loading properties file:/home/exp213/provider.properties
+Oct 12, 2022 2:32:37 PM esa.mo.helpertools.helpers.HelperMisc loadProperties
+INFO: Loading properties file:/home/exp213/settings.properties
+Oct 12, 2022 2:32:37 PM esa.mo.helpertools.helpers.HelperMisc loadProperties
+INFO: Loading properties file:/home/exp213/transport.properties
+Oct 12, 2022 2:32:38 PM esa.mo.com.impl.archive.db.DatabaseBackend startDatabaseDriver
+INFO: Attempting to establish a connection to the database:
+ >> jdbc:sqlite:comArchive.db
+Oct 12, 2022 2:32:41 PM org.ccsds.moims.mo.mal.transport.MALTransportFactory newFactory
+INFO: New transport factory registered with classname: de.dlr.gsoc.mo.malspp.transport.SPPTransportFactory
+Oct 12, 2022 2:32:41 PM org.ccsds.moims.mo.mal.transport.MALTransportFactory newFactory
+INFO: New transport factory registered with classname: esa.mo.mal.transport.tcpip.TCPIPTransportFactoryImpl
+Oct 12, 2022 2:32:42 PM org.ccsds.moims.mo.mal.encoding.MALElementStreamFactory newFactory
+INFO: New encoding factory registered with classname: esa.mo.mal.encoder.binary.fixed.FixedBinaryStreamFactory
+Oct 12, 2022 2:32:42 PM esa.mo.mal.transport.tcpip.TCPIPTransport createTransportAddress
+INFO: TCP/IP Transport address: 192.168.166.1:1024
+Oct 12, 2022 2:32:42 PM esa.mo.com.impl.provider.ArchiveProviderServiceImpl init
+INFO: Archive service READY
+Oct 12, 2022 2:32:42 PM esa.mo.com.impl.provider.EventProviderServiceImpl init
+INFO: Event service: READY
+Oct 12, 2022 2:32:42 PM esa.mo.com.impl.provider.ActivityTrackingProviderServiceImpl init
+INFO: Activity Tracking service READY
+Oct 12, 2022 2:32:43 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl init
+INFO: ArchiveSync service READY
+Oct 12, 2022 2:32:43 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl init
+INFO: Attempting to connect to Central Directory service at: maltcp://192.168.135.1:1024/nanosat-mo-supervisor-Directory
+Oct 12, 2022 2:32:43 PM esa.mo.mal.transport.gen.GENTransport manageCommunicationChannel
+INFO: Establishing connection to remote root URI: maltcp://192.168.135.1:1024
+Oct 12, 2022 2:32:43 PM esa.mo.mal.transport.tcpip.TCPIPConnectionPoolManager get
+INFO: The socket doesn't exist! Creating a new one...
+Oct 12, 2022 2:32:43 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl init
+INFO: The Central Directory service is operational!
+Oct 12, 2022 2:32:45 PM esa.mo.helpertools.clock.SystemClock setPlatformClockCallback
+INFO: Using system clock
+Oct 12, 2022 2:32:45 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl init
+INFO: Successfully connected to Platform services on: nanosat-mo-supervisor
+Oct 12, 2022 2:32:45 PM org.ccsds.moims.mo.mal.encoding.MALElementStreamFactory newFactory
+INFO: New encoding factory registered with classname: de.dlr.gsoc.mo.malspp.encoding.SPPElementStreamFactory
+Oct 12, 2022 2:32:46 PM esa.mo.mc.impl.provider.ParameterProviderServiceImpl init
+INFO: esa.nmf.parameters.storeInArchive = true
+Oct 12, 2022 2:32:46 PM esa.mo.mc.impl.provider.ParameterProviderServiceImpl init
+INFO: Parameter service READY
+Oct 12, 2022 2:32:46 PM esa.mo.mc.impl.provider.ActionProviderServiceImpl init
+INFO: Action service READY
+Oct 12, 2022 2:32:47 PM esa.mo.mc.impl.provider.AlertProviderServiceImpl init
+INFO: Alert service READY
+Oct 12, 2022 2:32:47 PM esa.mo.mc.impl.provider.AggregationProviderServiceImpl init
+INFO: esa.nmf.parameters.storeInArchive = true
+Oct 12, 2022 2:32:47 PM esa.mo.mc.impl.provider.AggregationProviderServiceImpl init
+INFO: Aggregation service READY
+Oct 12, 2022 2:32:47 PM esa.mo.common.impl.provider.DirectoryProviderServiceImpl init
+INFO: Directory service READY
+Oct 12, 2022 2:32:47 PM esa.mo.sm.impl.provider.HeartbeatProviderServiceImpl init
+INFO: Heartbeat service READY
+Oct 12, 2022 2:32:47 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl init
+INFO: Populating local Directory service...
+Oct 12, 2022 2:32:47 PM esa.mo.helpertools.helpers.HelperMisc loadProperties
+INFO: Loading properties file:/home/exp213/providerURIs.properties
+Oct 12, 2022 2:32:47 PM esa.mo.helpertools.helpers.HelperMisc loadProperties
+INFO: Loading properties file:/home/exp213/providerURIsSecondary.properties
+Oct 12, 2022 2:32:47 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl init
+INFO: Populating Central Directory service on URI: maltcp://192.168.135.1:1024/nanosat-mo-supervisor-Directory
+Oct 12, 2022 2:32:48 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl init
+INFO: Populated! And the connection to the Directory service has been successfully closed!
+Oct 12, 2022 2:32:48 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl init
+INFO: Loading previous configurations...
+Oct 12, 2022 2:32:49 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 3 chunks in total!
+Oct 12, 2022 2:32:49 PM esa.mo.nmf.MonitorAndControlNMFAdapter registerParameters
+INFO: Registering Parameters:
+Oct 12, 2022 2:32:49 PM esa.mo.nmf.MonitorAndControlNMFAdapter registerActions
+INFO: Registering Actions
+Oct 12, 2022 2:32:49 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl init
+INFO: NanoSat MO Connector initialized in 11.511 seconds!
+Oct 12, 2022 2:32:49 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl init
+INFO: URI: malspp:247/1237/11
+
+Oct 12, 2022 2:32:49 PM esa.mo.nmf.spacemoadapter.SpaceMOApdapterImpl getNMFProviderSummary
+INFO: Found nanosat-mo-supervisor provider
+Oct 12, 2022 2:32:53 PM esa.mo.common.impl.util.HelperCommon providerSummaryToConnectionConsumer
+WARNING: The service could not be found in the MAL factory. Maybe the Helper for that service was not initialized. The service key is: (area=7, service=1, version=1)
+Oct 12, 2022 2:32:53 PM esa.mo.common.impl.util.HelperCommon providerSummaryToConnectionConsumer
+WARNING: The service could not be found in the MAL factory. Maybe the Helper for that service was not initialized. The service key is: (area=7, service=3, version=1)
+Oct 12, 2022 2:32:53 PM esa.mo.common.impl.util.HelperCommon providerSummaryToConnectionConsumer
+WARNING: The service could not be found in the MAL factory. Maybe the Helper for that service was not initialized. The service key is: (area=7, service=5, version=1)
+Oct 12, 2022 2:32:53 PM esa.mo.helpertools.helpers.HelperMisc loadProperties
+INFO: Loading properties file:/home/exp213/consumer.properties
+Oct 12, 2022 2:32:53 PM esa.mo.helpertools.helpers.HelperMisc loadProperties
+INFO: Reloading properties file:/home/exp213/consumer.properties
+Oct 12, 2022 2:32:53 PM esa.mo.nmf.apps.SaaSyMLApp start
+INFO: Starting the app.
+Oct 12, 2022 2:32:57 PM esa.mo.nmf.apps.PropertiesManager loadProperties
+INFO: Loaded configuration properties from file config.properties
+Oct 12, 2022 2:32:57 PM esa.mo.nmf.apps.saasyml.api.verticles.MainVerticle deployVerticles
+INFO: Deploying Verticles
+Oct 12, 2022 2:32:58 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:32:58 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle start
+INFO: Starting a Verticle instance with deployment id e7077fda-cd61-4531-b89a-aed754f43089.
+Oct 12, 2022 2:32:58 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle start
+INFO: Starting a Verticle instance with deployment id e7077fda-cd61-4531-b89a-aed754f43089.
+Oct 12, 2022 2:32:58 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle start
+INFO: Starting a Verticle instance with deployment id e7077fda-cd61-4531-b89a-aed754f43089.
+Oct 12, 2022 2:32:58 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle start
+INFO: Starting a Verticle instance with deployment id e7077fda-cd61-4531-b89a-aed754f43089.
+Oct 12, 2022 2:32:58 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle start
+INFO: Starting a Verticle instance with deployment id e7077fda-cd61-4531-b89a-aed754f43089.
+Oct 12, 2022 2:32:59 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle connect
+INFO: Database connection created successfully.
+Oct 12, 2022 2:32:59 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle connect
+INFO: Created the training_data table.
+Oct 12, 2022 2:32:59 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle connect
+INFO: Created the labels table.
+Oct 12, 2022 2:32:59 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle connect
+INFO: Created the models table.
+Oct 12, 2022 2:33:08 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:33:17 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:33:22 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: The POST saasyml.training.data.subscribe request payload: {"expId":213,"datasetId":2,"iterations":100,"labels":{"0":true},"interval":2,"params":["GNC_0005","GNC_0011","GNC_0007","GNC_0013","GNC_0016"]}
+Oct 12, 2022 2:33:22 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: The POST saasyml.training.data.subscribe request payload: {"expId":213,"datasetId":3,"iterations":100,"labels":{"0":true},"interval":2,"params":["GNC_0005","GNC_0011","GNC_0007","GNC_0013","GNC_0016"]}
+Oct 12, 2022 2:33:22 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: The POST saasyml.training.data.subscribe request payload: {"expId":213,"datasetId":1,"iterations":100,"labels":{"0":true},"interval":2,"params":["GNC_0005","GNC_0011","GNC_0007","GNC_0013","GNC_0016"]}
+Oct 12, 2022 2:33:22 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: The POST saasyml.training.data.subscribe request payload: {"expId":213,"datasetId":5,"iterations":100,"labels":{"0":true},"interval":2,"params":["GNC_0005","GNC_0011","GNC_0007","GNC_0013","GNC_0016"]}
+Oct 12, 2022 2:33:22 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: The POST saasyml.training.data.subscribe request payload: {"expId":213,"datasetId":4,"iterations":100,"labels":{"0":true},"interval":2,"params":["GNC_0005","GNC_0011","GNC_0007","GNC_0013","GNC_0016"]}
+Oct 12, 2022 2:33:22 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] JSON payload parsed
+Oct 12, 2022 2:33:22 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] JSON payload parsed
+Oct 12, 2022 2:33:22 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] JSON payload parsed
+Oct 12, 2022 2:33:22 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] JSON payload parsed
+Oct 12, 2022 2:33:22 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Before addParamNames
+Oct 12, 2022 2:33:22 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Before addParamNames
+Oct 12, 2022 2:33:22 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Before addParamNames
+Oct 12, 2022 2:33:22 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Before addParamNames
+Oct 12, 2022 2:33:22 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] After addParamNames
+Oct 12, 2022 2:33:22 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] JSON payload parsed
+Oct 12, 2022 2:33:22 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Before createAggregationHandler
+Oct 12, 2022 2:33:22 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] After addParamNames
+Oct 12, 2022 2:33:22 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] After addParamNames
+Oct 12, 2022 2:33:22 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Before createAggregationHandler
+Oct 12, 2022 2:33:22 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Before createAggregationHandler
+Oct 12, 2022 2:33:22 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] After addParamNames
+Oct 12, 2022 2:33:22 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Before addParamNames
+Oct 12, 2022 2:33:22 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] After addParamNames
+Oct 12, 2022 2:33:22 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Before createAggregationHandler
+Oct 12, 2022 2:33:22 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Before createAggregationHandler
+Oct 12, 2022 2:33:25 PM esa.mo.nmf.apps.AggregationHandler enableSupervisorParameterSubscription
+INFO: [E213_D4]Started fetching parameters from supervisor.
+Oct 12, 2022 2:33:25 PM esa.mo.nmf.apps.AggregationHandler enableSupervisorParameterSubscription
+INFO: [E213_D3]Started fetching parameters from supervisor.
+Oct 12, 2022 2:33:25 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Created aggregation handler
+Oct 12, 2022 2:33:25 PM esa.mo.nmf.apps.AggregationHandler enableSupervisorParameterSubscription
+INFO: [E213_D2]Started fetching parameters from supervisor.
+Oct 12, 2022 2:33:25 PM esa.mo.nmf.apps.AggregationHandler enableSupervisorParameterSubscription
+INFO: [E213_D5]Started fetching parameters from supervisor.
+Oct 12, 2022 2:33:25 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Created aggregation handler
+Oct 12, 2022 2:33:25 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Created aggregation handler
+Oct 12, 2022 2:33:25 PM esa.mo.nmf.apps.AggregationHandler enableSupervisorParameterSubscription
+INFO: [E213_D1]Started fetching parameters from supervisor.
+Oct 12, 2022 2:33:25 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Created aggregation handler
+Oct 12, 2022 2:33:25 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Created aggregation handler
+Oct 12, 2022 2:33:29 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:33:38 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:33:48 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:33:58 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:34:08 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:34:18 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:34:28 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:34:38 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:34:48 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:34:58 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:35:08 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:35:18 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:35:28 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:35:38 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:35:48 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:35:58 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:36:08 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:36:18 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:36:29 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:36:38 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:36:48 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:36:58 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:37:08 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:37:19 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:37:26 PM esa.mo.nmf.apps.AggregationHandler disableSupervisorParametersSubscription
+INFO: [E213_D4]Stopped fetching parameters from supervisor.
+Oct 12, 2022 2:37:26 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$null$1
+INFO: [TRACE LOG] Disabled parameter feed
+Oct 12, 2022 2:37:26 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$null$1
+INFO: [TRACE LOG] Stop periodic check
+Oct 12, 2022 2:37:27 PM esa.mo.nmf.apps.AggregationHandler disableSupervisorParametersSubscription
+INFO: [E213_D3]Stopped fetching parameters from supervisor.
+Oct 12, 2022 2:37:27 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$null$1
+INFO: [TRACE LOG] Disabled parameter feed
+Oct 12, 2022 2:37:27 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$null$1
+INFO: [TRACE LOG] Stop periodic check
+Oct 12, 2022 2:37:28 PM esa.mo.nmf.apps.AggregationHandler disableSupervisorParametersSubscription
+INFO: [E213_D1]Stopped fetching parameters from supervisor.
+Oct 12, 2022 2:37:28 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$null$1
+INFO: [TRACE LOG] Disabled parameter feed
+Oct 12, 2022 2:37:28 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$null$1
+INFO: [TRACE LOG] Stop periodic check
+Oct 12, 2022 2:37:28 PM esa.mo.nmf.apps.AggregationHandler disableSupervisorParametersSubscription
+INFO: [E213_D5]Stopped fetching parameters from supervisor.
+Oct 12, 2022 2:37:28 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$null$1
+INFO: [TRACE LOG] Disabled parameter feed
+Oct 12, 2022 2:37:28 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:37:28 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$null$1
+INFO: [TRACE LOG] Stop periodic check
+Oct 12, 2022 2:37:29 PM esa.mo.nmf.apps.AggregationHandler disableSupervisorParametersSubscription
+INFO: [E213_D2]Stopped fetching parameters from supervisor.
+Oct 12, 2022 2:37:29 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$null$1
+INFO: [TRACE LOG] Disabled parameter feed
+Oct 12, 2022 2:37:29 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$null$1
+INFO: [TRACE LOG] Stop periodic check
+Oct 12, 2022 2:37:38 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:37:47 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:37:57 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:38:07 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:38:17 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:38:27 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:38:38 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:38:47 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:38:57 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:39:07 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: The POST saasyml.training.data.subscribe request payload: {"expId":213,"datasetId":1,"iterations":100,"labels":{"1":true},"interval":2,"params":["GNC_0005","GNC_0011","GNC_0007","GNC_0013","GNC_0016"]}
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] JSON payload parsed
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Before addParamNames
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] After addParamNames
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: The POST saasyml.training.data.subscribe request payload: {"expId":213,"datasetId":2,"iterations":100,"labels":{"1":true},"interval":2,"params":["GNC_0005","GNC_0011","GNC_0007","GNC_0013","GNC_0016"]}
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Before createAggregationHandler
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] JSON payload parsed
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Before addParamNames
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] After addParamNames
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Before createAggregationHandler
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: The POST saasyml.training.data.subscribe request payload: {"expId":213,"datasetId":3,"iterations":100,"labels":{"1":true},"interval":2,"params":["GNC_0005","GNC_0011","GNC_0007","GNC_0013","GNC_0016"]}
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: The POST saasyml.training.data.subscribe request payload: {"expId":213,"datasetId":5,"iterations":100,"labels":{"1":true},"interval":2,"params":["GNC_0005","GNC_0011","GNC_0007","GNC_0013","GNC_0016"]}
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] JSON payload parsed
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] JSON payload parsed
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Before addParamNames
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: The POST saasyml.training.data.subscribe request payload: {"expId":213,"datasetId":4,"iterations":100,"labels":{"1":true},"interval":2,"params":["GNC_0005","GNC_0011","GNC_0007","GNC_0013","GNC_0016"]}
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Before addParamNames
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] After addParamNames
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] JSON payload parsed
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] After addParamNames
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Before addParamNames
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Before createAggregationHandler
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.AggregationHandler enableSupervisorParameterSubscription
+INFO: [E213_D2]Started fetching parameters from supervisor.
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.AggregationHandler enableSupervisorParameterSubscription
+INFO: [E213_D1]Started fetching parameters from supervisor.
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Before createAggregationHandler
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] After addParamNames
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Created aggregation handler
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Created aggregation handler
+Oct 12, 2022 2:39:08 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Before createAggregationHandler
+Oct 12, 2022 2:39:09 PM esa.mo.nmf.apps.AggregationHandler enableSupervisorParameterSubscription
+INFO: [E213_D3]Started fetching parameters from supervisor.
+Oct 12, 2022 2:39:09 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Created aggregation handler
+Oct 12, 2022 2:39:09 PM esa.mo.nmf.apps.AggregationHandler enableSupervisorParameterSubscription
+INFO: [E213_D4]Started fetching parameters from supervisor.
+Oct 12, 2022 2:39:09 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Created aggregation handler
+Oct 12, 2022 2:39:09 PM esa.mo.nmf.apps.AggregationHandler enableSupervisorParameterSubscription
+INFO: [E213_D5]Started fetching parameters from supervisor.
+Oct 12, 2022 2:39:09 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$start$3
+INFO: [TRACE LOG] Created aggregation handler
+Oct 12, 2022 2:39:18 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:39:28 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:40:07 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:40:18 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:40:28 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:40:38 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:40:48 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:40:58 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:41:08 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:41:18 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:41:28 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:41:38 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:41:48 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:41:58 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:42:08 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:42:18 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:42:28 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:42:28 PM esa.mo.nmf.apps.AggregationHandler disableSupervisorParametersSubscription
+INFO: [E213_D1]Stopped fetching parameters from supervisor.
+Oct 12, 2022 2:42:28 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$null$1
+INFO: [TRACE LOG] Disabled parameter feed
+Oct 12, 2022 2:42:28 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$null$1
+INFO: [TRACE LOG] Stop periodic check
+Oct 12, 2022 2:42:29 PM esa.mo.nmf.apps.AggregationHandler disableSupervisorParametersSubscription
+INFO: [E213_D2]Stopped fetching parameters from supervisor.
+Oct 12, 2022 2:42:29 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$null$1
+INFO: [TRACE LOG] Disabled parameter feed
+Oct 12, 2022 2:42:29 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$null$1
+INFO: [TRACE LOG] Stop periodic check
+Oct 12, 2022 2:42:29 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$null$1
+INFO: [TRACE LOG] Disabled parameter feed
+Oct 12, 2022 2:42:29 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$null$1
+INFO: [TRACE LOG] Stop periodic check
+Oct 12, 2022 2:42:30 PM esa.mo.nmf.apps.AggregationHandler disableSupervisorParametersSubscription
+INFO: [E213_D3]Stopped fetching parameters from supervisor.
+Oct 12, 2022 2:42:30 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$null$1
+INFO: [TRACE LOG] Disabled parameter feed
+Oct 12, 2022 2:42:30 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$null$1
+INFO: [TRACE LOG] Stop periodic check
+Oct 12, 2022 2:42:30 PM esa.mo.nmf.apps.AggregationHandler disableSupervisorParametersSubscription
+INFO: [E213_D4]Stopped fetching parameters from supervisor.
+Oct 12, 2022 2:42:30 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$null$1
+INFO: [TRACE LOG] Disabled parameter feed
+Oct 12, 2022 2:42:30 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$null$1
+INFO: [TRACE LOG] Stop periodic check
+Oct 12, 2022 2:42:31 PM esa.mo.nmf.apps.AggregationHandler disableSupervisorParametersSubscription
+INFO: [E213_D5]Stopped fetching parameters from supervisor.
+Oct 12, 2022 2:42:31 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$null$1
+INFO: [TRACE LOG] Disabled parameter feed
+Oct 12, 2022 2:42:31 PM esa.mo.nmf.apps.saasyml.api.verticles.FetchTrainingDataVerticle lambda$null$1
+INFO: [TRACE LOG] Stop periodic check
+Oct 12, 2022 2:42:38 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:42:47 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:42:57 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:43:07 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:43:17 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:43:27 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:43:37 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:43:47 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:43:57 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:44:07 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:44:17 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:44:27 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:44:37 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:44:47 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:44:49 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:49 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:49 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:49 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:49 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:50 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:50 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:50 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:50 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:50 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:50 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:50 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:50 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:50 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:50 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:50 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:50 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:50 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:50 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:50 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:50 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:50 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:50 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:50 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:50 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:50 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:50 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:51 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:51 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:51 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:51 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:51 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:51 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:51 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:51 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:51 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:51 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:51 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:51 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:51 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:51 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:51 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:51 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:51 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:51 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:51 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:52 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:52 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:52 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:52 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:52 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:44:53 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:53 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:54 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:54 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:54 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:55 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:56 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:57 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:57 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 1)
+Oct 12, 2022 2:44:57 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:44:57 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 1)
+Oct 12, 2022 2:44:57 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 1)
+Oct 12, 2022 2:44:57 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 2)
+Oct 12, 2022 2:44:58 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:44:58 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 2)
+Oct 12, 2022 2:44:58 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 1)
+Oct 12, 2022 2:44:59 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 1)
+Oct 12, 2022 2:44:59 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 2)
+Oct 12, 2022 2:44:59 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 2)
+Oct 12, 2022 2:44:59 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 2)
+Oct 12, 2022 2:45:00 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 3)
+Oct 12, 2022 2:45:01 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 1)
+Oct 12, 2022 2:45:02 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 2)
+Oct 12, 2022 2:45:02 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 3)
+Oct 12, 2022 2:45:02 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 3)
+Oct 12, 2022 2:45:03 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 4)
+Oct 12, 2022 2:45:03 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 3)
+Oct 12, 2022 2:45:03 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 3)
+Oct 12, 2022 2:45:03 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 4)
+Oct 12, 2022 2:45:05 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 3)
+Oct 12, 2022 2:45:05 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 4)
+Oct 12, 2022 2:45:05 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 4)
+Oct 12, 2022 2:45:05 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 4)
+Oct 12, 2022 2:45:05 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 4)
+Oct 12, 2022 2:45:05 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 5)
+Oct 12, 2022 2:45:05 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 5)
+Oct 12, 2022 2:45:05 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 5)
+Oct 12, 2022 2:45:05 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 5)
+Oct 12, 2022 2:45:05 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 5)
+Oct 12, 2022 2:45:05 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 5)
+Oct 12, 2022 2:45:07 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:45:17 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:45:27 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:45:29 PM esa.mo.nmf.apps.saasyml.api.verticles.MainVerticle fetchTrainingModels
+INFO: [TRACE LOG] Fetch training models
+Oct 12, 2022 2:45:29 PM esa.mo.nmf.apps.saasyml.api.verticles.MainVerticle fetchTrainingModels
+INFO: [TRACE LOG] Fetch training models
+Oct 12, 2022 2:45:30 PM esa.mo.nmf.apps.saasyml.api.verticles.MainVerticle fetchTrainingModels
+INFO: [TRACE LOG] Fetch training models
+Oct 12, 2022 2:45:30 PM esa.mo.nmf.apps.saasyml.api.verticles.MainVerticle fetchTrainingModels
+INFO: [TRACE LOG] Fetch training models
+Oct 12, 2022 2:45:30 PM esa.mo.nmf.apps.saasyml.api.verticles.MainVerticle fetchTrainingModels
+INFO: [TRACE LOG] Fetch training models
+Oct 12, 2022 2:45:30 PM esa.mo.nmf.apps.saasyml.api.verticles.MainVerticle fetchTrainingModels
+INFO: [TRACE LOG] Fetch training models
+Oct 12, 2022 2:45:30 PM esa.mo.nmf.apps.saasyml.api.verticles.MainVerticle fetchTrainingModels
+INFO: [TRACE LOG] Fetch training models
+Oct 12, 2022 2:45:30 PM esa.mo.nmf.apps.saasyml.api.verticles.MainVerticle fetchTrainingModels
+INFO: [TRACE LOG] Fetch training models
+Oct 12, 2022 2:45:30 PM esa.mo.nmf.apps.saasyml.api.verticles.MainVerticle fetchTrainingModels
+INFO: [TRACE LOG] Fetch training models
+Oct 12, 2022 2:45:30 PM esa.mo.nmf.apps.saasyml.api.verticles.MainVerticle fetchTrainingModels
+INFO: [TRACE LOG] Fetch training models
+Oct 12, 2022 2:45:37 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:45:43 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:43 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:43 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:43 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:43 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:43 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:43 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:43 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:43 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:43 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:43 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:43 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:43 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:43 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:43 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:43 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:44 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:44 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:44 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:44 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:44 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:44 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:44 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:44 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:44 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:44 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:44 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:44 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:44 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:44 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:44 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:45 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:45 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 1)
+Oct 12, 2022 2:45:45 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:46 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:46 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:46 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:46 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:46 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:46 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:46 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$start$4
+INFO: Started training.classifier
+Oct 12, 2022 2:45:46 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:46 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:46 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:46 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 1)
+Oct 12, 2022 2:45:46 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:46 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:46 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:46 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:46 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:46 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:46 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:46 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:46 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:46 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:46 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:47 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:47 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 1)
+Oct 12, 2022 2:45:47 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:47 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:47 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:47 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:47 PM esa.mo.nmf.apps.saasyml.api.verticles.TrainModelVerticle lambda$null$3
+INFO: Trained model will be stored in the filesystem and referenced from the database once training is complete.
+Oct 12, 2022 2:45:47 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:45:48 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 1)
+Oct 12, 2022 2:45:49 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 1)
+Oct 12, 2022 2:45:49 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 2)
+Oct 12, 2022 2:45:50 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 1)
+Oct 12, 2022 2:45:51 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 2)
+Oct 12, 2022 2:45:54 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 2)
+Oct 12, 2022 2:45:55 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 3)
+Oct 12, 2022 2:45:56 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 2)
+Oct 12, 2022 2:45:56 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 3)
+Oct 12, 2022 2:45:56 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 2)
+Oct 12, 2022 2:45:56 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 2)
+Oct 12, 2022 2:45:56 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 3)
+Oct 12, 2022 2:45:56 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 4)
+Oct 12, 2022 2:45:56 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 4)
+Oct 12, 2022 2:45:56 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 4)
+Oct 12, 2022 2:45:56 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 3)
+Oct 12, 2022 2:45:56 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 3)
+Oct 12, 2022 2:45:56 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 5)
+Oct 12, 2022 2:45:56 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 5)
+Oct 12, 2022 2:45:56 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 3)
+Oct 12, 2022 2:45:56 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 4)
+Oct 12, 2022 2:45:56 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 4)
+Oct 12, 2022 2:45:56 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 4)
+Oct 12, 2022 2:45:56 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 5)
+Oct 12, 2022 2:45:56 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 5)
+Oct 12, 2022 2:45:56 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 5)
+Oct 12, 2022 2:45:56 PM esa.mo.nmf.apps.saasyml.api.verticles.DatabaseVerticle lambda$start$10
+INFO: Saved model metadata for (expId, datasetId) = (213, 5)
+Oct 12, 2022 2:45:58 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:46:07 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:46:17 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:46:26 PM esa.mo.nmf.apps.saasyml.api.verticles.MainVerticle fetchTrainingModels
+INFO: [TRACE LOG] Fetch training models
+Oct 12, 2022 2:46:26 PM esa.mo.nmf.apps.saasyml.api.verticles.MainVerticle fetchTrainingModels
+INFO: [TRACE LOG] Fetch training models
+Oct 12, 2022 2:46:26 PM esa.mo.nmf.apps.saasyml.api.verticles.MainVerticle fetchTrainingModels
+INFO: [TRACE LOG] Fetch training models
+Oct 12, 2022 2:46:26 PM esa.mo.nmf.apps.saasyml.api.verticles.MainVerticle fetchTrainingModels
+INFO: [TRACE LOG] Fetch training models
+Oct 12, 2022 2:46:26 PM esa.mo.nmf.apps.saasyml.api.verticles.MainVerticle fetchTrainingModels
+INFO: [TRACE LOG] Fetch training models
+Oct 12, 2022 2:46:26 PM esa.mo.nmf.apps.saasyml.api.verticles.MainVerticle fetchTrainingModels
+INFO: [TRACE LOG] Fetch training models
+Oct 12, 2022 2:46:26 PM esa.mo.nmf.apps.saasyml.api.verticles.MainVerticle fetchTrainingModels
+INFO: [TRACE LOG] Fetch training models
+Oct 12, 2022 2:46:26 PM esa.mo.nmf.apps.saasyml.api.verticles.MainVerticle fetchTrainingModels
+INFO: [TRACE LOG] Fetch training models
+Oct 12, 2022 2:46:27 PM esa.mo.nmf.apps.saasyml.api.verticles.MainVerticle fetchTrainingModels
+INFO: [TRACE LOG] Fetch training models
+Oct 12, 2022 2:46:27 PM esa.mo.nmf.apps.saasyml.api.verticles.MainVerticle fetchTrainingModels
+INFO: [TRACE LOG] Fetch training models
+Oct 12, 2022 2:46:27 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:46:37 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:46:47 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:46:57 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:47:07 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:47:17 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:47:27 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:47:37 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:47:47 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:47:57 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:48:07 PM esa.mo.nmf.apps.saasyml.api.verticles.InferenceVerticle lambda$start$2
+INFO: Started saasyml.inference
+Oct 12, 2022 2:48:07 PM esa.mo.nmf.apps.saasyml.api.verticles.InferenceVerticle lambda$start$2
+INFO: Stoped saasyml.inference
+Oct 12, 2022 2:48:07 PM esa.mo.nmf.apps.saasyml.api.verticles.InferenceVerticle lambda$start$2
+INFO: Started saasyml.inference
+Oct 12, 2022 2:48:07 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:48:07 PM esa.mo.nmf.apps.saasyml.api.verticles.InferenceVerticle lambda$start$2
+INFO: Stoped saasyml.inference
+Oct 12, 2022 2:48:07 PM esa.mo.nmf.apps.saasyml.api.verticles.InferenceVerticle lambda$start$2
+INFO: Started saasyml.inference
+Oct 12, 2022 2:48:08 PM esa.mo.nmf.apps.saasyml.api.verticles.InferenceVerticle lambda$start$2
+INFO: Stoped saasyml.inference
+Oct 12, 2022 2:48:09 PM esa.mo.nmf.apps.saasyml.api.verticles.InferenceVerticle lambda$start$2
+INFO: Started saasyml.inference
+Oct 12, 2022 2:48:09 PM esa.mo.nmf.apps.saasyml.api.verticles.InferenceVerticle lambda$start$2
+INFO: Stoped saasyml.inference
+Oct 12, 2022 2:48:09 PM esa.mo.nmf.apps.saasyml.api.verticles.InferenceVerticle lambda$start$2
+INFO: Started saasyml.inference
+Oct 12, 2022 2:48:10 PM esa.mo.nmf.apps.saasyml.api.verticles.InferenceVerticle lambda$start$2
+INFO: Stoped saasyml.inference
+Oct 12, 2022 2:48:27 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:48:37 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:48:47 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:48:57 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:49:07 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:49:17 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:49:27 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:49:37 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:49:47 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:49:57 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:50:07 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:50:17 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:50:27 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:50:37 PM esa.mo.com.impl.provider.ArchiveSyncProviderServiceImpl$Dispatcher flushData
+INFO: Objects were successfully flushed! 0 chunks in total!
+Oct 12, 2022 2:50:38 PM esa.mo.nmf.nanosatmoconnector.CloseAppEventListener onDataReceived
+INFO: New StopApp Event Received! For provider: 'App: exp213' (Related link: 1,237)
+Oct 12, 2022 2:50:39 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl closeGracefully
+INFO: Publishing event to uri: maltcp://192.168.166.1:1024/exp213-Event
+Oct 12, 2022 2:50:39 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl closeGracefully
+INFO: Triggering the closeAppAdapter of the app business logic...
+Oct 12, 2022 2:50:39 PM esa.mo.nmf.apps.AppMCAdapter onClose
+INFO: Closed application successfully.
+Oct 12, 2022 2:50:39 PM esa.mo.mal.transport.tcpip.TCPIPTransport close
+INFO: Closing TCPIPTransport...
+Oct 12, 2022 2:50:39 PM esa.mo.mal.transport.tcpip.TCPIPConnectionPoolManager close
+INFO: Closing client sockets...
+Oct 12, 2022 2:50:39 PM esa.mo.mal.transport.gen.util.GENMessagePoller run
+INFO: Client closing connection: maltcp://192.168.135.1:1024
+Oct 12, 2022 2:50:39 PM esa.mo.mal.transport.gen.sending.GENConcurrentMessageSender terminate
+INFO: Terminating all processing threads for sender for URI:maltcp://192.168.135.1:1024
+Oct 12, 2022 2:50:39 PM esa.mo.mal.transport.gen.GENTransport closeConnection
+WARNING: Could not locate associated data channel to close communications, perhaps it was closed before. URI : maltcp://192.168.135.1:1024 
+Oct 12, 2022 2:50:39 PM de.dlr.gsoc.mo.malspp.transport.SPPTransport$2 run
+INFO: The Space Packet receive thread has been interrupted.
+Oct 12, 2022 2:50:39 PM esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl closeGracefully
+INFO: Success! The currently running Java Virtual Machine will now terminate. (App closed in: 592 ms)
+
