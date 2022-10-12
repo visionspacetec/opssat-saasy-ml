@@ -34,6 +34,8 @@
     
     $ git submodule update
     
+    $ cd JSAT/
+    
     $ mvn install
 
 You can skip the test of maven with the following command:
