@@ -1,6 +1,8 @@
 #!/bin/sh
 echo "Running test train classifier models no thread"
 
+sleep 1
+
 # experimenter id 213
 
 

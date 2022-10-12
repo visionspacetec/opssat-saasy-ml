@@ -23,6 +23,9 @@ public class ApplicationManager {
 
     // map to track the label (expected output) for the requested data
     private Map<Pair<Integer, Integer>, Map<String, Boolean>> labelMap;
+
+    // map to track the label pluglins
+    private Map<Pair<Integer, Integer>, String> labelPluginMap;
     
     // map that contains all instances of aggregation handlers
     private Map<Pair<Integer, Integer>, AggregationHandler> aggregationHandlerMap;
@@ -33,6 +36,7 @@ public class ApplicationManager {
         this.paramNamesMap = new ConcurrentHashMap<Pair<Integer, Integer>, List<String>>();
         this.paramIdsMap = new ConcurrentHashMap<Pair<Integer, Integer>, LongList>();
         this.labelMap = new ConcurrentHashMap<Pair<Integer, Integer>, Map<String, Boolean>>();
+        this.labelPluginMap = new ConcurrentHashMap<Pair<Integer, Integer>, String>();
         this.aggregationHandlerMap = new ConcurrentHashMap<Pair<Integer, Integer>, AggregationHandler>();
     }
 
@@ -78,6 +82,15 @@ public class ApplicationManager {
 
     public Map<String, Boolean> getLabels(int expId, int datasetId) {
         return this.labelMap.get(new Pair<Integer, Integer>(expId, datasetId));
+    }
+
+    public synchronized void addLabelPlugin(int expId, int datasetId, String labelPlugin) {
+        this.labelPluginMap.put(new Pair<Integer, Integer>(expId, datasetId), labelPlugin);
+    }
+
+    public String getLabelPlugin(int expId, int datasetId) {
+        String labelPlugin = this.labelPluginMap.get(new Pair<Integer, Integer>(expId, datasetId));
+        return labelPlugin.equals("null")?null:labelPlugin;
     }
 
     public void addAggregationHandler(int expId, int datasetId, AggregationHandler aggregationHandler) {

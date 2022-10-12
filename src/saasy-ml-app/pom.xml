@@ -69,8 +69,9 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
+  
   <dependencies>
+
     <!-- NMF Dependencies -->
     <dependency>
       <groupId>int.esa.nmf.core</groupId>
@@ -114,6 +115,19 @@
       <version>3.32.3.2</version>
     </dependency>
 
+    <!-- pf4j -->
+    <dependency>
+      <groupId>org.pf4j</groupId>
+      <artifactId>pf4j</artifactId>
+      <version>3.7.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>esa.mo.nmf.apps.saasyml.plugins</groupId>
+      <artifactId>saasyml-ml-app-plugins-api</artifactId>
+      <version>1.0.0</version>
+    </dependency> 
+
     <!-- MLPipeline Layer -->
     <dependency>
       <groupId>int.esa.nmf.sdk.space.saasyml</groupId>
@@ -122,12 +136,12 @@
       <scope>compile</scope>
     </dependency>
 
-    <!-- Thanks for using https://jar-download.com -->
+    <!-- Thanks for using https://jar-download.com 
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-base</artifactId>
       <version>11</version>
-    </dependency>    
+    </dependency>  -->  
 
   </dependencies>
   <build>

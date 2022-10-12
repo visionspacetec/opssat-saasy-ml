@@ -1,5 +1,7 @@
 :: Set variables
 SET PIPELINE_DIR=<FULL_PATH>\opssat-saasy-ml\src\saasy-ml-layer-pipeline
+SET PLUGINS_API_DIR=C:\Users\VST\git\vspace\opssat\saasy-ml\opssat-saasy-ml\src\saasy-ml-app-plugins-api
+SET PLUGINS_DIR=C:\Users\VST\git\vspace\opssat\saasy-ml\opssat-saasy-ml\src\saasy-ml-app-plugins
 SET PROJECT_DIR=<FULL_PATH>\opssat-saasy-ml\src\saasy-ml-app
 SET NMF_SDK_PACKAGE_DIR=<FULL_PATH>\opssat-saasy-ml-nanosat-mo-framework\sdk\sdk-package
 
@@ -9,6 +11,14 @@ if "%~1"=="" SET RUN_FLAG=0
 
 :: Build the ML pipeline
 CD %PIPELINE_DIR%
+CALL mvn clean install
+
+:: Build the Plugins API
+CD %PLUGINS_API_DIR%
+CALL mvn clean install
+
+:: Build the example Plugins
+CD %PLUGINS_DIR%
 CALL mvn clean install
 
 :: Build the app

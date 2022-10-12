@@ -580,7 +580,7 @@ public class DatabaseVerticle extends AbstractVerticle {
         }
 
         // if code execution reaches here it means that not label was given for a training dataset input, log it as an error
-        LOGGER.log(Level.WARNING, "Expected label was not set so training dataset input will discarded as model training input");
+        LOGGER.log(Level.WARNING, "Expected label was not set so training dataset input will be discarded as a model training input");
     }
 
     /**

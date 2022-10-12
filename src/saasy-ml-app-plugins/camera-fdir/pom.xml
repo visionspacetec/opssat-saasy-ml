@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>esa.mo.nmf.apps.saasyml.plugins</groupId>
+        <artifactId>saasy-ml-app-plugins</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>saasyml-app-plugin-camera-fdir</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+    <name>SaaSyML Plugin - Camera FDIR</name>
+
+    <properties>
+        <plugin.id>camera-fdir-plugin</plugin.id>
+        <plugin.class>esa.mo.nmf.apps.saasyml.plugins.CameraFdirPlugin</plugin.class>
+        <plugin.version>0.0.1</plugin.version>
+        <plugin.provider>Tanagra Space</plugin.provider>
+        <plugin.dependencies />
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.pf4j</groupId>
+            <artifactId>pf4j</artifactId>
+            <version>3.7.0</version>
+            <!-- !!! VERY IMPORTANT -->
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>esa.mo.nmf.apps.saasyml.plugins</groupId>
+            <artifactId>saasyml-ml-app-plugins-api</artifactId>
+            <version>1.0.0</version>
+            <!-- !!! VERY IMPORTANT -->
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+</project>
