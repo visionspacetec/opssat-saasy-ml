@@ -1,0 +1,1 @@
+{  "response" : "Training the model(s) has been triggered. Query the /api/v1/download/models endpoint for training status."}

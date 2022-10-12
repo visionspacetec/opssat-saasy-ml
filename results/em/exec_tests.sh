@@ -33,7 +33,7 @@ read -rsn1 -p"Press any key to continue";echo
 # Get classifier models with thread
 { ./exec_test_5_get_classifier_models.sh "$1" "$2" "$3" "-thread"; } 2> "$1"/"$2"/train/results_time_get_classifier_models_thread.txt
 
-read -rsn1 -p"Press any key to continue";echo
+read -rsn1 -p"Press any key to continue with the inference";echo
 
 # Inference
-# { ./exec_test_6_inference.sh "$1" "$2" "$3" ; } 2> "$1"/"$2"/inference/results_time_inference.txt
+{ ./exec_test_6_inference.sh "$1" "$2" "$3" ; } 2> "$1"/"$2"/inference/results_time_inference.txt
