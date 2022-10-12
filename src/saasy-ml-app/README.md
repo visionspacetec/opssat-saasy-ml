@@ -5,7 +5,6 @@ An NMF App for the OPS-SAT spacecraft. The app uses ML to train AI models with t
 # Table of Content
 
 - [Requirements](#requirements)
-- [Prerequisite Install](#prerequisite-install)
 - [Quick Install](#quick-install)
 - [Long Install](#long-install)
 - [Run App](#run-app)
@@ -34,12 +33,6 @@ Java version: 1.8.0_312, vendor: Private Build
 Default locale: en, platform encoding: UTF-8
 OS name: "linux", version: "5.10.16.3-microsoft-standard-wsl2", arch: "amd64", family: "unix"
 ```
-
-## Prequisite Install
-Do a `mvn clean install` of the following projects in `opssat-saasy-ml/src/saasy-ml-app`:
-- saasy-ml-layer-pipeline
-- saasy-ml-app-plugins-api
-- saasy-ml-app-plugins
 
 ## Quick Install
 
@@ -341,7 +334,7 @@ In some cases, clients generate their own training data to send to the app to tr
 http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/data/save
 ```
 
-Sample payload:
+Sample payload (The training parameter is optional and used to auto-trigger training the model(s)):
 
 ```json
 {
@@ -423,8 +416,6 @@ Sample payload:
 ```
 
 Sample payload with label values (expected output) provided by the client:
-
-**TODO:** This is not supported.
 
 ```json
 {
@@ -510,7 +501,154 @@ Sample payload with label values (expected output) provided by the client:
 }
 ```
 
-The training parameter is optional and used to auto-trigger training the model(s).
+Sample payload with the label extension provided by the client:
+
+```json
+{
+    "expId": 123,
+    "datasetId": 2,
+    "labelsPlugin": "esa.mo.nmf.apps.saasyml.plugins.CameraStateLabels",
+    "data": [
+        [
+            {
+                "name": "CADC0894",
+                "value": "0.0",
+                "dataType": 4,
+                "timestamp": 1656803525000
+            }
+        ],
+        [
+            {
+                "name": "CADC0894",
+                "value": "0.1",
+                "dataType": 4,
+                "timestamp": 1656804525000
+            }
+        ],
+        [
+            {
+                "name": "CADC0894",
+                "value": "0.2",
+                "dataType": 4,
+                "timestamp": 1656805525000
+            }
+        ],
+        [
+            {
+                "name": "CADC0894",
+                "value": "0.2",
+                "dataType": 4,
+                "timestamp": 1656806525000
+            }
+        ],
+        [
+            {
+                "name": "CADC0894",
+                "value": "0.3",
+                "dataType": 4,
+                "timestamp": 1656807525000
+            }
+        ],
+        [
+            {
+                "name": "CADC0894",
+                "value": "0.4",
+                "dataType": 4,
+                "timestamp": 1656808525000
+            }
+        ],
+        [
+            {
+                "name": "CADC0894",
+                "value": "0.5",
+                "dataType": 4,
+                "timestamp": 1656809525000
+            }
+        ],
+        [
+            {
+                "name": "CADC0894",
+                "value": "0.6",
+                "dataType": 4,
+                "timestamp": 1656810525000
+            }
+        ],
+        [
+            {
+                "name": "CADC0894",
+                "value": "0.7",
+                "dataType": 4,
+                "timestamp": 1656811525000
+            }
+        ],
+        [
+            {
+                "name": "CADC0894",
+                "value": "0.8",
+                "dataType": 4,
+                "timestamp": 1656812525000
+            }
+        ],
+        [
+            {
+                "name": "CADC0894",
+                "value": "0.9",
+                "dataType": 4,
+                "timestamp": 1656813525000
+            }
+        ],
+        [
+            {
+                "name": "CADC0894",
+                "value": "1.0",
+                "dataType": 4,
+                "timestamp": 1656814525000
+            }
+        ],
+        [
+            {
+                "name": "CADC0894",
+                "value": "1.1",
+                "dataType": 4,
+                "timestamp": 1656815525000
+            }
+        ],
+        [
+            {
+                "name": "CADC0894",
+                "value": "1.2",
+                "dataType": 4,
+                "timestamp": 1656816525000
+            }
+        ],
+        [
+            {
+                "name": "CADC0894",
+                "value": "1.3",
+                "dataType": 4,
+                "timestamp": 1656817525000
+            }
+        ],
+        [
+            {
+                "name": "CADC0894",
+                "value": "1.4",
+                "dataType": 4,
+                "timestamp": 1656818525000
+            }
+        ],
+        [
+            {
+                "name": "CADC0894",
+                "value": "1.5",
+                "dataType": 4,
+                "timestamp": 1656819525000
+            }
+        ]
+    ]
+}
+```
+
 
 ### Delete data
 

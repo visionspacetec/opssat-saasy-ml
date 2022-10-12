@@ -25,7 +25,7 @@ public class ApplicationManager {
     private Map<Pair<Integer, Integer>, Map<String, Boolean>> labelMap;
 
     // map to track the label pluglins
-    private Map<Pair<Integer, Integer>, String> labelPluginMap;
+    private Map<Pair<Integer, Integer>, String> extensionClasspathMap;
     
     // map that contains all instances of aggregation handlers
     private Map<Pair<Integer, Integer>, AggregationHandler> aggregationHandlerMap;
@@ -36,7 +36,7 @@ public class ApplicationManager {
         this.paramNamesMap = new ConcurrentHashMap<Pair<Integer, Integer>, List<String>>();
         this.paramIdsMap = new ConcurrentHashMap<Pair<Integer, Integer>, LongList>();
         this.labelMap = new ConcurrentHashMap<Pair<Integer, Integer>, Map<String, Boolean>>();
-        this.labelPluginMap = new ConcurrentHashMap<Pair<Integer, Integer>, String>();
+        this.extensionClasspathMap = new ConcurrentHashMap<Pair<Integer, Integer>, String>();
         this.aggregationHandlerMap = new ConcurrentHashMap<Pair<Integer, Integer>, AggregationHandler>();
     }
 
@@ -84,13 +84,13 @@ public class ApplicationManager {
         return this.labelMap.get(new Pair<Integer, Integer>(expId, datasetId));
     }
 
-    public synchronized void addLabelPlugin(int expId, int datasetId, String labelPlugin) {
-        this.labelPluginMap.put(new Pair<Integer, Integer>(expId, datasetId), labelPlugin);
+    public synchronized void addExtensionClasspath(int expId, int datasetId, String extensionClasspath) {
+        this.extensionClasspathMap.put(new Pair<Integer, Integer>(expId, datasetId), extensionClasspath);
     }
 
-    public String getLabelPlugin(int expId, int datasetId) {
-        String labelPlugin = this.labelPluginMap.get(new Pair<Integer, Integer>(expId, datasetId));
-        return labelPlugin.equals("null")?null:labelPlugin;
+    public String getExtentionClasspath(int expId, int datasetId) {
+        String extensionClasspath = this.extensionClasspathMap.get(new Pair<Integer, Integer>(expId, datasetId));
+        return extensionClasspath.equals("null")?null:extensionClasspath;
     }
 
     public void addAggregationHandler(int expId, int datasetId, AggregationHandler aggregationHandler) {

@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Context;
@@ -28,6 +30,7 @@ import java.sql.Timestamp;
 import org.sqlite.SQLiteConfig;
 
 import esa.mo.nmf.apps.ApplicationManager;
+import esa.mo.nmf.apps.ExtensionManager;
 import esa.mo.nmf.apps.saasyml.api.Constants;
 import esa.mo.nmf.apps.saasyml.api.utils.Pair;
 import esa.mo.nmf.apps.PropertiesManager;
@@ -162,23 +165,36 @@ public class DatabaseVerticle extends AbstractVerticle {
             final int datasetId = payload.getInteger(Constants.KEY_DATASETID).intValue();
             final JsonArray data = payload.getJsonArray(Constants.KEY_DATA);
 
+            // get the extension classpath if it has been set so we know to calculate expected labels if they rely on a plugin
+            String extensionClasspath = ApplicationManager.getInstance().getExtentionClasspath(expId, datasetId);
+
+            // create map of param name and double values in case we need it for the plugin
+            Map<String, Double> extensionInputMap = new HashMap<String, Double>();
+
+            // the expected labels retrived from the extension
+            LinkedHashMap<Long, Map<String, Boolean>> expectedLabelsExtMap = new LinkedHashMap<Long, Map<String, Boolean>>();
+
             List<Pair<Integer, String>> paramValues = new ArrayList<Pair<Integer, String>>();
             List<String> paramNames = new ArrayList<String>();
-            List<Long> timestamps = new ArrayList<Long>();
+            List<Long> paramTimestamps = new ArrayList<Long>();
+            Long currentParamTimestamp = null;
 
-            // TODO: Labels are not being considered
-
-            // the prepared statement
-            PreparedStatement prep = null;
-
+            // collect timestamps for the labels table
+            List<Long> labelTimestamps = new ArrayList<Long>();
+            Long currentLabelTimestamp = null;
+   
             try { 
 
                 // fetch data
-                data.forEach(dataset -> {
-                    JsonArray ds = (JsonArray) dataset;
+                for(int i = 0; i < data.size(); i++){
+                    JsonArray ds = data.getJsonArray(i);
 
-                    ds.forEach(param -> {
-                        JsonObject p = (JsonObject) param;
+                    // reset labels timestamp flags
+                    currentParamTimestamp = null;
+                    currentLabelTimestamp = null;
+
+                    for(int j = 0; j < ds.size(); j++){
+                        JsonObject p = ds.getJsonObject(j);
 
                         // parameter name
                         paramNames.add(p.getString(Constants.KEY_NAME));
@@ -188,10 +204,50 @@ public class DatabaseVerticle extends AbstractVerticle {
                         String value = p.getString(Constants.KEY_VALUE);
                         paramValues.add(new Pair<Integer, String>(dataType, value));
                         
-                        // the timestamp
-                        timestamps.add(p.getLong(Constants.KEY_TIMESTAMP));
-                    });
-                });
+                        // fetch the param timestamp in milliseconds
+                        // if no timestamp is given then set one
+                        if(currentParamTimestamp == null){
+                            if(p.containsKey(Constants.KEY_TIMESTAMP)){
+                                currentParamTimestamp = p.getLong(Constants.KEY_TIMESTAMP);
+                            }else {
+                                // FIXME: inconsistent time value storage, millisecond vs nanoseconds
+                                // if we have to set our own time then it needs to be in nanoseconds
+                                // this is because we want to make sure each timestamp value is unique
+                                currentParamTimestamp = System.nanoTime();
+                            }
+                        }
+
+                        paramTimestamps.add(currentParamTimestamp);
+
+                        // set the label timestamp if it has not been set
+                        if(currentLabelTimestamp == null){
+                            currentLabelTimestamp = currentParamTimestamp;
+                            labelTimestamps.add(currentLabelTimestamp);
+                        }
+
+                        if(extensionClasspath != null){
+                            try {
+                                // populate extension input map
+                                extensionInputMap.put(p.getString(Constants.KEY_NAME), new Double(p.getString(Constants.KEY_VALUE)));
+                            } catch (Exception e) {
+                                extensionInputMap.clear();
+                                LOGGER.log(Level.SEVERE, "The expected labels plugin cannot be invoked because the fetched parameter values are uncastable to the Double type", e);
+                            }  
+                        }
+                    }
+
+                    // If we are meant to fetch the expected labels from a plugin then do that now
+                    if(!extensionInputMap.isEmpty()){
+                        Map<String, Boolean> expLbls = ExtensionManager.getInstance().getExpectedLabels(expId, datasetId, extensionInputMap);
+                        if(expLbls != null){
+                            expectedLabelsExtMap.put(currentLabelTimestamp, expLbls);
+                            extensionInputMap.clear();
+                        }else{
+                            LOGGER.log(Level.SEVERE, "Could not retrieve expected label from extension " + extensionClasspath + ". The fetched training data will be persisted without expected labels.");
+                        }
+                    }
+
+                }
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Error preparing training data and labels to insert into the database.", e);
 
@@ -200,27 +256,47 @@ public class DatabaseVerticle extends AbstractVerticle {
                 return;
             }
 
+            
+            // the prepared statement
+            PreparedStatement prep = null;
+
             // create the prepared statement and execute
             try {
 
                 // no commit per statement
                 this.conn.setAutoCommit(false);
 
-                // insert training data
+                // init the prepared statement to insert training data
                 prep = this.conn.prepareStatement(
                     SQL_INSERT_TRAINING_DATA
                 );
 
-                this.setInsertTrainingDataPreparedStatementParameters(prep, expId, datasetId, paramNames, paramValues, timestamps);
+                this.setInsertTrainingDataPreparedStatementParameters(prep, expId, datasetId, paramNames, paramValues, paramTimestamps);
                 prep.executeBatch();
                 prep.close();
 
-                // insert labels
+                // re-init the prepared statement to insert labels
                 prep = this.conn.prepareStatement(
                     SQL_INSERT_LABELS
                 );
 
-                this.setInsertLabelsPreparedStatementParameters(prep, expId, datasetId, timestamps.get(0));
+                // if expected labels are fetcched from the extension
+                if(extensionClasspath != null) {
+                    for (Map.Entry<Long, Map<String, Boolean>> entry : expectedLabelsExtMap.entrySet()){
+                        // set the expected label calculate by the extension
+                        ApplicationManager.getInstance().addLabels(expId, datasetId, entry.getValue());
+    
+                        // persist the expected label in the database
+                        this.setInsertLabelsPreparedStatementParameters(prep, expId, datasetId, entry.getKey());
+                    }
+                } else {
+                    // if labels are provided as part of the request payload
+                    for(Long t : labelTimestamps){
+                        this.setInsertLabelsPreparedStatementParameters(prep, expId, datasetId, t);
+                    }
+                }
+                
+
                 prep.executeBatch();
                 prep.close();
 
@@ -564,15 +640,15 @@ public class DatabaseVerticle extends AbstractVerticle {
             if(label.getValue()) {
 
                 // set satement parameters
-                prep.setInt(1, expId); // experiment id
-                prep.setInt(2, datasetId); // dataset id
-                prep.setTimestamp(3, new Timestamp(timestamp)); // the timestamp returned by NMF marking when the data was fetched
+                prep.setInt(1, expId); // the experiment id
+                prep.setInt(2, datasetId); // the dataset id
+                prep.setTimestamp(3, new Timestamp(timestamp)); // the timestamp marking when the data was fetched
                 prep.setInt(4, Integer.parseInt(label.getKey())); // the label value
                 
                 // add to batch
                 prep.addBatch();
-
-                // successfully set the expected label
+                
+                // successfully set the expected labels
                 // can exit function
                 return;
             }
