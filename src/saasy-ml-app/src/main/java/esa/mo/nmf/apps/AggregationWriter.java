@@ -1,9 +1,7 @@
 package esa.mo.nmf.apps;
 
 import java.util.List;
-import java.util.Map;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,13 +18,10 @@ import esa.mo.mc.impl.consumer.ParameterConsumerServiceImpl;
 import esa.mo.mc.impl.provider.AggregationInstance;
 import esa.mo.nmf.apps.saasyml.api.Constants;
 import esa.mo.nmf.apps.saasyml.api.utils.Pair;
-import esa.mo.nmf.apps.saasyml.plugins.api.ExpectedLabels;
 import esa.mo.nmf.commonmoadapter.CompleteAggregationReceivedListener;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-
-import org.pf4j.PluginManager;
 
 public class AggregationWriter implements CompleteAggregationReceivedListener {    
 
@@ -36,25 +31,17 @@ public class AggregationWriter implements CompleteAggregationReceivedListener {
     // the vertx object
     private Vertx vertx;
 
-    // the plugin manager
-    private PluginManager pluginManager;
-
-    // the requested plugin
-    private ExpectedLabels plugin;
-
     // services
     private ArchiveConsumerServiceImpl archiveService;
     private ParameterConsumerServiceImpl paramService;
     
-
-    // make inaccessible the default constructor
+    // hide the default constructor
     private AggregationWriter(){}
 
     // constructor
-    public AggregationWriter(Vertx vertx, PluginManager pluginManager) { 
+    public AggregationWriter(Vertx vertx) { 
         try{
             this.vertx = vertx;
-            this.pluginManager = pluginManager;
 
             this.archiveService = AppMCAdapter.getInstance().getSupervisorSMA().getCOMServices().getArchiveService();
             this.paramService = AppMCAdapter.getInstance().getSupervisorSMA().getMCServices().getParameterService();
@@ -87,9 +74,6 @@ public class AggregationWriter implements CompleteAggregationReceivedListener {
             // get dataset id
             int datasetId = Utils.getDatasetIdFromAggId(aggId);
 
-            // get the label plugin classpath
-            String labelPlugin = ApplicationManager.getInstance().getLabelPlugin(expId, datasetId);
-
             // get the parameter names
             List<String> paramNames = ApplicationManager.getInstance().getParamNames(expId, datasetId);
         
@@ -105,20 +89,7 @@ public class AggregationWriter implements CompleteAggregationReceivedListener {
             // build the params array
             JsonArray params = new JsonArray();
 
-            // create map of param name and double values in case we need it for the plugin
-            Map<String, Double> pluginParamInputMap = new HashMap<String, Double>();
-
-            for(int i = 0; i < paramNames.size(); i++) {
-
-                if(labelPlugin != null) {
-                    try {
-                        // populate extension input map
-                        pluginParamInputMap.put(paramNames.get(i), new Double(paramValues.get(i).getValue()));
-                    } catch (Exception e) {
-                        labelPlugin = null;
-                        LOGGER.log(Level.SEVERE, "The expected labels plugin cannot be invoked because the fetched parameter values are uncastable to the Double type", e);
-                    }  
-                }                              
+            for(int i = 0; i < paramNames.size(); i++) {                          
 
                 // populate the Json array
                 JsonObject param = new JsonObject();
@@ -136,36 +107,6 @@ public class AggregationWriter implements CompleteAggregationReceivedListener {
             // put the training data array into the payload json object
             payload.put("data", data);
 
-            if(!pluginParamInputMap.isEmpty()){
-                if(labelPlugin != null){
-    
-                    // retrieve the extensions for Expected Labels extension point
-                    List<ExpectedLabels> expectedLabelsPlugins = pluginManager.getExtensions(ExpectedLabels.class);
-                    //LOGGER.log(Level.INFO, "Found " + expectedLabelsPlugins.size() + " extensions for expected labels.");
-    
-                    // pick the extension specified by the request
-                    for (ExpectedLabels p : expectedLabelsPlugins) {
-                        if(p.getClass().getCanonicalName().equals(labelPlugin)){
-                            //LOGGER.log(Level.INFO, "Fetched the following plugin: " + p.getClass().getCanonicalName());
-                            this.plugin = p;
-                            break;
-                        }
-                    }
-    
-                    // check if requested extension was found
-                    if(this.plugin == null){
-                        if(ApplicationManager.getInstance().getLabels(expId, datasetId) != null){
-                            ApplicationManager.getInstance().getLabels(expId, datasetId).clear();
-                        }
-                        LOGGER.log(Level.SEVERE, "Could not retrieve plugin extension " + labelPlugin + ". The fetched training data will be persisted without expected labels.");
-                    } else {
-                        // if requested plugin was found then set the label
-                        Map<String, Boolean> expectedLabelsMap = this.plugin.getLabels(pluginParamInputMap);
-                        ApplicationManager.getInstance().addLabels(expId, datasetId, expectedLabelsMap);
-                    }
-                }
-            }
-            
             // send the payload to the database verticle
             this.vertx.eventBus().send(Constants.ADDRESS_DATA_SAVE, payload);   
 

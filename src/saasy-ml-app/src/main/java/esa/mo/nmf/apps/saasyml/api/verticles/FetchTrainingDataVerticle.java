@@ -47,27 +47,6 @@ public class FetchTrainingDataVerticle extends AbstractVerticle {
             final int iterations = payload.containsKey(Constants.KEY_ITERATIONS)
                     ? payload.getInteger(Constants.KEY_ITERATIONS).intValue() : -1;
 
-            // the labels map for the expected output
-            // this will be read when inserting the fetched training data
-            // the labels will be inserted into their own labels table
-            if(payload.containsKey(Constants.KEY_LABELS))
-            {
-                final Map<String, Boolean> labelMap = createLabelMapFromJsonObject(payload.getJsonObject(Constants.KEY_LABELS));
-                ApplicationManager.getInstance().addLabels(expId, datasetId, labelMap);
-                ApplicationManager.getInstance().addLabelPlugin(expId, datasetId, "null");
-                
-            }
-            else {
-                if (payload.containsKey(Constants.KEY_LABELS_PLUGIN)) {
-                    // identifier for plugin to calculate the expected label 
-                    if (ApplicationManager.getInstance().getLabels(expId, datasetId) != null) {
-                        ApplicationManager.getInstance().getLabels(expId, datasetId).clear();
-                    }
-                    ApplicationManager.getInstance().addLabelPlugin(expId, datasetId,
-                            payload.getString(Constants.KEY_LABELS_PLUGIN));
-                }
-            } 
-
             // create list of training data param names from JsonArray
             List<String> paramNameList = createArrayFromJsonArray(payload.getJsonArray(Constants.KEY_PARAMS));
 

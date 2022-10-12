@@ -13,19 +13,17 @@ import io.vertx.core.json.JsonObject;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Iterator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import esa.mo.nmf.apps.AppMCAdapter;
+import esa.mo.nmf.apps.ApplicationManager;
+import esa.mo.nmf.apps.ExtensionManager;
 import esa.mo.nmf.apps.saasyml.api.Constants;
 import esa.mo.nmf.apps.PropertiesManager;
-
-import org.pf4j.DefaultPluginManager;
-import org.pf4j.PluginManager;
 
 
 /**
@@ -39,28 +37,19 @@ import org.pf4j.PluginManager;
 public class MainVerticle extends AbstractVerticle {
     private static final Logger LOGGER = Logger.getLogger(MainVerticle.class.getName());
 
-    // the plugin manager
-    private PluginManager pluginManager;
-
     // constructor
     public MainVerticle() {
         vertx = Vertx.vertx();
-
-        // load the plugins
-        Path pluginsDir = Paths.get("plugins");
-        this.pluginManager = new DefaultPluginManager(pluginsDir);
-        
     }
 
     @Override
     public void start() throws Exception {
 
         // load and start the plugins
-        pluginManager.loadPlugins();
-        pluginManager.startPlugins();
+        ExtensionManager.getInstance().startPlugins();
 
         // add data received listener
-        AppMCAdapter.getInstance().addDataReceivedListener(vertx, pluginManager);
+        AppMCAdapter.getInstance().addDataReceivedListener(vertx);
 
         // set app http server port
         int port = PropertiesManager.getInstance().getPort();
@@ -81,8 +70,7 @@ public class MainVerticle extends AbstractVerticle {
     @Override
     public void stop() throws Exception {
         // stop and unload the plugins
-        pluginManager.stopPlugins();
-        pluginManager.unloadPlugins();
+        ExtensionManager.getInstance().stopPlugins();
     }
 
     /**
@@ -217,7 +205,7 @@ public class MainVerticle extends AbstractVerticle {
         });
 
     }
-
+    
 
     /**
      * Function to Subscribe to training data feed
@@ -233,6 +221,11 @@ public class MainVerticle extends AbstractVerticle {
         Map<String, String> responseMap = new HashMap<String, String>();
 
         try {
+
+            // parse expected labels from payload if it has been set in the payload
+            // can either me a expected label object or the classpath of the plugin extension that needs to be executed
+            parseExpectedLabelsFromPayload(payload);
+
             // forward request to event bus to be handled in the appropriate Verticle
             vertx.eventBus().request(Constants.ADDRESS_DATA_SUBSCRIBE, payload, reply -> {
                 // return response from the verticle
@@ -302,6 +295,11 @@ public class MainVerticle extends AbstractVerticle {
         Map<String, String> responseMap = new HashMap<String, String>();
 
         try {
+
+            // parse expected labels from payload if it has been set in the payload
+            // can either me a expected label object or the classpath of the plugin extension that needs to be executed
+            parseExpectedLabelsFromPayload(payload);
+
             // forward request to event bus to be handled in the appropriate Verticle
             vertx.eventBus().request(Constants.ADDRESS_DATA_SAVE, payload, reply -> {
                 // return response from the verticle
@@ -586,6 +584,52 @@ public class MainVerticle extends AbstractVerticle {
             responseMap.put(Constants.KEY_RESPONSE, "error");
             responseMap.put(Constants.KEY_MESSAGE, "unsupported or invalid inference request");
             ctx.request().response().end(Json.encodePrettily(responseMap));
+        }
+    }
+
+
+    private Map<String, Boolean> createLabelMapFromJsonObject(JsonObject jsonObject) {
+
+        // the labels (expected output) map
+        Map<String, Boolean> labelMap = new HashMap<String, Boolean>();
+
+        // iterator to loop through the json object's <key, value> pairs
+        Iterator<Map.Entry<String, Object>> iter = jsonObject.iterator();
+        
+        // put <key, value> pairs in the map
+        while(iter.hasNext()){
+            Map.Entry<String, Object> entry = iter.next();
+            labelMap.put(entry.getKey(), (Boolean)entry.getValue());
+        }
+
+        // return the map
+        return labelMap;
+    }
+
+
+    private void parseExpectedLabelsFromPayload(JsonObject payload){
+
+        // parse experiment id and dataset id
+        final int expId = payload.getInteger(Constants.KEY_EXPID).intValue();
+        final int datasetId = payload.getInteger(Constants.KEY_DATASETID).intValue();
+
+        // the labels map for the expected output
+        // this will be read when inserting the fetched training data
+        // the labels will be inserted into their own labels table
+        if(payload.containsKey(Constants.KEY_LABELS))
+        {
+            final Map<String, Boolean> labelMap = createLabelMapFromJsonObject(payload.getJsonObject(Constants.KEY_LABELS));
+            ApplicationManager.getInstance().addLabels(expId, datasetId, labelMap);
+            ApplicationManager.getInstance().addExtensionClasspath(expId, datasetId, "null");
+            
+        }
+        else if (payload.containsKey(Constants.KEY_LABELS_PLUGIN)) {
+            // identifier for plugin to calculate the expected label 
+            if (ApplicationManager.getInstance().getLabels(expId, datasetId) != null) {
+                ApplicationManager.getInstance().getLabels(expId, datasetId).clear();
+            }
+            ApplicationManager.getInstance().addExtensionClasspath(expId, datasetId,
+                    payload.getString(Constants.KEY_LABELS_PLUGIN));
         }
     }
 

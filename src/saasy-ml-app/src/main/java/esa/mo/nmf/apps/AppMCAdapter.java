@@ -9,7 +9,6 @@ import esa.mo.nmf.nanosatmoconnector.NanoSatMOConnectorImpl;
 import esa.mo.nmf.spacemoadapter.SpaceMOApdapterImpl;
 import io.vertx.core.Vertx;
 
-import org.pf4j.PluginManager;
 
 public class AppMCAdapter extends MonitorAndControlNMFAdapter{
     private static final Logger LOGGER = Logger.getLogger(AppMCAdapter.class.getName());
@@ -129,10 +128,10 @@ public class AppMCAdapter extends MonitorAndControlNMFAdapter{
         this.supervisorSMA = supervisorSMA;
     }
 
-    public void addDataReceivedListener(Vertx vertx, PluginManager pluginManager) throws Exception{
+    public void addDataReceivedListener(Vertx vertx) throws Exception{
         // register data received listener
         if(this.aggregationWriter  == null){
-            this.aggregationWriter = new AggregationWriter(vertx, pluginManager);
+            this.aggregationWriter = new AggregationWriter(vertx);
             getSupervisorSMA().addDataReceivedListener(this.aggregationWriter);
         }
     }
