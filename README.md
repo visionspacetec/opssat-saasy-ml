@@ -42,9 +42,9 @@ You can skip the test of maven with the following command:
 
     $ mvn install -Dmaven.test.skip
     
-    or 
+    or for maven 3.8.6
     
-    $ mvn install -DskipTests
+    $ mvn install -DskipTests 
 
 ## SaaSy-ML as NMF App
 
