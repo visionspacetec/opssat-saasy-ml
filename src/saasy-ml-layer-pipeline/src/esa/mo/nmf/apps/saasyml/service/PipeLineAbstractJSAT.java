@@ -178,6 +178,18 @@ public abstract class PipeLineAbstractJSAT implements IPipeLineLayer{
                     test = new GridDataGenerator(new Normal(10, 1.0), 1, 1, 1).generateData(N);
                 }
                 break;
+
+            case Regressor:
+                if (train == null) {
+                    logger.info("Generate train dataset: ");
+                    train = GenerateDataset.getLinearRegression(200, RandomUtil.getRandom());
+                }
+
+                if (test == null) {
+                    logger.info("Generate test dataset: ");
+                    test = GenerateDataset.getLinearRegression(10, RandomUtil.getRandom());
+                }
+                break;
         }
         
     }

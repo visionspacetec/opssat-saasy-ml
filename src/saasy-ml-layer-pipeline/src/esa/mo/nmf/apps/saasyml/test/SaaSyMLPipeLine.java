@@ -39,7 +39,7 @@ public class SaaSyMLPipeLine {
     public static void main(String[] args) {
 
         // how to use information
-        String howToUse = "$ java -jar saasyml-pipeline-0.1.0-SNAPSHOT.jar -thread [1 | true] -s [1 | true] -tests [1 2 3 | Classifier Cluster Outlier]";
+        String howToUse = "$ java -jar saasyml-pipeline-0.1.0-SNAPSHOT.jar -thread [1 | true] -s [1 | true] -tests [1 2 3 4 | Classifier Cluster Outlier Regressor]";
 
         // if the thread is available or not
         boolean thread = false;
@@ -50,7 +50,7 @@ public class SaaSyMLPipeLine {
         // set of tests to execute
         List<String> tests_list = null;
 
-        // if there is no arguments, we add by default three tests
+        // if there is no arguments, we add by default four tests
         if (args.length < 1) {
 
             tests_list =  new ArrayList<String>() {
@@ -58,6 +58,7 @@ public class SaaSyMLPipeLine {
                     add("1");
                     add("2");
                     add("3");
+                    add("4");
                 }
             };
 
@@ -97,6 +98,7 @@ public class SaaSyMLPipeLine {
                         add("1");
                         add("2");
                         add("3");
+                        add("4");
                     }
                 };
             }else{
@@ -142,6 +144,10 @@ public class SaaSyMLPipeLine {
             if (s.equals("3") || s.equals("Outlier")) {
                 logger.info("************* Testing Outlier **************");
                 SaaSyMLPipeLineTest.testOutlier(thread, serialize);
+            }
+            if (s.equals("4") || s.equals("Regressor")) {
+                logger.info("************* Testing Regressor **************");
+                SaaSyMLPipeLineTest.testRegressor(thread, serialize);
             }
         }
 
