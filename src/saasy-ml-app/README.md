@@ -6,7 +6,6 @@ An NMF App for the OPS-SAT spacecraft. The app uses ML to train AI models with t
 
 - [Requirements](#requirements)
 - [Quick Install](#quick-install)
-- [Long Install](#long-install)
 - [Run App](#run-app)
 - [Known Issue](#known-issue)
 - [Training Data Types](training-data-types)
@@ -41,10 +40,54 @@ OS name: "linux", version: "5.10.16.3-microsoft-standard-wsl2", arch: "amd64", f
     ```shell
     $ git clone https://github.com/visionspacetec/opssat-saasy-ml.git
     $ git clone https://github.com/visionspacetec/opssat-saasy-ml-nanosat-mo-framework.git
-    $ cd opssat-saasy-ml/src/saasy-ml-app
     ```
 
-2. Copy **build.bat.template** to a new **build.bat** file and **run.bat.template** to a new **run.bat** and modify the <FULL_PATH> in both files to match the environment
+2. Compile the nanosat mo framework
+
+    ```shell
+    $ cd opssat-saasy-ml-nanosat-mo-framework/
+    $ mvn install
+    $ cd sdk/sdk-package/
+    $ mvn install
+    ```
+
+3. Modify the **sdk/sdk-package/pom.xml** copy instruction to match the environment's location
+
+    ```xml
+    <!-- SaaSyML: resource and config files -->
+    <copy todir="${esa.nmf.sdk.assembly.outputdir}/home/saasy-ml">
+      <fileset dir="${basedir}/src/main/resources/space-common"/>
+      <fileset dir="${basedir}/src/main/resources/space-app-root"/>
+      <fileset dir="${basedir}/../../../opssat-saasy-ml/src/saasy-ml-app/conf"/>
+    </copy>
+    <!-- SaaSyML: plugins directory -->
+    <mkdir dir="${esa.nmf.sdk.assembly.outputdir}/home/saasy-ml/plugins"/>
+    <copy todir="${esa.nmf.sdk.assembly.outputdir}/home/saasy-ml/plugins">
+      <fileset dir="${basedir}/../../../opssat-saasy-ml/src/saasy-ml-app/plugins">
+        <include name="*.jar"/>
+        <include name="*.zip"/>
+      </fileset>
+    </copy>
+    ```
+
+    And add SaaSy-ML as dependency:
+
+    ```xml
+    <!-- SaaSyML-->
+    <dependency>
+      <groupId>int.esa.nmf.apps</groupId>
+      <artifactId>saasy-ml-app</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    ```
+
+3. Create the build and run files of SaaSy ML
+
+    ```shell
+    $ cd ../../../opssat-saasy-ml/src/saasy-ml-app
+    ```
+
+    Copy **build.bat.template** to a new **build.bat** file and **run.bat.template** to a new **run.bat** and modify the <FULL_PATH> in both files to match the environment. 
 
     ```powershell
     :: Set variables
@@ -52,96 +95,10 @@ OS name: "linux", version: "5.10.16.3-microsoft-standard-wsl2", arch: "amd64", f
     SET NMF_SDK_PACKAGE_DIR=<FULL_PATH>\opssat-saasy-ml-nmf\sdk\sdk-package
     ```
 
-3. Modify the **con/config.properties** file to set the desired app configurations.
-
-3. Go to the folder **opssat-saasy-ml-nanosat-mo-framework/**
-
-4. Modify the **sdk/sdk-package/pom.xml** copy instruction to match the environment's location
-
-    ```xml
-    <!-- SaaSyML: resource and config files -->
-    <copy todir="${esa.nmf.sdk.assembly.outputdir}/home/saasy-ml">
-      <fileset dir="${basedir}/src/main/resources/space-common"/>
-      <fileset dir="${basedir}/src/main/resources/space-app-root"/>
-      <fileset dir="${basedir}/../../../opssat-saasy-ml/src/saasy-ml-app/conf"/>
-    </copy>
-    <!-- SaaSyML: plugins directory -->
-    <mkdir dir="${esa.nmf.sdk.assembly.outputdir}/home/saasy-ml/plugins"/>
-    <copy todir="${esa.nmf.sdk.assembly.outputdir}/home/saasy-ml/plugins">
-      <fileset dir="${basedir}/../../../opssat-saasy-ml/src/saasy-ml-app/plugins">
-        <include name="*.jar"/>
-        <include name="*.zip"/>
-      </fileset>
-    </copy>
-    ```
+4. Modify the **con/config.properties** file to set the desired app configurations.
 
 5. Execute **./build.bat** to build all the Apps or **./build.bat 1** to build the Apps and execute the Supervisor and CTT, or **./run.bat** to only execute the Supervisor and CTT, or **./run.bat 1** to remove the Database and execute the Supervisor and CTT.
 
-
-## Long Install
-
-1. Install the SaaSyML App
-
-    ```shell
-    $ git clone https://github.com/visionspacetec/opssat-saasy-ml.git
-    $ cd opssat-saasy-ml/src/saasy-ml-app
-    $ mvn install
-    $ cd .. && cd .. 
-    ```
-
-2. Install NMF
-
-    ```shell
-    $ git clone https://github.com/visionspacetec/opssat-saasy-ml-nanosat-mo-framework.git
-    $ cd opssat-saasy-ml-nanosat-mo-framework
-    $ mvn install
-    ```
-
-    If in step 2 the app was cloned to a different folder name than the default **opssat-saasy-ml**, then the following copy configuration in **sdk/sdk-package/pom.xml** must be updated:
-
-    ```xml
-    <!-- SaaSyML: resource and config files -->
-    <copy todir="${esa.nmf.sdk.assembly.outputdir}/home/saasy-ml">
-      <fileset dir="${basedir}/src/main/resources/space-common"/>
-      <fileset dir="${basedir}/src/main/resources/space-app-root"/>
-      <fileset dir="${basedir}/../../../opssat-saasy-ml/src/saasy-ml-app/conf"/>
-    </copy>
-    <!-- SaaSyML: plugins directory -->
-    <mkdir dir="${esa.nmf.sdk.assembly.outputdir}/home/saasy-ml/plugins"/>
-    <copy todir="${esa.nmf.sdk.assembly.outputdir}/home/saasy-ml/plugins">
-      <fileset dir="${basedir}/../../../opssat-saasy-ml/src/saasy-ml-app/plugins">
-        <include name="*.jar"/>
-        <include name="*.zip"/>
-      </fileset>
-    </copy>
-    ```
-
-3. Deploy the SaaSyML App
-
-    ```shell
-    $ cd sdk/sdk-package/
-    $ mvn install
-    ```
-
-4. Supervisor and CTT
-
-    Open a second terminal window to run both the Supervisor and the Consumer Test Tool (CTT).
-
-    The Supervisor:
-
-    ```shell
-    $ cd target/nmf-sdk-2.1.0-SNAPSHOT/home/nmf/nanosat-mo-supervisor-sim
-    $ ./nanosat-mo-supervisor-sim.sh 
-    ```
-
-    - The Supervisor outputs a URI on the console.
-    - This URI follows the pattern `maltcp://<SUPERVISOR_HOST>:<SUPERVISOR_PORT>/nanosat-mo-supervisor-Directory`.
-
-    The CTT:
-    ```shell
-    $ cd target/nmf-sdk-2.1.0-SNAPSHOT/home/nmf/consumer-test-tool
-    $ ./consumer-test-tool.sh
-    ```
 
 ## Run App
 
