@@ -447,7 +447,7 @@ public class DatabaseVerticle extends AbstractVerticle {
             // select training data records
             JsonArray data = null;
             try {
-                data = this.selectTrainingData(expId, datasetId);
+                data = this.selectQueryByExpIdAndDatasetId(expId, datasetId, SQL_SELECT_TRAINING_DATA);
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Error while trying to get training data from the database.", e);
             }
@@ -472,7 +472,7 @@ public class DatabaseVerticle extends AbstractVerticle {
             // select labels records
             JsonArray data = null;
             try {
-                data = this.selectLabels(expId, datasetId);
+                data = this.selectQueryByExpIdAndDatasetId(expId, datasetId, SQL_SELECT_LABELS);
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Error while trying to get labels from the database.", e);
             }
@@ -534,7 +534,7 @@ public class DatabaseVerticle extends AbstractVerticle {
             // select labels records
             JsonArray data = null;
             try {
-                data = this.selectDistinctLabels(expId, datasetId);
+                data = this.selectQueryByExpIdAndDatasetId(expId, datasetId, SQL_SELECT_DISTINCT_LABELS);
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Error while trying to get labels from the database.", e);
             }
@@ -561,12 +561,8 @@ public class DatabaseVerticle extends AbstractVerticle {
             final String filepath = payload.getString(Constants.KEY_FILEPATH);
             final String error = payload.getString(Constants.KEY_ERROR);
 
-            try {
-
-                // insert training data
-                PreparedStatement prep = this.conn.prepareStatement(
-                    SQL_INSERT_MODELS
-                );
+            // insert training data
+            try (PreparedStatement prep = this.conn.prepareStatement(SQL_INSERT_MODELS)) {
 
                 // set satement parameters
                 prep.setInt(1, expId); // experiment id
@@ -578,7 +574,6 @@ public class DatabaseVerticle extends AbstractVerticle {
                 prep.setString(7, error); // the error message (if an error was thrown during training)
                 
                 prep.executeUpdate();
-                prep.close();
                 
                 // log and respond
                 String message = String.format("Saved model metadata for (expId, datasetId) = (%d, %d)", expId, datasetId);
@@ -599,7 +594,6 @@ public class DatabaseVerticle extends AbstractVerticle {
     public void stop() throws Exception {
         this.closeConnection();
     }
-
 
     private void setInsertTrainingDataPreparedStatementParameters(PreparedStatement prep,
         int expId, int datasetId, List<String> paramNames, List<Pair<Integer, String>> paramValues, List<Long>timestamps) throws Exception {
@@ -659,19 +653,6 @@ public class DatabaseVerticle extends AbstractVerticle {
         LOGGER.log(Level.WARNING, "Expected label was not set so training dataset input will be discarded as a model training input");
     }
 
-    /**
-    private void insertTrainingData(int expId, int datasetId, List<String> paramNames, List<Pair<Integer, String>> paramValues, List<Long>timestamps) throws Exception {
-        // create the prepared statement
-        PreparedStatement prep = this.conn.prepareStatement(
-            SQL_INSERT_TRAINING_DATA
-        );
-
-        setInsertTrainingDataPreparedStatementParameters(prep, expId, datasetId, paramNames, paramValues, timestamps);
-            
-        // execute the prepared statement
-        prep.executeBatch();
-    } */
-
     private void deleteTrainingData(int expId, int datasetId) throws Exception {
         
         // when deleting training data we need to also delete their labels in the labels table
@@ -682,168 +663,85 @@ public class DatabaseVerticle extends AbstractVerticle {
         // no commit per statement
         this.conn.setAutoCommit(false); 
 
-        // the prepared statement object that will be used for both training data and labels deletes
-        PreparedStatement ps = null;
+        // delete the training data
+        deleteTable(expId, datasetId, SQL_DELETE_TRAINING_DATA);
 
-        try {    
-            // init the prepared statement to delete the training data
-            ps = this.conn.prepareStatement(SQL_DELETE_TRAINING_DATA);
+        // no commit per statement
+        this.conn.setAutoCommit(false);
+        
+        // delete the labels
+        deleteTable(expId, datasetId, SQL_DELETE_LABELS);
 
-            // set satement parameters
-            ps.setInt(1, expId); // experiment id
-            ps.setInt(2, datasetId); // dataset id
+    }
 
-            // execute the delete statement to delete training data
-            ps.executeUpdate();
-
-            // close
-            ps.close();
-
-            // init the prepared statement to delete the labels
-            ps = this.conn.prepareStatement(SQL_DELETE_LABELS);
+    private void deleteTable(int expId, int datasetId, String SQLQuery) throws Exception {
+        
+        // create the prepared statement
+        try (PreparedStatement ps = this.conn.prepareStatement(SQLQuery)) {
 
             // set satement parameters
             ps.setInt(1, expId); // experiment id
             ps.setInt(2, datasetId); // dataset id
 
-            // execute the delete statement to delete labels
+            // execute the delete statement
             ps.executeUpdate();
-
-            // close
             ps.close();
 
         } catch(SQLException e){
             // an error has occured: rollback
             LOGGER.log(Level.SEVERE, "Error executing the training data and labels delete transaction: rolling back", e);
             this.conn.rollback();
-
         } finally {
             try {
                 // reset auto-commit to true
-                this.conn.setAutoCommit(true); 
-
-                if(ps != null && !ps.isClosed()) {
-                    // cleanup resources
-                    ps.close();
-                }
-            }
-            catch (SQLException e) {
+                this.conn.setAutoCommit(true);
+            } catch (SQLException e) {
                 LOGGER.log(Level.SEVERE, "Error cleaning up", e);
             }
-        }  
-    }
-
-    private void deleteLabels(int expId, int datasetId) throws Exception {
-        // create the prepared statement
-        PreparedStatement ps = this.conn.prepareStatement(SQL_DELETE_LABELS);
-
-        // set satement parameters
-        ps.setInt(1, expId); // experiment id
-        ps.setInt(2, datasetId); // dataset id
-
-        // execute the delete statement
-        ps.executeUpdate();
-        ps.close();
+        }
     }
 
     private int executeCountQuery(int expId, int datasetId, String querySQL) throws Exception {
         // create the prepared statement
-        PreparedStatement ps = this.conn.prepareStatement(querySQL);
+        try (PreparedStatement ps = this.conn.prepareStatement(querySQL)) {
 
-        // set satement parameters
-        ps.setInt(1, expId); // experiment id
-        ps.setInt(2, datasetId); // dataset id
+            // set satement parameters
+            ps.setInt(1, expId); // experiment id
+            ps.setInt(2, datasetId); // dataset id
 
-        // execute the delete statement
-        ResultSet rs = ps.executeQuery();
+            // execute the delete statement
+            try (ResultSet rs = ps.executeQuery()) {
 
-        // todo: ps.close()?
+                // return the result        
+                if (rs.next()) {
+                    return rs.getInt(1);
+                } else {
+                    LOGGER.log(Level.SEVERE, "Error in the Query. Please, check the statement parameters");
+                    return -1;
+                }
+            }
 
-        // return the result        
-        if (rs.next()) {
-            return rs.getInt(1);
-        } else {
-            LOGGER.log(Level.SEVERE, "Error in the Query. Please, check the statement parameters");
-            return -1;
+        }  catch (java.sql.SQLException e) {
+            throw new Exception("The query did not work.");
         }
-    }
-
-    private JsonArray selectTrainingData(int expId, int datasetId) throws Exception {
-        
-        // create the prepared statement
-        PreparedStatement ps = this.conn.prepareStatement(SQL_SELECT_TRAINING_DATA);
-
-        // set statement parameters
-        ps.setInt(1, expId);
-        ps.setInt(2, datasetId);
-
-        // execute the select statement
-        ResultSet rs = ps.executeQuery();
-
-        // ps.close();
-
-        // return the result
-        return toJSON(rs);
-
-    }
-
-    private JsonArray selectLabels(int expId, int datasetId) throws Exception {
-        
-        // create the prepared statement
-        PreparedStatement ps = this.conn.prepareStatement(SQL_SELECT_LABELS);
-
-        // set statement parameters
-        ps.setInt(1, expId);
-        ps.setInt(2, datasetId);
-
-        // execute the select statement
-        ResultSet rs = ps.executeQuery();
-
-        // ps.close();
-
-        // return the result
-        return toJSON(rs);
     }
 
     private JsonArray selectQueryByExpIdAndDatasetId(int expId, int datasetId, String SQL_QUERY) throws Exception {
         
         // create the prepared statement
-        PreparedStatement ps = this.conn.prepareStatement(SQL_QUERY);
+        try (PreparedStatement ps = this.conn.prepareStatement(SQL_QUERY)) {
 
-        // set statement parameters
-        ps.setInt(1, expId);
-        ps.setInt(2, datasetId);
+            // set statement parameters
+            ps.setInt(1, expId);
+            ps.setInt(2, datasetId);
 
-        // execute the select statement
-        ResultSet rs = ps.executeQuery();
+            // execute the select statement
+            try (ResultSet rs = ps.executeQuery()) {
 
-        // ps.close();
-
-        // return the result
-        return toJSON(rs);
-    }
-
-
-    private JsonArray selectDistinctLabels(int expId, int datasetId) throws Exception {
-        
-        // create the prepared statement
-        PreparedStatement ps = this.conn.prepareStatement(SQL_SELECT_DISTINCT_LABELS);
-
-        // set statement parameters
-        ps.setInt(1, expId);
-        ps.setInt(2, datasetId);
-
-        // execute the select statement
-        ResultSet rs = ps.executeQuery();
-
-        // build the result JSON
-        JsonArray resultJson = toJSON(rs);
-
-        // close the prepared statement
-        ps.close();
-
-        // return the result
-        return resultJson;
+                // return the result
+                return toJSON(rs);
+            }
+        }
     }
 
     private JsonArray toJSON(ResultSet rs) {
@@ -884,13 +782,11 @@ public class DatabaseVerticle extends AbstractVerticle {
     private void createTable(String SQL_QUERY) throws Exception {
 
         // create a statement
-        Statement stmt = this.conn.createStatement();
+        try (Statement stmt = this.conn.createStatement()) {
 
-        // execute the statement to create the table
-        stmt.executeUpdate(SQL_QUERY);
-
-        // close the statement
-        stmt.close();
+            // execute the statement to create the table
+            stmt.executeUpdate(SQL_QUERY);
+        }
     }
 
     public void closeConnection() throws Exception {
