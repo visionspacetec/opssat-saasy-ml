@@ -4,7 +4,7 @@ import esa.mo.nmf.apps.saasyml.common.IPipeLineLayer;
 import esa.mo.nmf.apps.saasyml.service.PipeLineClassifierJSAT;
 import esa.mo.nmf.apps.saasyml.service.PipeLineClusterJSAT;
 import esa.mo.nmf.apps.saasyml.service.PipeLineOutlierJSAT;
-
+import esa.mo.nmf.apps.saasyml.service.PipeLineRegressorJSAT;
 import jsat.classifiers.Classifier;
 import jsat.classifiers.linear.ALMA2;
 import jsat.classifiers.linear.AROW;
@@ -33,6 +33,11 @@ import jsat.outlier.LOF;
 import jsat.outlier.LinearOCSVM;
 import jsat.outlier.LoOP;
 import jsat.outlier.Outlier;
+import jsat.regression.KernelRidgeRegression;
+import jsat.regression.MultipleLinearRegression;
+import jsat.regression.OrdinaryKriging;
+import jsat.regression.Regressor;
+import jsat.regression.RidgeRegression;
 
 /**
  * Factory to create ML Pipeline, build ML models, identify the ML model type
@@ -50,6 +55,7 @@ public class MLPipeLineFactory {
         Classifier,
         Cluster,
         Outlier,
+        Regressor,
         Unknown,
     }
 
@@ -89,6 +95,8 @@ public class MLPipeLineFactory {
                 return new PipeLineClusterJSAT(expId, datasetId, thread, serialize, modelName, typeModel);
             case Outlier:
                 return new PipeLineOutlierJSAT(expId, datasetId, thread, serialize, modelName, typeModel);
+            case Regressor:
+                return new PipeLineRegressorJSAT(expId, datasetId, thread, serialize, modelName, typeModel);
             default:
                 return new PipeLineClassifierJSAT(expId, datasetId, thread, serialize, modelName, typeModel);
         }
@@ -168,6 +176,26 @@ public class MLPipeLineFactory {
     }
 
     /**
+     * Generate Regressor models
+     * @param modelName a string that holds the name of the model to create
+     * @return Regressor model
+     */
+    public static Regressor buildModelRegressor(String modelName) {
+
+        switch (modelName){
+            default:
+            case "KernelRidgeRegression":
+                return new KernelRidgeRegression();
+            case "MultipleLinearRegression":
+                return new MultipleLinearRegression();
+            case "OrdinaryKriging":
+                return new OrdinaryKriging();
+            case "RidgeRegression":
+                return new RidgeRegression();            
+        }
+    }
+
+    /**
      * Given the name of the model, retrieve the type of model
      * @param modelName a string that holds the name of the model
      * @return TypeModel type of model
@@ -203,6 +231,12 @@ public class MLPipeLineFactory {
             case "LoOP":       
             case "LinearOCSVM":
                 return TypeModel.Outlier;
+
+            case "KernelRidgeRegression":
+            case "MultipleLinearRegression":
+            case "OrdinaryKriging":
+            case "RidgeRegression":
+                return TypeModel.Regressor;
         }
 
         return TypeModel.Unknown;

@@ -118,6 +118,36 @@ public class SaaSyMLPipeLineTest {
     }
 
     /**
+     * test the Regressor ML model
+     *
+     * @param thread boolean variable that holds the activation of the thread
+     * @param serialize boolean variable that holds if we should serialize the model or not
+     */
+    public static void testRegressor(boolean thread, boolean serialize) {
+        // name of the model
+        String modelName = "MultipleLinearRegression";
+
+        // instantiate the class
+        IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(123, 1, thread, serialize, modelName);
+
+        logger.info("Generate training dataset...");
+        DataSet train = GenerateDataset.getLinearRegression(200, RandomUtil.getRandom());        
+
+        // build the model
+        saasyml.build();
+
+        // upload the train dataset
+        saasyml.setDataSet(train, null);
+
+        // start training the model
+        saasyml.train();
+
+        // inference the model
+        saasyml.inference();
+
+    }
+
+    /**
      * test in one execution all the different settings
      */
     public static void testSettings() {
