@@ -172,11 +172,10 @@ public class MainVerticle extends AbstractVerticle {
         return router;
     }
 
-    
     /**
      * Function to create failure handler of the Router  
      * 
-     * For each API endpoint, we define the failure handler
+     * For any API endpoint, we define the failure handler
      * 
      * @return defined Router with API paths and failure handlers
      */
@@ -205,7 +204,6 @@ public class MainVerticle extends AbstractVerticle {
         });
 
     }
-    
 
     /**
      * Function to Subscribe to training data feed
@@ -224,7 +222,7 @@ public class MainVerticle extends AbstractVerticle {
 
             // parse expected labels from payload if it has been set in the payload
             // can either me a expected label object or the classpath of the plugin extension that needs to be executed
-            parseExpectedLabelsFromPayload(payload);
+            parseExpectedLabelsOrPlugins(payload);
 
             // forward request to event bus to be handled in the appropriate Verticle
             vertx.eventBus().request(Constants.ADDRESS_DATA_SUBSCRIBE, payload, reply -> {
@@ -232,7 +230,7 @@ public class MainVerticle extends AbstractVerticle {
                 responseMap.put(Constants.KEY_RESPONSE, reply.result().body().toString());
 
                 ctx.request().response()
-                    .putHeader("content-type", "application/json; charset=utf-8")
+                    .putHeader(Constants.KEY_CONTENT_TYPE, Constants.KEY_CONTENT_TYPE_JSON)
                     .end(Json.encodePrettily(responseMap));
             });
         } catch (Exception e) {
@@ -240,9 +238,8 @@ public class MainVerticle extends AbstractVerticle {
             responseMap.put(Constants.KEY_RESPONSE, "error");
             responseMap.put(Constants.KEY_MESSAGE, "error while subscribing to a training data feed.");
 
-            // error response
             ctx.request().response()
-                .putHeader("content-type", "application/json; charset=utf-8")
+                .putHeader(Constants.KEY_CONTENT_TYPE, Constants.KEY_CONTENT_TYPE_JSON)
                 .end(Json.encodePrettily(responseMap));
         } 
     }
@@ -267,7 +264,7 @@ public class MainVerticle extends AbstractVerticle {
                 responseMap.put(Constants.KEY_RESPONSE, reply.result().body().toString());
 
                 ctx.request().response()
-                    .putHeader("content-type", "application/json; charset=utf-8")
+                    .putHeader(Constants.KEY_CONTENT_TYPE, Constants.KEY_CONTENT_TYPE_JSON)
                     .end(Json.encodePrettily(responseMap));
             });
         } catch (Exception e) {
@@ -277,7 +274,7 @@ public class MainVerticle extends AbstractVerticle {
 
             // error response
             ctx.request().response()
-                .putHeader("content-type", "application/json; charset=utf-8")
+                .putHeader(Constants.KEY_CONTENT_TYPE, Constants.KEY_CONTENT_TYPE_JSON)
                 .end(Json.encodePrettily(responseMap));
         }
     }
@@ -298,7 +295,7 @@ public class MainVerticle extends AbstractVerticle {
 
             // parse expected labels from payload if it has been set in the payload
             // can either me a expected label object or the classpath of the plugin extension that needs to be executed
-            parseExpectedLabelsFromPayload(payload);
+            parseExpectedLabelsOrPlugins(payload);
 
             // forward request to event bus to be handled in the appropriate Verticle
             vertx.eventBus().request(Constants.ADDRESS_DATA_SAVE, payload, reply -> {
@@ -306,7 +303,7 @@ public class MainVerticle extends AbstractVerticle {
                 responseMap.put(Constants.KEY_RESPONSE, reply.result().body().toString());
 
                 ctx.request().response()
-                    .putHeader("content-type", "application/json; charset=utf-8")
+                    .putHeader(Constants.KEY_CONTENT_TYPE, Constants.KEY_CONTENT_TYPE_JSON)
                     .end(Json.encodePrettily(responseMap));
             });
 
@@ -317,8 +314,8 @@ public class MainVerticle extends AbstractVerticle {
 
             // error response
             ctx.request().response()
-                    .putHeader("content-type", "application/json; charset=utf-8")
-                    .end(Json.encodePrettily(responseMap));
+                .putHeader(Constants.KEY_CONTENT_TYPE, Constants.KEY_CONTENT_TYPE_JSON)
+                .end(Json.encodePrettily(responseMap));
         }
     }
     
@@ -330,12 +327,12 @@ public class MainVerticle extends AbstractVerticle {
     void trainingDataDownload(RoutingContext ctx) {
         // payload
         JsonObject payload = ctx.getBodyAsJson();
-        
+
         // response
         Map<String, Object> responseMap = new HashMap<String, Object>();
 
         try {
-            
+
             // forward request to event bus to be handled in the appropriate Verticle
             vertx.eventBus().request(Constants.ADDRESS_TRAINING_DATA_SELECT, payload, reply -> {
                 JsonObject json = (JsonObject) reply.result().body();
@@ -343,27 +340,13 @@ public class MainVerticle extends AbstractVerticle {
                 json = prepareDownloadResponse(json);
                 json.put(Constants.KEY_EXPID, payload.getInteger(Constants.KEY_EXPID));
                 json.put(Constants.KEY_DATASETID, payload.getInteger(Constants.KEY_DATASETID));
-                
-                // TODO: temporal code for the EM Session. Remove later
-                // json.put(Constants.KEY_DATASETID, payload.getInteger(Constants.KEY_DATASETID) + 1);
-                
-                /*JsonArray jsonArray = new JsonArray();
-                JsonObject object = new JsonObject();
-                object.put(Constants.LABEL_TYPE, "classifier");
-                object.put(Constants.LABEL_ALGORITHM, "aode");
-                jsonArray.add(object);
-                json.put(Constants.LABEL_TRAINING, jsonArray);*/
-                
-                // temporal code for the EM Session. Remove later
-                // And replace for this code:
-                // json.put(Constants.LABEL_DATASETID, payload.getInteger(Constants.LABEL_DATASETID));
 
                 // return response from the verticle
                 responseMap.put(Constants.KEY_RESPONSE, json);
 
                 ctx.request().response()
-                    .putHeader("content-type", "application/json; charset=utf-8")
-                    .end(Json.encodePrettily(responseMap));
+                        .putHeader(Constants.KEY_CONTENT_TYPE, Constants.KEY_CONTENT_TYPE_JSON)
+                        .end(Json.encodePrettily(responseMap));
             });
 
         } catch (Exception e) {
@@ -373,11 +356,17 @@ public class MainVerticle extends AbstractVerticle {
 
             // error response
             ctx.request().response()
-                    .putHeader("content-type", "application/json; charset=utf-8")
+                    .putHeader(Constants.KEY_CONTENT_TYPE, Constants.KEY_CONTENT_TYPE_JSON)
                     .end(Json.encodePrettily(responseMap));
         }
     }
 
+    /**
+     * Function to prepare the final output to the user
+     * 
+     * @param json text with the information of the training data
+     * @return JSON text with the final output. It contains the training data
+     */
     private JsonObject prepareDownloadResponse(JsonObject json) {
 
         JsonArray newData = new JsonArray();
@@ -409,15 +398,6 @@ public class MainVerticle extends AbstractVerticle {
             // if colcount is equal to total columns, we add a new row
             if (!timestamp.equals(cur_timestamp)) {
                 timestamp = cur_timestamp;
-
-                // TODO: temporal code for the EM Session. Remove later
-                // JsonObject labelObject = new JsonObject();
-                // labelObject.put(Constants.KEY_NAME, "label");
-                // labelObject.put(Constants.KEY_VALUE, String.valueOf(new Random().nextInt(4)));
-                // labelObject.put(Constants.KEY_DATA_TYPE, object.getValue("data_type"));
-                // labelObject.put(Constants.KEY_TIMESTAMP, object.getLong(Constants.KEY_TIMESTAMP));
-                // newData.add(labelObject);
-                // Temporal code for the EM Session. Remove later
 
                 finalResponse.add(newData.copy());
                 newData = new JsonArray();
@@ -451,7 +431,7 @@ public class MainVerticle extends AbstractVerticle {
                 responseMap.put(Constants.KEY_RESPONSE, reply.result().body().toString());
 
                 ctx.request().response()
-                    .putHeader("content-type", "application/json; charset=utf-8")
+                    .putHeader(Constants.KEY_CONTENT_TYPE, Constants.KEY_CONTENT_TYPE_JSON)
                     .end(Json.encodePrettily(responseMap));
             });
 
@@ -462,7 +442,7 @@ public class MainVerticle extends AbstractVerticle {
             
             // error response
             ctx.request().response()
-                .putHeader("content-type", "application/json; charset=utf-8")
+                .putHeader(Constants.KEY_CONTENT_TYPE, Constants.KEY_CONTENT_TYPE_JSON)
                 .end(Json.encodePrettily(responseMap));
         }
     }
@@ -481,7 +461,7 @@ public class MainVerticle extends AbstractVerticle {
         Map<String, String> responseMap = new HashMap<String, String>();
 
         // get api request url params
-        // e.g. /api/v1/training/classifier/classifier.bayesian.aode
+        // e.g. /api/v1/training/classifier/aode
         // type is "classifier"
         // algorithm is "aode"
 
@@ -498,7 +478,7 @@ public class MainVerticle extends AbstractVerticle {
                 responseMap.put(Constants.KEY_RESPONSE, reply.result().body().toString());
 
                 ctx.request().response()
-                    .putHeader("content-type", "application/json; charset=utf-8")
+                    .putHeader(Constants.KEY_CONTENT_TYPE, Constants.KEY_CONTENT_TYPE_JSON)
                     .end(Json.encodePrettily(responseMap));
             });
         } catch (Exception e) {
@@ -507,16 +487,15 @@ public class MainVerticle extends AbstractVerticle {
             responseMap.put(Constants.KEY_MESSAGE, "unsupported or invalid training request");            
             
             ctx.request().response()
-                .putHeader("content-type", "application/json; charset=utf-8")
+                .putHeader(Constants.KEY_CONTENT_TYPE, Constants.KEY_CONTENT_TYPE_JSON)
                 .end(Json.encodePrettily(responseMap));
         }
     }
 
-
     /**
      * fetch info on trained models
      * 
-     * @param ctx
+     * @param ctx body context of the request
      */
     void fetchTrainingModels(RoutingContext ctx) {
         // get the payload
@@ -537,7 +516,7 @@ public class MainVerticle extends AbstractVerticle {
                 responseMap.put(Constants.KEY_RESPONSE, json);
 
                 ctx.request().response()
-                    .putHeader("content-type", "application/json; charset=utf-8")
+                    .putHeader(Constants.KEY_CONTENT_TYPE, Constants.KEY_CONTENT_TYPE_JSON)
                     .end(Json.encodePrettily(responseMap));
                     
             });
@@ -548,7 +527,7 @@ public class MainVerticle extends AbstractVerticle {
 
             // error response
             ctx.request().response()
-                .putHeader("content-type", "application/json; charset=utf-8")
+                .putHeader(Constants.KEY_CONTENT_TYPE, Constants.KEY_CONTENT_TYPE_JSON)
                 .end(Json.encodePrettily(responseMap));
         }
     }
@@ -556,7 +535,7 @@ public class MainVerticle extends AbstractVerticle {
     /**
      * use a trained model to execute an inference
      * 
-     * @param ctx
+     * @param ctx body context of the request
      */
     void inference(RoutingContext ctx) {
 
@@ -575,7 +554,7 @@ public class MainVerticle extends AbstractVerticle {
                 JsonObject json = (JsonObject) reply.result().body();
 
                 ctx.request().response()
-                    .putHeader("Content-Type", "application/json; charset=utf-8")
+                    .putHeader(Constants.KEY_CONTENT_TYPE, Constants.KEY_CONTENT_TYPE_JSON)
                     .end(json.encode());
             });
 
@@ -583,11 +562,55 @@ public class MainVerticle extends AbstractVerticle {
             // error object
             responseMap.put(Constants.KEY_RESPONSE, "error");
             responseMap.put(Constants.KEY_MESSAGE, "unsupported or invalid inference request");
-            ctx.request().response().end(Json.encodePrettily(responseMap));
+
+            ctx.request().response()
+                .putHeader(Constants.KEY_CONTENT_TYPE, Constants.KEY_CONTENT_TYPE_JSON)
+                .end(Json.encodePrettily(responseMap));
         }
     }
 
+    /**
+     * Function to parse the expected labels or the plugins. 
+     * 
+     * The plugins are classes that allow the user to provide their own labels based on the explanatory data
+     * 
+     * @param payload Json text received from the user
+     */
+    private void parseExpectedLabelsOrPlugins(JsonObject payload) {
 
+        // parse experiment id and dataset id
+        final int expId = payload.getInteger(Constants.KEY_EXPID).intValue();
+        final int datasetId = payload.getInteger(Constants.KEY_DATASETID).intValue();
+
+        // the labels map for the expected output
+        // this will be read when inserting the fetched training data
+        // the labels will be inserted into their own labels table
+        if (payload.containsKey(Constants.KEY_LABELS)) {
+            final Map<String, Boolean> labelMap = createLabelMapFromJsonObject(
+                    payload.getJsonObject(Constants.KEY_LABELS));
+            ApplicationManager.getInstance().addLabels(expId, datasetId, labelMap);
+            ApplicationManager.getInstance().addExtensionClasspath(expId, datasetId, "null");
+        } else {
+            // the plugins map to calculate the expected output
+            // this will be read when inserting the fetched training data
+            // the plugins will be inserted as extension classpath into their own table
+            if (payload.containsKey(Constants.KEY_LABELS_PLUGIN)) {
+                // identifier for plugin to calculate the expected label 
+                if (ApplicationManager.getInstance().getLabels(expId, datasetId) != null) {
+                    ApplicationManager.getInstance().getLabels(expId, datasetId).clear();
+                }
+                ApplicationManager.getInstance().addExtensionClasspath(expId, datasetId,
+                        payload.getString(Constants.KEY_LABELS_PLUGIN));
+            }
+        }
+    }
+    
+    /**
+     * Function to translate the JsonObject to a Map
+     * 
+     * @param jsonObject Json text with the information of the labels
+     * @return a hash map with the information of the JsonObject
+     */
     private Map<String, Boolean> createLabelMapFromJsonObject(JsonObject jsonObject) {
 
         // the labels (expected output) map
@@ -604,33 +627,6 @@ public class MainVerticle extends AbstractVerticle {
 
         // return the map
         return labelMap;
-    }
-
-
-    private void parseExpectedLabelsFromPayload(JsonObject payload){
-
-        // parse experiment id and dataset id
-        final int expId = payload.getInteger(Constants.KEY_EXPID).intValue();
-        final int datasetId = payload.getInteger(Constants.KEY_DATASETID).intValue();
-
-        // the labels map for the expected output
-        // this will be read when inserting the fetched training data
-        // the labels will be inserted into their own labels table
-        if(payload.containsKey(Constants.KEY_LABELS))
-        {
-            final Map<String, Boolean> labelMap = createLabelMapFromJsonObject(payload.getJsonObject(Constants.KEY_LABELS));
-            ApplicationManager.getInstance().addLabels(expId, datasetId, labelMap);
-            ApplicationManager.getInstance().addExtensionClasspath(expId, datasetId, "null");
-            
-        }
-        else if (payload.containsKey(Constants.KEY_LABELS_PLUGIN)) {
-            // identifier for plugin to calculate the expected label 
-            if (ApplicationManager.getInstance().getLabels(expId, datasetId) != null) {
-                ApplicationManager.getInstance().getLabels(expId, datasetId).clear();
-            }
-            ApplicationManager.getInstance().addExtensionClasspath(expId, datasetId,
-                    payload.getString(Constants.KEY_LABELS_PLUGIN));
-        }
     }
 
 }

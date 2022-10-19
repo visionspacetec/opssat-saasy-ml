@@ -54,6 +54,8 @@ OS name: "linux", version: "5.10.16.3-microsoft-standard-wsl2", arch: "amd64", f
 
 3. Modify the **con/config.properties** file to set the desired app configurations.
 
+3. Go to the folder **opssat-saasy-ml-nanosat-mo-framework/**
+
 4. Modify the **sdk/sdk-package/pom.xml** copy instruction to match the environment's location
 
     ```xml

@@ -51,10 +51,6 @@ public class TrainModelVerticle extends AbstractVerticle {
                     && payload.getBoolean(Constants.KEY_THREAD) != null) ? payload.getBoolean(Constants.KEY_THREAD)
                             : PropertiesManager.getInstance().getThread();
             boolean serialize = PropertiesManager.getInstance().getSerialize();
-            /* Does not make sense because we want always to store the model
-            if (payload.containsKey("serialize") && payload.getBoolean("serialize") != null) {
-                serialize = payload.getBoolean("serialize");
-            }*/
 
             // the train model will be serialized and saved as a file in the filesystem
             // a reference to the file as well as some metadata will be stored in the database
@@ -106,7 +102,7 @@ public class TrainModelVerticle extends AbstractVerticle {
                                         ClassificationDataSet train = new ClassificationDataSet(
                                             dimensions, 
                                             new CategoricalData[0], new CategoricalData(distinctLabelsJsonArray.size())
-                                        );   
+                                        );
 
                                         // the training input data point array
                                         JsonArray trainingDatapointJsonArray = new JsonArray();

@@ -9,6 +9,8 @@ public final class Constants {
     public static final int EXPERIMENT_ID = 213;
 
     // labels 
+    public static final String KEY_CONTENT_TYPE = "content-type";
+    public static final String KEY_CONTENT_TYPE_JSON = "application/json; charset=utf-8";
     public static final String KEY_TYPE = "type";
     public static final String KEY_ALGORITHM = "algorithm";
     public static final String KEY_REQUEST = "request";
@@ -81,11 +83,6 @@ public final class Constants {
 
 
     public static final String BASE_ADDRESS_INFERENCE = "saasyml.inference";
-    public static final String ADDRESS_INFERENCE_CLASSIFIER = BASE_ADDRESS_INFERENCE + ".classifier";
-
-
-
-
-    
+    public static final String ADDRESS_INFERENCE_CLASSIFIER = BASE_ADDRESS_INFERENCE + ".classifier";    
 
 }
