@@ -3,13 +3,18 @@ package esa.mo.nmf.apps.saasyml.dataset.utils;
 import jsat.classifiers.CategoricalData;
 import jsat.classifiers.ClassificationDataSet;
 import jsat.distributions.multivariate.NormalM;
+import jsat.linear.ConstantVector;
 import jsat.linear.DenseVector;
 import jsat.linear.Matrix;
 import jsat.linear.Vec;
 import jsat.regression.RegressionDataSet;
 import jsat.utils.random.RandomUtil;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+
 
 /**
  * Contains pre determined code for generating specific data sets. 
@@ -43,7 +48,47 @@ public class GenerateDataset
         
         return train;
     }
-    
+
+    /**
+     * Generates a linearly separable binary classification problem
+     * @param dataSetSize the number of points to generated
+     * @return a binary classification data set that is linearly separable
+     */
+    public static ClassificationDataSet get2ClassLinearOwnData(int dataSetSize)
+    {
+        ClassificationDataSet train = new ClassificationDataSet(c2l_m0.length(), new CategoricalData[0],
+                new CategoricalData(2));
+
+        List<Vec> c0 = new ArrayList<Vec>(dataSetSize);
+
+        int lenght = 7;
+        
+        for(int i = 0; i < dataSetSize; i++)
+        {
+            double randomNum = ThreadLocalRandom.current().nextDouble(0, 1);
+
+            Vec sample = new ConstantVector(randomNum, lenght);
+            c0.add(sample);
+        }
+
+        for(Vec s : c0)
+            train.addDataPoint(s, new int[0], 0);
+
+        List<Vec> c1 = new ArrayList<Vec>(dataSetSize);
+        
+        for(int i = 0; i < dataSetSize; i++)
+        {
+            double randomNum = ThreadLocalRandom.current().nextDouble(10, 11);
+
+            Vec sample = new ConstantVector(randomNum, lenght);
+            c1.add(sample);
+        }
+        
+        for(Vec s : c1)
+            train.addDataPoint(s, new int[0], 1);
+        
+        return train;
+    }
     
     /**
      * Creates a 2D linearly separable problem 

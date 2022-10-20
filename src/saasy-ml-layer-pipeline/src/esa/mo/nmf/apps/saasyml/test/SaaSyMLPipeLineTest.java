@@ -56,6 +56,36 @@ public class SaaSyMLPipeLineTest {
     }
 
     /**
+     * test the classifier ML model with own data
+     *
+     * @param thread boolean variable that holds the activation of the thread
+     * @param serialize boolean variable that holds if we should serialize the model or not
+     */
+    public static void testClassifierOwnData(boolean thread, boolean serialize) {
+        // name of the model
+        String modelName = "LinearSGD";
+
+        // instantiate the class
+        IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(123, 1, thread, serialize, modelName);
+
+        logger.info("Generate training and test dataset...");
+        DataSet train = GenerateDataset.get2ClassLinearOwnData(200);
+        DataSet test = GenerateDataset.get2ClassLinearOwnData(200);
+
+        // build the model
+        saasyml.build();
+
+        // upload the train dataset
+        saasyml.setDataSet(train, test);
+
+        // start training the model
+        saasyml.train();
+
+        // inference the model
+        saasyml.inference();
+    }
+
+    /**
      * test the clustering ML model
      *
      * @param thread boolean variable that holds the activation of the thread

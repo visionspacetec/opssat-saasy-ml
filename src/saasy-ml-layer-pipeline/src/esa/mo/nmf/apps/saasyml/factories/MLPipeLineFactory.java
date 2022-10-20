@@ -26,6 +26,7 @@ import jsat.classifiers.linear.StochasticMultinomialLogisticRegression;
 import jsat.clustering.Clusterer;
 import jsat.clustering.FLAME;
 import jsat.linear.distancemetrics.EuclideanDistance;
+import jsat.lossfunctions.HingeLoss;
 import jsat.lossfunctions.LogisticLoss;
 import jsat.outlier.DensityOutlier;
 import jsat.outlier.IsolationForest;
@@ -120,7 +121,7 @@ public class MLPipeLineFactory {
             case "BBR" : return new BBR(0.01, 1000, BBR.Prior.GAUSSIAN);
             case "LinearBatch" : return new LinearBatch();
             case "LinearL1SCD" : return new LinearL1SCD();
-            case "LinearSGD" : return new LinearSGD();
+            case "LinearSGD" : return new LinearSGD(new HingeLoss(), 1e-4, 1e-5);
             default:
             case "LogisticRegressionDCD" : return new LogisticRegressionDCD();
             case "NewGLMNET" : return new NewGLMNET();
