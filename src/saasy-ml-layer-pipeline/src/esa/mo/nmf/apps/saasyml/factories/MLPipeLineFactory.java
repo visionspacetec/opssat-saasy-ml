@@ -162,7 +162,11 @@ public class MLPipeLineFactory {
                 return sdca;
             }
             case "SMIDAS" : return new SMIDAS(0.1);
-            case "SPA" : return new SPA();
+            case "SPA" : {
+                SPA spa = new SPA();
+                spa.setUseBias(true);
+                return spa;
+            }
             case "STGD" : return new STGD(5, 0.1, Double.POSITIVE_INFINITY, 0.1);
             case "StochasticMultinomialLogisticRegression": return new StochasticMultinomialLogisticRegression();
         
