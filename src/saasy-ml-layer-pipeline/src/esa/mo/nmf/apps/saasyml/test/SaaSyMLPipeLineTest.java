@@ -63,7 +63,7 @@ public class SaaSyMLPipeLineTest {
      */
     public static void testClassifierOwnData(boolean thread, boolean serialize) {
         // name of the model
-        String modelName = "LinearSGD";
+        String modelName = "LinearBatch";
 
         // instantiate the class
         IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(123, 1, thread, serialize, modelName);

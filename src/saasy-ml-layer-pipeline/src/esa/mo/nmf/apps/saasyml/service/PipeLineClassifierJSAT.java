@@ -75,8 +75,6 @@ public class PipeLineClassifierJSAT extends PipeLineAbstractJSAT {
             // deserialize the model
             this.model = deserializeClassifier(this.modelPathSerialized);
         }
-        
-        // logger.info("test: " + String.valueOf(test.getDataVectors()));
 
         // test the model
         List<Object> result = new ArrayList<Object>();

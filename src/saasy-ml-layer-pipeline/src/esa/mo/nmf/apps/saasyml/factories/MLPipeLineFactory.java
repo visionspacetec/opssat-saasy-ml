@@ -7,6 +7,7 @@ import esa.mo.nmf.apps.saasyml.service.PipeLineOutlierJSAT;
 import esa.mo.nmf.apps.saasyml.service.PipeLineRegressorJSAT;
 import jsat.classifiers.Classifier;
 import jsat.classifiers.linear.ALMA2;
+import jsat.classifiers.linear.kernelized.ALMA2K;
 import jsat.classifiers.linear.AROW;
 import jsat.classifiers.linear.BBR;
 import jsat.classifiers.linear.LinearBatch;
@@ -25,6 +26,7 @@ import jsat.classifiers.linear.STGD;
 import jsat.classifiers.linear.StochasticMultinomialLogisticRegression;
 import jsat.clustering.Clusterer;
 import jsat.clustering.FLAME;
+import jsat.distributions.kernels.RBFKernel;
 import jsat.linear.distancemetrics.EuclideanDistance;
 import jsat.lossfunctions.HingeLoss;
 import jsat.lossfunctions.LogisticLoss;
@@ -116,14 +118,31 @@ public class MLPipeLineFactory {
             // imbalance classifiers
             // knn classifiers
             // linear classifiers
-            case "ALMA2" : return new ALMA2();
-            case "AROW" : return new AROW(1, true);
+            // no working properly
+            case "ALMA2": { 
+                ALMA2 alma = new ALMA2();
+                alma.setEpochs(5);
+                return alma;
+            } 
+            case "AROW":
+                return new AROW(1, false);// no working properly
+            
+            // working properly
+            case "ALMA2K": return new ALMA2K(new RBFKernel(0.5), 0.8);
+            default:
+            case "LogisticRegressionDCD": {
+                LogisticRegressionDCD lr = new LogisticRegressionDCD();
+                lr.setUseBias(true);
+                return lr;
+            }
             case "BBR" : return new BBR(0.01, 1000, BBR.Prior.GAUSSIAN);
-            case "LinearBatch" : return new LinearBatch();
+            case "LinearBatch":
+                return new LinearBatch(new LogisticLoss(), 1e-4);
+            
+            // no tested
             case "LinearL1SCD" : return new LinearL1SCD();
             case "LinearSGD" : return new LinearSGD(new HingeLoss(), 1e-4, 1e-5);
-            default:
-            case "LogisticRegressionDCD" : return new LogisticRegressionDCD();
+            
             case "NewGLMNET" : return new NewGLMNET();
             case "NHERD" : return new NHERD(1, NHERD.CovMode.FULL);
             case "PassiveAggressive" : return new PassiveAggressive();
