@@ -63,7 +63,7 @@ public class SaaSyMLPipeLineTest {
      */
     public static void testClassifierOwnData(boolean thread, boolean serialize) {
         // name of the model
-        String modelName = "LinearBatch";
+        String modelName = "ALMA2";
 
         // instantiate the class
         IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(123, 1, thread, serialize, modelName);
@@ -93,7 +93,7 @@ public class SaaSyMLPipeLineTest {
      */
     public static void testClustering(boolean thread, boolean serialize) {
         // name of the model
-        String modelName = "FLAME";
+        String modelName = "LinearSGD";
 
         // instantiate the class
         IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(123, 1, thread, serialize, modelName);

@@ -24,12 +24,17 @@ import jsat.classifiers.linear.SMIDAS;
 import jsat.classifiers.linear.SPA;
 import jsat.classifiers.linear.STGD;
 import jsat.classifiers.linear.StochasticMultinomialLogisticRegression;
+import jsat.classifiers.linear.StochasticSTLinearL1;
 import jsat.clustering.Clusterer;
 import jsat.clustering.FLAME;
 import jsat.distributions.kernels.RBFKernel;
 import jsat.linear.distancemetrics.EuclideanDistance;
 import jsat.lossfunctions.HingeLoss;
 import jsat.lossfunctions.LogisticLoss;
+import jsat.math.optimization.stochastic.AdaGrad;
+import jsat.math.optimization.stochastic.GradientUpdater;
+import jsat.math.optimization.stochastic.RMSProp;
+import jsat.math.optimization.stochastic.SimpleSGD;
 import jsat.outlier.DensityOutlier;
 import jsat.outlier.IsolationForest;
 import jsat.outlier.LOF;
@@ -112,12 +117,16 @@ public class MLPipeLineFactory {
      */
     public static Classifier buildModelClassifier(String modelName) {
 
+        GradientUpdater[] updaters = new GradientUpdater[] { new SimpleSGD(), new AdaGrad(),
+                new RMSProp() };
+
         switch (modelName){
             // bayesian classifiers
             // boosting classifiers
             // imbalance classifiers
             // knn classifiers
             // linear classifiers
+
             // no working properly
             case "ALMA2": { 
                 ALMA2 alma = new ALMA2();
@@ -125,7 +134,26 @@ public class MLPipeLineFactory {
                 return alma;
             } 
             case "AROW":
-                return new AROW(1, false);// no working properly
+                return new AROW(1, false);
+            case "LinearL1SCD": return new LinearL1SCD(1000, -1e-14, StochasticSTLinearL1.Loss.SQUARED, true);
+            case "LinearSGD": {
+
+                int index = 2;
+                LinearSGD linearsgd = new LinearSGD(new HingeLoss(), 1e-4, 1e-5);
+                linearsgd.setUseBias(true);
+
+                linearsgd.setGradientUpdater(updaters[index]);
+
+                //SGD needs more iterations/data to learn a really close fit
+                linearsgd.setEpochs(50);
+                if (!(updaters[index] instanceof SimpleSGD))//the others need a higher learning rate than the default
+                {
+                    linearsgd.setEta(0.5);
+                    linearsgd.setEpochs(100);//more iters b/c RMSProp probably isn't the best for this overly simple problem
+                }
+
+                return linearsgd;
+            }
             
             // working properly
             case "ALMA2K": return new ALMA2K(new RBFKernel(0.5), 0.8);
@@ -140,13 +168,10 @@ public class MLPipeLineFactory {
                 return new LinearBatch(new LogisticLoss(), 1e-4);
             
             // no tested
-            case "LinearL1SCD" : return new LinearL1SCD();
-            case "LinearSGD" : return new LinearSGD(new HingeLoss(), 1e-4, 1e-5);
-            
-            case "NewGLMNET" : return new NewGLMNET();
             case "NHERD" : return new NHERD(1, NHERD.CovMode.FULL);
             case "PassiveAggressive" : return new PassiveAggressive();
             case "SCD" : return new SCD(new LogisticLoss(), 1e-6, 100);
+            case "NewGLMNET" : return new NewGLMNET();
             
             
             
