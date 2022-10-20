@@ -147,6 +147,10 @@ public class MLPipeLineFactory {
             case "NHERD" : return new NHERD(1, NHERD.CovMode.FULL);
             case "PassiveAggressive" : return new PassiveAggressive();
             case "SCD" : return new SCD(new LogisticLoss(), 1e-6, 100);
+            
+            
+            
+            // Liliana
             case "SCW" : return new SCW();
             case "SDCA" : return new SDCA();
             case "SMIDAS" : return new SMIDAS(0.1);
