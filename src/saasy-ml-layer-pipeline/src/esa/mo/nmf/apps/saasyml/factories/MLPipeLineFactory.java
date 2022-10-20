@@ -30,6 +30,7 @@ import jsat.distributions.kernels.RBFKernel;
 import jsat.linear.distancemetrics.EuclideanDistance;
 import jsat.lossfunctions.HingeLoss;
 import jsat.lossfunctions.LogisticLoss;
+import jsat.lossfunctions.SquaredLoss;
 import jsat.outlier.DensityOutlier;
 import jsat.outlier.IsolationForest;
 import jsat.outlier.LOF;
@@ -152,7 +153,14 @@ public class MLPipeLineFactory {
             
             // Liliana
             case "SCW" : return new SCW();
-            case "SDCA" : return new SDCA();
+            case "SDCA" : {
+                SDCA sdca = new SDCA();
+                sdca.setLoss(new LogisticLoss());
+                sdca.setTolerance(1e-10);
+                sdca.setLambda(0.005);
+                sdca.setAlpha(0);
+                return sdca;
+            }
             case "SMIDAS" : return new SMIDAS(0.1);
             case "SPA" : return new SPA();
             case "STGD" : return new STGD(5, 0.1, Double.POSITIVE_INFINITY, 0.1);
