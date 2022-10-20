@@ -135,12 +135,36 @@ public class MLPipeLineFactory {
                 return alma;
             } 
             case "AROW":
-                return new AROW(1, false);
-            case "LinearL1SCD": return new LinearL1SCD(1000, -1e-14, StochasticSTLinearL1.Loss.SQUARED, true);
+                return new AROW(1, true);
+            case "NHERD":
+                return new NHERD(1, NHERD.CovMode.PROJECT); // FULL,DROP, PROJECT no working, 
+            case "PassiveAggressive" : {
+                PassiveAggressive pa = new PassiveAggressive();
+                pa.setMode(PassiveAggressive.Mode.PA);
+                pa.setEps(0.00001);
+                pa.setEpochs(10000);
+                pa.setC(20);
+                return pa;
+            }
+            case "SCD" : return new SCD(new LogisticLoss(), 1e-6, 100); // regularization: 1e-6
+
+            
+            // working properly
+            case "ALMA2K": return new ALMA2K(new RBFKernel(0.5), 0.8);
+            default:
+            case "LogisticRegressionDCD": {
+                LogisticRegressionDCD lr = new LogisticRegressionDCD();
+                lr.setUseBias(true);
+                return lr;
+            }
+            case "BBR" : return new BBR(0.01, 1000, BBR.Prior.GAUSSIAN);
+            case "LinearBatch":
+                return new LinearBatch(new LogisticLoss(), 1e-4);
+            case "LinearL1SCD": return new LinearL1SCD(1000, 1e-14, StochasticSTLinearL1.Loss.LOG, true);
             case "LinearSGD": {
 
                 int index = 2;
-                LinearSGD linearsgd = new LinearSGD(new HingeLoss(), 1e-4, 1e-5);
+                LinearSGD linearsgd = new LinearSGD(new LogisticLoss(), 1e-4, 1e-5);
                 linearsgd.setUseBias(true);
 
                 linearsgd.setGradientUpdater(updaters[index]);
@@ -155,29 +179,6 @@ public class MLPipeLineFactory {
 
                 return linearsgd;
             }
-            
-            // working properly
-            case "ALMA2K": return new ALMA2K(new RBFKernel(0.5), 0.8);
-            default:
-            case "LogisticRegressionDCD": {
-                LogisticRegressionDCD lr = new LogisticRegressionDCD();
-                lr.setUseBias(true);
-                return lr;
-            }
-            case "BBR" : return new BBR(0.01, 1000, BBR.Prior.GAUSSIAN);
-            case "LinearBatch":
-                return new LinearBatch(new LogisticLoss(), 1e-4);
-            
-            // no tested
-            case "NHERD" : return new NHERD(1, NHERD.CovMode.FULL);
-            case "PassiveAggressive" : return new PassiveAggressive();
-            case "SCD" : return new SCD(new LogisticLoss(), 1e-6, 100);
-            case "NewGLMNET" : return new NewGLMNET();
-            
-            
-            
-            // Liliana
-            case "SCW" : return new SCW();
             case "SDCA" : {
                 SDCA sdca = new SDCA();
                 sdca.setLoss(new LogisticLoss());
@@ -186,14 +187,22 @@ public class MLPipeLineFactory {
                 sdca.setAlpha(0);
                 return sdca;
             }
-            case "SMIDAS" : return new SMIDAS(0.1);
             case "SPA" : {
                 SPA spa = new SPA();
                 spa.setUseBias(true);
                 return spa;
             }
+            case "StochasticMultinomialLogisticRegression":
+                return new StochasticMultinomialLogisticRegression();
+            case "NewGLMNET" : return new NewGLMNET();
+            
+                
+
+            // no tested
+            // Liliana
+            case "SCW" : return new SCW();
+            case "SMIDAS" : return new SMIDAS(0.1);
             case "STGD" : return new STGD(5, 0.1, Double.POSITIVE_INFINITY, 0.1);
-            case "StochasticMultinomialLogisticRegression": return new StochasticMultinomialLogisticRegression();
         
             // neuralnetwork
             // svm classifiers
