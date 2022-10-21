@@ -119,11 +119,12 @@ public class MLPipeLineFactory {
     public static Classifier buildModelClassifier(String modelName) {
 
         switch (modelName){
-            // bayesian classifiers
-            // boosting classifiers
-            // imbalance classifiers
-            // knn classifiers
-            // linear classifiers
+        // bayesian classifiers
+        // boosting classifiers
+        // imbalance classifiers
+        // knn classifiers
+
+        // linear classifiers
 
             // no working properly
             case "ALMA2":
@@ -138,6 +139,7 @@ public class MLPipeLineFactory {
                 return new NHERD(1, NHERD.CovMode.PROJECT); // FULL,DROP, PROJECT no working, 
 
             
+                
             // working properly
             case "ALMA2K":
                 return ModelClassifierFactory.buildModelALMA2K(new RBFKernel(0.5), 0.8);
@@ -168,9 +170,9 @@ public class MLPipeLineFactory {
             case "SMIDAS" : return new SMIDAS(0.1);
             case "STGD" : return new STGD(5, 0.1, Double.POSITIVE_INFINITY, 0.1);
         
-            // neuralnetwork
-            // svm classifiers
-            // tress classifiers
+        // neuralnetwork
+        // svm classifiers
+        // tress classifiers
         }
     }
 
@@ -183,7 +185,8 @@ public class MLPipeLineFactory {
 
         switch (modelName){
             default:
-            case "FLAME" : return new FLAME(new EuclideanDistance(), k, 800);
+            case "FLAME":
+                return ModelClusteringFactory.buildModelFLAME(new EuclideanDistance(), k, 800); 
         }
     }
 

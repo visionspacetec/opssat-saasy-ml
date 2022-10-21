@@ -93,7 +93,7 @@ public class SaaSyMLPipeLineTest {
      */
     public static void testClustering(boolean thread, boolean serialize) {
         // name of the model
-        String modelName = "NewGLMNET";
+        String modelName = "FLAME";
 
         // instantiate the class
         IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(123, 1, thread, serialize, modelName);
