@@ -2,17 +2,29 @@ package esa.mo.nmf.apps.saasyml.factories;
 
 import jsat.classifiers.Classifier;
 import jsat.classifiers.linear.ALMA2;
+import jsat.classifiers.linear.AROW;
 import jsat.classifiers.linear.kernelized.ALMA2K;
 import jsat.classifiers.linear.BBR;
+import jsat.classifiers.linear.LinearBatch;
+import jsat.classifiers.linear.LinearL1SCD;
 import jsat.classifiers.linear.LinearSGD;
 import jsat.classifiers.linear.LogisticRegressionDCD;
+import jsat.classifiers.linear.NHERD;
+import jsat.classifiers.linear.NewGLMNET;
 import jsat.classifiers.linear.PassiveAggressive;
 import jsat.classifiers.linear.SCD;
+import jsat.classifiers.linear.SCW;
 import jsat.classifiers.linear.SDCA;
+import jsat.classifiers.linear.SMIDAS;
 import jsat.classifiers.linear.SPA;
+import jsat.classifiers.linear.STGD;
+import jsat.classifiers.linear.StochasticMultinomialLogisticRegression;
 import jsat.classifiers.linear.BBR.Prior;
+import jsat.classifiers.linear.NHERD.CovMode;
+import jsat.classifiers.linear.StochasticSTLinearL1.Loss;
 import jsat.distributions.kernels.KernelTrick;
 import jsat.lossfunctions.LogisticLoss;
+import jsat.lossfunctions.LossFunc;
 import jsat.math.optimization.stochastic.AdaGrad;
 import jsat.math.optimization.stochastic.GradientUpdater;
 import jsat.math.optimization.stochastic.RMSProp;
@@ -70,6 +82,43 @@ public class ModelClassifierFactory {
      */
     public static Classifier buildModelSCD(LogisticLoss loss, double regularization, int iterations) {
         return new SCD(loss, regularization, iterations); // regularization: 1e-6
+    }
+
+    /**
+     * Generate classifier model AROW
+     * @param r the regularization parameter
+     * @param diagonalOnly whether or not to use only the diagonal of the covariance 
+     * @return Classifier model
+     */
+    public static Classifier buildModelAROW(double r, boolean diagonalOnly) {
+        AROW arow = new AROW();
+        arow.setR(r);
+        arow.setDiagonalOnly(diagonalOnly);
+        return arow;
+    }
+
+    /**
+     * Generate classifier model NHERD
+     * @param C the aggressiveness parameter
+     * @param covMode how to form the covariance matrix
+     * @return Classifier model
+     */
+    public static Classifier buildModelNHERD(double C, CovMode covMode) {
+        NHERD nherd = new NHERD(C, covMode);
+        return nherd;
+    }
+
+    /**
+     * Generate classifier model SCW
+     * @param eta the margin confidence parameter in [0.5, 1]
+     * @param mode mode controlling which algorithm to use
+     * @param diagonalOnly whether or not to use only the diagonal of the 
+     * covariance matrix
+     * @return Classifier model
+     */
+    public static Classifier buildModelSCW(double eta, SCW.Mode mode, boolean diagonalOnly) {
+        SCW scw = new SCW(eta, mode, diagonalOnly);
+        return scw;
     }
 
     /**
@@ -155,12 +204,84 @@ public class ModelClassifierFactory {
 
     /**
      * Generate classifier model SPA
-     * @param useBais whether or not an implicit bias term should be added to the model. 
+     * @param useBias whether or not an implicit bias term should be added to the model. 
      * @return Classifier model
      */
-    public static Classifier buildModelSPA(boolean useBais) {
+    public static Classifier buildModelSPA(boolean useBias) {
         SPA spa = new SPA();
-        spa.setUseBias(useBais);
+        spa.setUseBias(useBias);
         return spa;
     }
+
+    /**
+     * Generate classifier model LinearBatch
+     * @param loss the loss function to use
+     * @param lambda0 the L<sub>2</sub> regularization term
+     * @return Classifier model
+     */
+    public static Classifier buildModelLinearBatch(LossFunc loss, double lambda0) {
+        LinearBatch linearbatch = new LinearBatch();
+        linearbatch.setLoss(loss);
+        linearbatch.setLambda0(lambda0);
+        return linearbatch;
+    }
+
+    /**
+     * Generate classifier model LinearL1SCD
+     * @param epochs the number of learning iterations
+     * @param lambda the regularization penalty
+     * @param loss the loss function to use
+     * @param reScale whether or not to rescale the feature values
+     * @return Classifier model
+     */
+    public static Classifier buildModelLinearL1SCD(int epochs, double lambda, Loss loss, boolean reScale) {
+        LinearL1SCD linearl1scd = new LinearL1SCD();
+        linearl1scd.setEpochs(epochs);
+        linearl1scd.setLambda(lambda);
+        linearl1scd.setLoss(loss);
+        linearl1scd.setReScale(reScale);
+        return linearl1scd;
+    }
+
+    /**
+     * Generate classifier model StochasticMultinomialLogisticRegression
+     * @return Classifier model
+     */
+    public static Classifier buildModelStochasticMultinomialLogisticRegression() {
+        StochasticMultinomialLogisticRegression smlr = new StochasticMultinomialLogisticRegression();
+        return smlr;
+    }
+
+    /**
+     * Generate classifier NewGLMNET
+     * @return Classifier model
+     */
+    public static Classifier buildModelNewGLMNET() {
+        NewGLMNET newglmnet = new NewGLMNET();
+        return newglmnet;
+    }
+
+    /**
+     * Generate classifier SMIDAS
+     * @param eta the learning rate for each iteration
+     * @return Classifier model
+     */
+    public static Classifier buildModelSMIDAS(double eta) {
+        SMIDAS smidas = new SMIDAS(eta);
+        return smidas;
+    }
+
+    /**
+     * Generate classifier STGD
+     * @param K the regularization frequency
+     * @param learningRate the learning rate to use
+     * @param threshold the regularization threshold
+     * @param gravity the regularization parameter
+     * @return Classifier model
+     */
+    public static Classifier buildModelSTGD(int K, double learningRate, double threshold, double gravity) {
+        STGD stgd = new STGD(K, learningRate, threshold, gravity);
+        return stgd;
+    }
+
 }

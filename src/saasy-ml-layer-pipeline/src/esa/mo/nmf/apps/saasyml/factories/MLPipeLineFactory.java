@@ -6,36 +6,15 @@ import esa.mo.nmf.apps.saasyml.service.PipeLineClusterJSAT;
 import esa.mo.nmf.apps.saasyml.service.PipeLineOutlierJSAT;
 import esa.mo.nmf.apps.saasyml.service.PipeLineRegressorJSAT;
 import jsat.classifiers.Classifier;
-import jsat.classifiers.linear.ALMA2;
-import jsat.classifiers.linear.kernelized.ALMA2K;
-import jsat.classifiers.linear.AROW;
 import jsat.classifiers.linear.BBR;
-import jsat.classifiers.linear.LinearBatch;
-import jsat.classifiers.linear.LinearL1SCD;
-import jsat.classifiers.linear.LinearSGD;
-import jsat.classifiers.linear.LogisticRegressionDCD;
 import jsat.classifiers.linear.NHERD;
-import jsat.classifiers.linear.NewGLMNET;
 import jsat.classifiers.linear.PassiveAggressive;
-import jsat.classifiers.linear.SCD;
 import jsat.classifiers.linear.SCW;
-import jsat.classifiers.linear.SDCA;
-import jsat.classifiers.linear.SMIDAS;
-import jsat.classifiers.linear.SPA;
-import jsat.classifiers.linear.STGD;
-import jsat.classifiers.linear.StochasticMultinomialLogisticRegression;
 import jsat.classifiers.linear.StochasticSTLinearL1;
 import jsat.clustering.Clusterer;
-import jsat.clustering.FLAME;
 import jsat.distributions.kernels.RBFKernel;
 import jsat.linear.distancemetrics.EuclideanDistance;
-import jsat.lossfunctions.HingeLoss;
 import jsat.lossfunctions.LogisticLoss;
-import jsat.math.optimization.stochastic.AdaGrad;
-import jsat.math.optimization.stochastic.GradientUpdater;
-import jsat.math.optimization.stochastic.RMSProp;
-import jsat.math.optimization.stochastic.SimpleSGD;
-import jsat.lossfunctions.SquaredLoss;
 import jsat.outlier.DensityOutlier;
 import jsat.outlier.IsolationForest;
 import jsat.outlier.LOF;
@@ -134,9 +113,11 @@ public class MLPipeLineFactory {
             case "SCD":
                 return ModelClassifierFactory.buildModelSCD(new LogisticLoss(), 1e-6, 100); 
             case "AROW":
-                return new AROW(1, true);
+                return ModelClassifierFactory.buildModelAROW(1, true);
             case "NHERD":
-                return new NHERD(1, NHERD.CovMode.PROJECT); // FULL,DROP, PROJECT no working, 
+                return ModelClassifierFactory.buildModelNHERD(1, NHERD.CovMode.PROJECT); // FULL,DROP, PROJECT no working, 
+            case "SCW" : 
+                return ModelClassifierFactory.buildModelSCW(0.9, SCW.Mode.SCWI, false);
 
             
                 
@@ -155,20 +136,22 @@ public class MLPipeLineFactory {
             case "SPA":
                 return ModelClassifierFactory.buildModelSPA(true); 
             case "LinearBatch":
-                return new LinearBatch(new LogisticLoss(), 1e-4);
+                return ModelClassifierFactory.buildModelLinearBatch(new LogisticLoss(), 1e-4);
             case "LinearL1SCD":
-                return new LinearL1SCD(1000, 1e-14, StochasticSTLinearL1.Loss.LOG, true);
-            case "StochasticMultinomialLogisticRegression":
-                return new StochasticMultinomialLogisticRegression();
-            case "NewGLMNET" : return new NewGLMNET();
-            
-                
+                return ModelClassifierFactory.buildModelLinearL1SCD(1000, 1e-14, StochasticSTLinearL1.Loss.LOG, true);
+            case "NewGLMNET" : 
+                return ModelClassifierFactory.buildModelNewGLMNET();
+                            
 
-            // no tested
-            // Liliana
-            case "SCW" : return new SCW();
-            case "SMIDAS" : return new SMIDAS(0.1);
-            case "STGD" : return new STGD(5, 0.1, Double.POSITIVE_INFINITY, 0.1);
+            // not working
+            // Liliana to check these again
+            case "SMIDAS" : 
+                return ModelClassifierFactory.buildModelSMIDAS(0.1);
+            case "STGD" : 
+                return ModelClassifierFactory.buildModelSTGD(5, 0.1, Double.POSITIVE_INFINITY, 0.1);
+            case "StochasticMultinomialLogisticRegression":
+                return ModelClassifierFactory.buildModelStochasticMultinomialLogisticRegression();
+
         
         // neuralnetwork
         // svm classifiers
