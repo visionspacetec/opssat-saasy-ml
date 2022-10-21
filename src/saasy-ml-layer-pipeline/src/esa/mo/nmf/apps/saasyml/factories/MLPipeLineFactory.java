@@ -118,9 +118,6 @@ public class MLPipeLineFactory {
      */
     public static Classifier buildModelClassifier(String modelName) {
 
-        GradientUpdater[] updaters = new GradientUpdater[] { new SimpleSGD(), new AdaGrad(),
-                new RMSProp() };
-
         switch (modelName){
             // bayesian classifiers
             // boosting classifiers
@@ -129,69 +126,36 @@ public class MLPipeLineFactory {
             // linear classifiers
 
             // no working properly
-            case "ALMA2": { 
-                ALMA2 alma = new ALMA2();
-                alma.setEpochs(5);
-                return alma;
-            } 
+            case "ALMA2":
+                return ModelClassifierFactory.buildModelALMA2(5);
+            case "PassiveAggressive":
+                return ModelClassifierFactory.buildModelPassiveAggresive(PassiveAggressive.Mode.PA, 0.00001, 10000, 20);
+            case "SCD":
+                return ModelClassifierFactory.buildModelSCD(new LogisticLoss(), 1e-6, 100); 
             case "AROW":
                 return new AROW(1, true);
             case "NHERD":
                 return new NHERD(1, NHERD.CovMode.PROJECT); // FULL,DROP, PROJECT no working, 
-            case "PassiveAggressive" : {
-                PassiveAggressive pa = new PassiveAggressive();
-                pa.setMode(PassiveAggressive.Mode.PA);
-                pa.setEps(0.00001);
-                pa.setEpochs(10000);
-                pa.setC(20);
-                return pa;
-            }
-            case "SCD" : return new SCD(new LogisticLoss(), 1e-6, 100); // regularization: 1e-6
 
             
             // working properly
-            case "ALMA2K": return new ALMA2K(new RBFKernel(0.5), 0.8);
+            case "ALMA2K":
+                return ModelClassifierFactory.buildModelALMA2K(new RBFKernel(0.5), 0.8);
             default:
-            case "LogisticRegressionDCD": {
-                LogisticRegressionDCD lr = new LogisticRegressionDCD();
-                lr.setUseBias(true);
-                return lr;
-            }
-            case "BBR" : return new BBR(0.01, 1000, BBR.Prior.GAUSSIAN);
+            case "LogisticRegressionDCD":
+                return ModelClassifierFactory.buildModelLogisticRegressionDCD(true); 
+            case "BBR":
+                return ModelClassifierFactory.buildModelBBR(0.01, 1000, BBR.Prior.GAUSSIAN);
+            case "LinearSGD":
+                return ModelClassifierFactory.buildModelLinearSGD(new LogisticLoss(), 1e-4, 1e-5, true, 50, 0.5, 100, 2);
+            case "SDCA":
+                return ModelClassifierFactory.buildModelSDCA(new LogisticLoss(), 1e-10, 0.005, 0); 
+            case "SPA":
+                return ModelClassifierFactory.buildModelSPA(true); 
             case "LinearBatch":
                 return new LinearBatch(new LogisticLoss(), 1e-4);
-            case "LinearL1SCD": return new LinearL1SCD(1000, 1e-14, StochasticSTLinearL1.Loss.LOG, true);
-            case "LinearSGD": {
-
-                int index = 2;
-                LinearSGD linearsgd = new LinearSGD(new LogisticLoss(), 1e-4, 1e-5);
-                linearsgd.setUseBias(true);
-
-                linearsgd.setGradientUpdater(updaters[index]);
-
-                //SGD needs more iterations/data to learn a really close fit
-                linearsgd.setEpochs(50);
-                if (!(updaters[index] instanceof SimpleSGD))//the others need a higher learning rate than the default
-                {
-                    linearsgd.setEta(0.5);
-                    linearsgd.setEpochs(100);//more iters b/c RMSProp probably isn't the best for this overly simple problem
-                }
-
-                return linearsgd;
-            }
-            case "SDCA" : {
-                SDCA sdca = new SDCA();
-                sdca.setLoss(new LogisticLoss());
-                sdca.setTolerance(1e-10);
-                sdca.setLambda(0.005);
-                sdca.setAlpha(0);
-                return sdca;
-            }
-            case "SPA" : {
-                SPA spa = new SPA();
-                spa.setUseBias(true);
-                return spa;
-            }
+            case "LinearL1SCD":
+                return new LinearL1SCD(1000, 1e-14, StochasticSTLinearL1.Loss.LOG, true);
             case "StochasticMultinomialLogisticRegression":
                 return new StochasticMultinomialLogisticRegression();
             case "NewGLMNET" : return new NewGLMNET();
