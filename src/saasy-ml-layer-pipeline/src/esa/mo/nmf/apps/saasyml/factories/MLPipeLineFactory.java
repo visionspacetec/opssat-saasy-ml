@@ -99,6 +99,23 @@ public class MLPipeLineFactory {
 
         switch (modelName){
         // bayesian classifiers
+
+            // not working properly
+            case "AODE" : // requires 2 categorical variables
+                return ModelClassifierFactory.buildModelAODE();
+            case "ConditionalProbabilityTable" :
+                return ModelClassifierFactory.buildModelConditionalProbabilityTable();
+            case "MultinomialNaiveBayes" :
+                return ModelClassifierFactory.buildModelMultinomialNaiveBayes();
+            case "MultivariateNormals" :
+                return ModelClassifierFactory.buildModelMultivariateNormals();
+            
+            // working properly
+            case "NaiveBayes" :
+                return ModelClassifierFactory.buildModelNaiveBayes();    
+            case "NaiveBayesUpdateable" :
+                return ModelClassifierFactory.buildModelNaiveBayesUpdateable();
+
         // boosting classifiers
         // imbalance classifiers
         // knn classifiers
@@ -223,7 +240,16 @@ public class MLPipeLineFactory {
     public static TypeModel getTypeModel(String modelName) {
 
         switch (modelName){
+
+            case "AODE" :
+            case "ConditionalProbabilityTable" :
+            case "MultinomialNaiveBayes" :
+            case "MultivariateNormals" :
+            case "NaiveBayes" :
+            case "NaiveBayesUpdateable" :
+
             case "ALMA2" :
+            case "ALMA2K" :
             case "AROW" :
             case "BBR" : 
             case "LinearBatch" : 

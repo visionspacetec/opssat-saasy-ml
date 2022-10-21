@@ -1,6 +1,12 @@
 package esa.mo.nmf.apps.saasyml.factories;
 
 import jsat.classifiers.Classifier;
+import jsat.classifiers.bayesian.AODE;
+import jsat.classifiers.bayesian.ConditionalProbabilityTable;
+import jsat.classifiers.bayesian.MultinomialNaiveBayes;
+import jsat.classifiers.bayesian.MultivariateNormals;
+import jsat.classifiers.bayesian.NaiveBayes;
+import jsat.classifiers.bayesian.NaiveBayesUpdateable;
 import jsat.classifiers.linear.ALMA2;
 import jsat.classifiers.linear.AROW;
 import jsat.classifiers.linear.kernelized.ALMA2K;
@@ -43,7 +49,65 @@ public class ModelClassifierFactory {
         new SimpleSGD(),
         new AdaGrad(),
         new RMSProp() };
-        
+    
+    // Bayesian classifiers
+
+    /**
+     * Generate classifier model AODE
+     * @return Classifier model
+     */
+    public static Classifier buildModelAODE() {
+        AODE aode = new AODE();
+        return aode;
+    }    
+
+    /**
+     * Generate classifier model ConditionalProbabilityTable
+     * @return Classifier model
+     */       
+    public static Classifier buildModelConditionalProbabilityTable() {
+        ConditionalProbabilityTable cpt = new ConditionalProbabilityTable();
+        return cpt;
+    }
+
+    /**
+     * Generate classifier model MultinomialNaiveBayes
+     * @return Classifier model
+     */    
+    public static Classifier buildModelMultinomialNaiveBayes() {
+        MultinomialNaiveBayes mnnaivebayes = new MultinomialNaiveBayes();
+        return mnnaivebayes;
+    }    
+    
+    /**
+     * Generate classifier model MultivariateNormals
+     * @return Classifier model
+     */
+    public static Classifier buildModelMultivariateNormals() {
+        MultivariateNormals mvn = new MultivariateNormals();
+        return mvn;
+    }
+
+    /**
+     * Generate classifier model NaiveBayes
+     * @return Classifier model
+     */
+    public static Classifier buildModelNaiveBayes() {
+        NaiveBayes naivebayes = new NaiveBayes();
+        return naivebayes;
+    }
+
+    /**
+     * Generate classifier model NaiveBayesUpdateable
+     * @return Classifier model
+     */
+    public static Classifier buildModelNaiveBayesUpdateable() {
+        NaiveBayesUpdateable naivebayesupd = new NaiveBayesUpdateable();
+        return naivebayesupd;
+    }
+
+    // Linear classifiers
+
     /**
      * Generate classifier model ALMA2
      * @param epoch an integer that holds number of epochs
