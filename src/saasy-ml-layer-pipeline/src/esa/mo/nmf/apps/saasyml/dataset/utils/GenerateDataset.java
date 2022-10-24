@@ -3,13 +3,18 @@ package esa.mo.nmf.apps.saasyml.dataset.utils;
 import jsat.classifiers.CategoricalData;
 import jsat.classifiers.ClassificationDataSet;
 import jsat.distributions.multivariate.NormalM;
+import jsat.linear.ConstantVector;
 import jsat.linear.DenseVector;
 import jsat.linear.Matrix;
 import jsat.linear.Vec;
 import jsat.regression.RegressionDataSet;
 import jsat.utils.random.RandomUtil;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+
 
 /**
  * Contains pre determined code for generating specific data sets. 
@@ -43,8 +48,66 @@ public class GenerateDataset
         
         return train;
     }
+
+    /**
+     * Generates a linearly separable binary classification problem
+     * @param dataSetSize the number of points to generated
+     * @return a binary classification data set that is linearly separable
+     */
+    public static ClassificationDataSet get2ClassLinearOwnData(int dataSetSize)
+    {
+        ClassificationDataSet classificationDataSet = new ClassificationDataSet(c2l_m0.length(), new CategoricalData[0],
+                new CategoricalData(2));
+
+        // we fixed the number of columns in the dataset
+        int length = 7;
+
+        // we generate a set of data
+        List<Vec> c0 = generateConstantVectorData(dataSetSize, length);
+
+        // we add in our data all the generated data with its associated label 0
+        for(Vec s : c0)
+            classificationDataSet.addDataPoint(s, new int[0], 0);
+
+        // we generate a set of data
+        List<Vec> c1 = generateConstantVectorData(dataSetSize, length);
+
+        // we add in our data all the generated data with its associated label 1
+        for(Vec s : c1)
+            classificationDataSet.addDataPoint(s, new int[0], 1);
+        
+        // return the data
+        return classificationDataSet;
+    }
     
-    
+    /**
+     * Generates a linearly separable binary classification data
+     * @param dataSetSize the number of points to generated
+     * @param length the number of columns to generated
+     * @return a binary classification data set that is linearly separable
+     */
+    private static List<Vec> generateConstantVectorData(int dataSetSize, int length) {
+
+        // initialize the list of vector
+        List<Vec> dataSet = new ArrayList<Vec>(dataSetSize);
+        
+        // considering the total number of rows for the dataset
+        for(int i = 0; i < dataSetSize; i++)
+        {
+            // generate a random number
+            double randomNum = ThreadLocalRandom.current().nextDouble(0, 1);
+
+            // create a vector with length columns and the same randon number in each column
+            Vec sample = new ConstantVector(randomNum, length);
+
+            // we add the row in our list of vectors
+            dataSet.add(sample);
+        }
+
+        // return the list of vectors
+        return dataSet;
+    }
+
     /**
      * Creates a 2D linearly separable problem 
      * @param dataSetSize0 size of the first class

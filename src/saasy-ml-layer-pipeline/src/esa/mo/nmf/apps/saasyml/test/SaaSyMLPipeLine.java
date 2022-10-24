@@ -39,7 +39,7 @@ public class SaaSyMLPipeLine {
     public static void main(String[] args) {
 
         // how to use information
-        String howToUse = "$ java -jar saasyml-pipeline-0.1.0-SNAPSHOT.jar -thread [1 | true] -s [1 | true] -tests [1 2 3 4 | Classifier Cluster Outlier Regressor]";
+        String howToUse = "$ java -jar saasyml-pipeline-0.1.0-SNAPSHOT.jar -thread [1 | true] -s [1 | true] -tests [1 2 3 4 5 | Classifier Cluster Outlier Regressor ClassifierOwnData]";
 
         // if the thread is available or not
         boolean thread = false;
@@ -59,6 +59,7 @@ public class SaaSyMLPipeLine {
                     add("2");
                     add("3");
                     add("4");
+                    add("5");
                 }
             };
 
@@ -99,6 +100,7 @@ public class SaaSyMLPipeLine {
                         add("2");
                         add("3");
                         add("4");
+                        add("5");
                     }
                 };
             }else{
@@ -148,6 +150,10 @@ public class SaaSyMLPipeLine {
             if (s.equals("4") || s.equals("Regressor")) {
                 logger.info("************* Testing Regressor **************");
                 SaaSyMLPipeLineTest.testRegressor(thread, serialize);
+            }
+            if (s.equals("5") || s.equals("ClassifierOwnData")) {
+                logger.info("************* Testing Classifier Own Data **************");
+                SaaSyMLPipeLineTest.testClassifierOwnData(thread, serialize);
             }
         }
 

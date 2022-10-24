@@ -6,25 +6,13 @@ import esa.mo.nmf.apps.saasyml.service.PipeLineClusterJSAT;
 import esa.mo.nmf.apps.saasyml.service.PipeLineOutlierJSAT;
 import esa.mo.nmf.apps.saasyml.service.PipeLineRegressorJSAT;
 import jsat.classifiers.Classifier;
-import jsat.classifiers.linear.ALMA2;
-import jsat.classifiers.linear.AROW;
 import jsat.classifiers.linear.BBR;
-import jsat.classifiers.linear.LinearBatch;
-import jsat.classifiers.linear.LinearL1SCD;
-import jsat.classifiers.linear.LinearSGD;
-import jsat.classifiers.linear.LogisticRegressionDCD;
 import jsat.classifiers.linear.NHERD;
-import jsat.classifiers.linear.NewGLMNET;
 import jsat.classifiers.linear.PassiveAggressive;
-import jsat.classifiers.linear.SCD;
 import jsat.classifiers.linear.SCW;
-import jsat.classifiers.linear.SDCA;
-import jsat.classifiers.linear.SMIDAS;
-import jsat.classifiers.linear.SPA;
-import jsat.classifiers.linear.STGD;
-import jsat.classifiers.linear.StochasticMultinomialLogisticRegression;
+import jsat.classifiers.linear.StochasticSTLinearL1;
 import jsat.clustering.Clusterer;
-import jsat.clustering.FLAME;
+import jsat.distributions.kernels.RBFKernel;
 import jsat.linear.distancemetrics.EuclideanDistance;
 import jsat.lossfunctions.LogisticLoss;
 import jsat.outlier.DensityOutlier;
@@ -110,33 +98,81 @@ public class MLPipeLineFactory {
     public static Classifier buildModelClassifier(String modelName) {
 
         switch (modelName){
-            // bayesian classifiers
-            // boosting classifiers
-            // imbalance classifiers
-            // knn classifiers
-            // linear classifiers
-            case "ALMA2" : return new ALMA2();
-            case "AROW" : return new AROW(1, true);
-            case "BBR" : return new BBR(0.01, 1000, BBR.Prior.GAUSSIAN);
-            case "LinearBatch" : return new LinearBatch();
-            case "LinearL1SCD" : return new LinearL1SCD();
-            case "LinearSGD" : return new LinearSGD();
+        // bayesian classifiers
+
+            // not working properly
+            case "AODE" : // requires 2 categorical variables
+                return ModelClassifierFactory.buildModelAODE();
+            case "ConditionalProbabilityTable" :
+                return ModelClassifierFactory.buildModelConditionalProbabilityTable();
+            case "MultinomialNaiveBayes" :
+                return ModelClassifierFactory.buildModelMultinomialNaiveBayes();
+            case "MultivariateNormals" :
+                return ModelClassifierFactory.buildModelMultivariateNormals();
+            
+            // working properly
+            case "NaiveBayes" :
+                return ModelClassifierFactory.buildModelNaiveBayes();    
+            case "NaiveBayesUpdateable" :
+                return ModelClassifierFactory.buildModelNaiveBayesUpdateable();
+
+        // boosting classifiers
+        // imbalance classifiers
+        // knn classifiers
+
+        // linear classifiers
+
+            // no working properly
+            case "ALMA2":
+                return ModelClassifierFactory.buildModelALMA2(5);
+            case "PassiveAggressive":
+                return ModelClassifierFactory.buildModelPassiveAggresive(PassiveAggressive.Mode.PA, 0.00001, 10000, 20);
+            case "SCD":
+                return ModelClassifierFactory.buildModelSCD(new LogisticLoss(), 1e-6, 100); 
+            case "AROW":
+                return ModelClassifierFactory.buildModelAROW(1, true);
+            case "NHERD":
+                return ModelClassifierFactory.buildModelNHERD(1, NHERD.CovMode.PROJECT); // FULL,DROP, PROJECT no working, 
+            case "SCW" : 
+                return ModelClassifierFactory.buildModelSCW(0.9, SCW.Mode.SCWI, false);
+
+            
+                
+            // working properly
+            case "ALMA2K":
+                return ModelClassifierFactory.buildModelALMA2K(new RBFKernel(0.5), 0.8);
             default:
-            case "LogisticRegressionDCD" : return new LogisticRegressionDCD();
-            case "NewGLMNET" : return new NewGLMNET();
-            case "NHERD" : return new NHERD(1, NHERD.CovMode.FULL);
-            case "PassiveAggressive" : return new PassiveAggressive();
-            case "SCD" : return new SCD(new LogisticLoss(), 1e-6, 100);
-            case "SCW" : return new SCW();
-            case "SDCA" : return new SDCA();
-            case "SMIDAS" : return new SMIDAS(0.1);
-            case "SPA" : return new SPA();
-            case "STGD" : return new STGD(5, 0.1, Double.POSITIVE_INFINITY, 0.1);
-            case "StochasticMultinomialLogisticRegression": return new StochasticMultinomialLogisticRegression();
+            case "LogisticRegressionDCD":
+                return ModelClassifierFactory.buildModelLogisticRegressionDCD(true); 
+            case "BBR":
+                return ModelClassifierFactory.buildModelBBR(0.01, 1000, BBR.Prior.GAUSSIAN);
+            case "LinearSGD":
+                return ModelClassifierFactory.buildModelLinearSGD(new LogisticLoss(), 1e-4, 1e-5, true, 50, 0.5, 100, 2);
+            case "SDCA":
+                return ModelClassifierFactory.buildModelSDCA(new LogisticLoss(), 1e-10, 0.005, 0); 
+            case "SPA":
+                return ModelClassifierFactory.buildModelSPA(true); 
+            case "LinearBatch":
+                return ModelClassifierFactory.buildModelLinearBatch(new LogisticLoss(), 1e-4);
+            case "LinearL1SCD":
+                return ModelClassifierFactory.buildModelLinearL1SCD(1000, 1e-14, StochasticSTLinearL1.Loss.LOG, true);
+            case "NewGLMNET" : 
+                return ModelClassifierFactory.buildModelNewGLMNET();
+                            
+
+            // not working
+            // Liliana to check these again
+            case "SMIDAS" : 
+                return ModelClassifierFactory.buildModelSMIDAS(0.1);
+            case "STGD" : 
+                return ModelClassifierFactory.buildModelSTGD(5, 0.1, Double.POSITIVE_INFINITY, 0.1);
+            case "StochasticMultinomialLogisticRegression":
+                return ModelClassifierFactory.buildModelStochasticMultinomialLogisticRegression();
+
         
-            // neuralnetwork
-            // svm classifiers
-            // tress classifiers
+        // neuralnetwork
+        // svm classifiers
+        // tress classifiers
         }
     }
 
@@ -149,7 +185,8 @@ public class MLPipeLineFactory {
 
         switch (modelName){
             default:
-            case "FLAME" : return new FLAME(new EuclideanDistance(), k, 800);
+            case "FLAME":
+                return ModelClusteringFactory.buildModelFLAME(new EuclideanDistance(), k, 800); 
         }
     }
 
@@ -203,7 +240,16 @@ public class MLPipeLineFactory {
     public static TypeModel getTypeModel(String modelName) {
 
         switch (modelName){
+
+            case "AODE" :
+            case "ConditionalProbabilityTable" :
+            case "MultinomialNaiveBayes" :
+            case "MultivariateNormals" :
+            case "NaiveBayes" :
+            case "NaiveBayesUpdateable" :
+
             case "ALMA2" :
+            case "ALMA2K" :
             case "AROW" :
             case "BBR" : 
             case "LinearBatch" : 

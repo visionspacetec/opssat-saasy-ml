@@ -1,7 +1,7 @@
 package esa.mo.nmf.apps.saasyml.service;
 
 import esa.mo.nmf.apps.saasyml.factories.MLPipeLineFactory;
-
+import jsat.classifiers.CategoricalResults;
 import jsat.classifiers.ClassificationDataSet;
 import jsat.classifiers.Classifier;
 import jsat.classifiers.DataPointPair;
@@ -71,18 +71,21 @@ public class PipeLineClassifierJSAT extends PipeLineAbstractJSAT {
     }
 
     public List<Object> inference(){
-        if (serialize){
+        if (serialize) {
             // deserialize the model
             this.model = deserializeClassifier(this.modelPathSerialized);
         }
 
         // test the model
         List<Object> result = new ArrayList<Object>();
-        for(DataPointPair<Integer> dpp : ((ClassificationDataSet)test).getAsDPPList()){
-            logger.info(String.valueOf(dpp.getPair().longValue()));
-            int classify = model.classify(dpp.getDataPoint()).mostLikely();
-            logger.info(dpp.getPair().longValue()+ " vs " + classify);
+        for(DataPointPair<Integer> dpp : ((ClassificationDataSet)test).getAsDPPList()) {
+
+            CategoricalResults results = model.classify(dpp.getDataPoint());
+            int classify = results.mostLikely();
             result.add(classify);
+            
+            logger.info("results of probabilities of the inference : " + results.toString());
+            logger.info("original vs inference : "+dpp.getPair()+ " vs " + classify);
         }
         return result;
     }
