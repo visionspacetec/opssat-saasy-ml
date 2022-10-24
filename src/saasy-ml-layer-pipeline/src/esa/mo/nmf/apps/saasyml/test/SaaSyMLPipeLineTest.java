@@ -132,18 +132,23 @@ public class SaaSyMLPipeLineTest {
         logger.info("Generate training dataset...");
         int N = 5000;
         DataSet train = new GridDataGenerator(new Normal(), 1,1,1).generateData(N);
+        
+        DataSet test = new GridDataGenerator(new Normal(10, 1.0), 1,1,1).generateData(10);
 
         // build the model
         saasyml.build();
 
         // upload the train dataset
-        saasyml.setDataSet(train, null);
+        saasyml.setDataSet(train, test);
 
         // start training the model
         saasyml.train();
 
         // inference the model
-        saasyml.inference();
+        List<Object> result = saasyml.inference();
+
+        logger.info("test data: "+ Arrays.toString(test.getDataVectors().toArray()));
+        logger.info("outlier result: "+ Arrays.toString(result.toArray()));
 
     }
 

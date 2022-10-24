@@ -9,7 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.DoubleStream;
 
 /**
  * Class that uses the JSAT library inside the PipeLine
@@ -48,16 +51,16 @@ public class PipeLineOutlierJSAT extends PipeLineAbstractJSAT{
     /************ PUBLIC METHODS **********/
     /**************************************/
 
-    public void build(){
+    public void build() {
         // build the model
         this.model = MLPipeLineFactory.buildModelOutlier(this.modelName);
     }
 
-    public void build(Object[] parameters){
+    public void build(Object[] parameters) {
         this.build();
     }
 
-    public void train(){
+    public void train() {
         // train the model
         this.model.fit((SimpleDataSet) train, thread);
 
@@ -67,21 +70,33 @@ public class PipeLineOutlierJSAT extends PipeLineAbstractJSAT{
         }
     }
 
-    public List<Object> inference(){
+    public List<Object> inference() {
 
         if (serialize){
             // deserialize the model
             this.model = deserializeOutlier(modelPathSerialized);
         }
 
-        // test the model
-        double numOutliersInTrain = ((SimpleDataSet)train).getDataPoints().stream().mapToDouble(model::score).filter(x -> x < 0).count();
-        logger.info((numOutliersInTrain / train.size()) + " vs " + 0.05);//Better say something like 95% are inlines!
+        List<Object> result = new ArrayList<Object>();
 
-        double numOutliersInOutliers = ((SimpleDataSet)test).getDataPoints().stream().mapToDouble(model::score).filter(x -> x < 0).count();
-        logger.info((numOutliersInOutliers / test.size()) + " vs " + 0.1);//Better say 90% are outliers!
+        // socre the test data with the trained model
+        Supplier<DoubleStream> recordsOutliersTest = () -> ((SimpleDataSet) test).getDataPoints().stream()
+                .mapToDouble(model::score);
+        
+        // store only the score that are outliers (any value less than )
+        Supplier<DoubleStream> outliers = () -> recordsOutliersTest.get().filter(x -> x < 0);
 
-        return null;
+        // From now, we store the score of all outliers
+        // 
+        // should we store only the outliers? If so, we should change recordsOutliersTest -> outliers
+        recordsOutliersTest.get().forEach(n -> result.add(n));
+
+        // get the number of outliers
+        double numOutliers = outliers.get().count();
+
+        logger.info("original vs inference : " + (numOutliers / test.size()) + " vs " + 0.1); //Better say 90% are outliers!
+
+        return result;
     }
 
 

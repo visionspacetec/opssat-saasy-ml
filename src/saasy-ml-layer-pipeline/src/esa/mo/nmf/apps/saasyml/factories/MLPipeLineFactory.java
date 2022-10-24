@@ -200,15 +200,15 @@ public class MLPipeLineFactory {
         switch (modelName){
             default:
             case "IsolationForest":
-                return new IsolationForest();
+                return ModelOutlierFactory.buildModelIsolationForest(); 
             case "DensityOutlier":
-                return new DensityOutlier();
+                return ModelOutlierFactory.buildModelDensityOutlier(); 
             case "LOF":
-                return new LOF();  
+                return ModelOutlierFactory.buildModelLOF(); 
             case "LoOP":
-                return new LoOP();
-            case "LinearOCSVM": // test
-                return new LinearOCSVM();
+                return ModelOutlierFactory.buildModelLoOP(); 
+            case "LinearOCSVM":
+                return ModelOutlierFactory.buildModelLinearOCSVM();
         }
     }
 

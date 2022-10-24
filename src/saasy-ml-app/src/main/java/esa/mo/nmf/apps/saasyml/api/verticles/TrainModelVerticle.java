@@ -64,7 +64,7 @@ public class TrainModelVerticle extends AbstractVerticle {
             // create the pipeline
             IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(expId, datasetId, thread, serialize, algorithm);
 
-            // build the model with parameters
+            // build the model 
             saasyml.build();
 
             // fetch training data and expected labels/clases and then train the model 
@@ -237,9 +237,6 @@ public class TrainModelVerticle extends AbstractVerticle {
 
         // train outlier
         vertx.eventBus().consumer(Constants.ADDRESS_TRAINING_OUTLIER, msg -> {
-            // variables to generate the class randomly
-            Random rand = new Random();
-            int totalClasses = 2;
 
             // the request payload (Json)
             JsonObject payload = (JsonObject) (msg.body());
@@ -249,16 +246,28 @@ public class TrainModelVerticle extends AbstractVerticle {
             final int expId = payload.getInteger(Constants.KEY_EXPID).intValue();
             final int datasetId = payload.getInteger(Constants.KEY_DATASETID).intValue();
             final String algorithm = payload.getString(Constants.KEY_ALGORITHM); 
-            boolean thread = (payload.containsKey(Constants.KEY_THREAD) && payload.getBoolean(Constants.KEY_THREAD) != null)? payload.getBoolean(Constants.KEY_THREAD): PropertiesManager.getInstance().getThread();
+
+            boolean thread = (payload.containsKey(Constants.KEY_THREAD) 
+                    && payload.getBoolean(Constants.KEY_THREAD) != null) ? payload.getBoolean(Constants.KEY_THREAD)
+                    : PropertiesManager.getInstance().getThread();
             boolean serialize = PropertiesManager.getInstance().getSerialize();
+
+            // the train model will be serialized and saved as a file in the filesystem
+            // a reference to the file as well as some metadata will be stored in the database
+            // collect all metadata in a Json object
+            JsonObject modelMetadata = new JsonObject();
+            modelMetadata.put(Constants.KEY_EXPID, expId);
+            modelMetadata.put(Constants.KEY_DATASETID, datasetId);
+            modelMetadata.put(Constants.KEY_TYPE, Constants.KEY_MODEL_OUTLIER);
+            modelMetadata.put(Constants.KEY_ALGORITHM, algorithm);
 
             // create the pipeline
             IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(expId, datasetId, thread, serialize, algorithm);
 
             // build the model with parameters
-            saasyml.build(new Integer[] {totalClasses});
+            saasyml.build();
             
-            // Train the model 
+            // train the model 
             try{
 
                 // build Json payload object with just expId and datasetId
