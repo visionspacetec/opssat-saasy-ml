@@ -45,6 +45,7 @@ public final class Constants {
     public static final String KEY_FILEPATH = "filepath";
 
     public static final String KEY_MODEL_CLASSIFIER = "Classifier";
+    public static final String KEY_MODEL_REGRESSOR = "Regressor";
 
 
     // labels for the endpoints
@@ -65,6 +66,7 @@ public final class Constants {
     public static final String ADDRESS_TRAINING_CLASSIFIER = BASE_ADDRESS_TRAINING + ".classifier";
     public static final String ADDRESS_TRAINING_CLUSTER = BASE_ADDRESS_TRAINING + ".cluster";
     public static final String ADDRESS_TRAINING_OUTLIER = BASE_ADDRESS_TRAINING + ".outlier";
+    public static final String ADDRESS_TRAINING_REGRESSOR = BASE_ADDRESS_TRAINING + ".regressor";
     public static final String ADDRESS_DATA_SAVE = BASE_ADDRESS_TRAINING + ".data.save";
     public static final String ADDRESS_DATA_DOWNLOAD = BASE_ADDRESS_TRAINING + ".data.download";
     public static final String ADDRESS_DATA_DELETE = BASE_ADDRESS_TRAINING + ".data.delete";
