@@ -19,6 +19,7 @@ import io.vertx.core.json.JsonObject;
 import jsat.DataSet;
 import jsat.classifiers.CategoricalData;
 import jsat.classifiers.ClassificationDataSet;
+import jsat.regression.RegressionDataSet;
 import jsat.linear.DenseVector;
 
 public class InferenceVerticle extends AbstractVerticle {
@@ -45,6 +46,7 @@ public class InferenceVerticle extends AbstractVerticle {
 
                 // prepare the test data of the classifier
                 DataSet[] testDataset = prepareClassifierOneTestData(data);
+                DataSet[] testDatasetRegressor = prepareRegressorOneTestData(data);
 
                 // for each model 
                 Iterator<Object> iter = models.iterator();
@@ -65,6 +67,10 @@ public class InferenceVerticle extends AbstractVerticle {
 
                     // set the full path of the model
                     saasyml.setModelPathSerialized(filePath);
+
+                    if (type.equals("Regressor")) {
+                        testDataset = testDatasetRegressor;
+                    }
 
                     // for each test data
                     for (DataSet test : testDataset) {
@@ -143,6 +149,45 @@ public class InferenceVerticle extends AbstractVerticle {
                     rand.nextInt(classification));
 
         });
+
+        // retrieve the list of tests
+        return tests.toArray(new DataSet[0]);
+    }
+
+    private DataSet[] prepareRegressorOneTestData(JsonArray data) {
+
+        // create the lists of tests
+        List<DataSet> tests = new ArrayList<DataSet>();
+
+        int total_columns = ((JsonArray) data.getValue(0)).size();
+        tests.add(new RegressionDataSet(total_columns, new CategoricalData[0]));
+        int index = 0;
+        
+        // fetch data
+        data.forEach(dataset -> {
+            JsonArray ds = (JsonArray) dataset;
+
+            // create the test data
+            double[] tempTestData = new double[total_columns];
+
+            int count = 0;
+
+            // iterate through the parameters
+            Iterator<Object> iter = ds.iterator();
+            while (iter.hasNext()) {
+                JsonObject p = (JsonObject) iter.next();
+
+                // store the values of the parameters
+                tempTestData[count++] = Double.parseDouble(p.getString(Constants.KEY_VALUE));
+            }
+
+            // create the data point of the test data
+            ((RegressionDataSet) tests.get(index)).addDataPoint(
+                new DenseVector(tempTestData), 
+                new int[0],
+                0.0);
+
+        });        
 
         // retrieve the list of tests
         return tests.toArray(new DataSet[0]);
