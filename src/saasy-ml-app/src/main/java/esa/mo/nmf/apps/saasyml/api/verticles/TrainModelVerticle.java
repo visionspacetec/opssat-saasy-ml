@@ -238,6 +238,10 @@ public class TrainModelVerticle extends AbstractVerticle {
         // train outlier
         vertx.eventBus().consumer(Constants.ADDRESS_TRAINING_OUTLIER, msg -> {
 
+            // variables to generate the class randomly
+            Random rand = new Random();
+            int totalClasses = 2;
+            
             // the request payload (Json)
             JsonObject payload = (JsonObject) (msg.body());
             LOGGER.log(Level.INFO, "Started training.outlier");
@@ -275,35 +279,27 @@ public class TrainModelVerticle extends AbstractVerticle {
                 payloadSelect.put(Constants.KEY_EXPID, expId);
                 payloadSelect.put(Constants.KEY_DATASETID, datasetId);
 
-                // get the total number of columns 
-                vertx.eventBus().request(Constants.ADDRESS_DATA_COUNT_DIMENSIONS, payloadSelect, reply -> {
-                    JsonObject response = (JsonObject) (reply.result().body());
+                // get the training input dimension
+                vertx.eventBus().request(Constants.ADDRESS_DATA_COUNT_DIMENSIONS, payload, dimensionResponse -> {
+                    JsonObject dimensionJson = (JsonObject) (dimensionResponse.result().body());
 
-                    // if the total number of columns exists and it is different from zero, continue
-                    if (response.containsKey(Constants.KEY_COUNT)
-                            && response.getInteger(Constants.KEY_COUNT) > 0) {
+                    // check if we actually have training input
+                    if (dimensionJson.containsKey(Constants.KEY_COUNT) && dimensionJson.getInteger(Constants.KEY_COUNT) > 0) {
                         
-                        payloadSelect.put(Constants.KEY_COUNT, response.getInteger(Constants.KEY_COUNT).intValue());
+                        // the dimension count
+                        int dimensions = dimensionJson.getInteger(Constants.KEY_COUNT).intValue();
                     
-                        // select all the data from the dataset
-                        vertx.eventBus().request(Constants.ADDRESS_TRAINING_DATA_SELECT, payloadSelect, selectReply -> {
-
+                        // select all the training data
+                        vertx.eventBus().request(Constants.ADDRESS_TRAINING_DATA_SELECT, payload, trainingDataResponse -> {
                             // get the response from the select
-                            JsonObject selectResponse = (JsonObject) (selectReply.result().body());
+                            JsonObject trainingDataResponseJson = (JsonObject) (trainingDataResponse.result().body());
+                            final JsonArray trainingDataJsonArray = trainingDataResponseJson.getJsonArray(Constants.KEY_DATA);
 
                             // if the response_select object contains the data, we can continue
-                            if(selectResponse.containsKey(Constants.KEY_DATA)) {
-
-                                // 1.2. Prepare data
-
-                                // the total number of columns
-                                int total_columns = payloadSelect.getInteger(Constants.KEY_COUNT);
-                                
-                                // get the data with the result of the select
-                                final JsonArray data = selectResponse.getJsonArray(Constants.KEY_DATA);
+                            if(trainingDataJsonArray != null) {
 
                                 // create variables for the k
-                                double[] tempTrainData = new double[total_columns]; // TRAIN
+                                double[] tempTrainData = new double[dimensions]; // TRAIN
                                 CategoricalData[] catDataInfo = new CategoricalData[] { new CategoricalData(totalClasses)} ; 
             
                                 List<DataPoint> dataPoints = new ArrayList<DataPoint>();
@@ -313,14 +309,14 @@ public class TrainModelVerticle extends AbstractVerticle {
                                 int colCount = 0;
 
                                 // iterate throughout all the data
-                                for (int pos = 0; pos < data.size(); pos++) {
+                                for (int pos = 0; pos < trainingDataJsonArray.size(); pos++) {
 
                                     // get the Json Object and store the value
-                                    JsonObject object = data.getJsonObject(pos);
+                                    JsonObject object = trainingDataJsonArray.getJsonObject(pos);
                                     tempTrainData[colCount++] = colCount + Double.valueOf(object.getString(Constants.KEY_VALUE));;
 
                                     // if colcount is equal to total columns, we add a new row
-                                    if (colCount == total_columns) {
+                                    if (colCount == dimensions) {
 
                                         // we add a data point to our train dataset 
                                         // with a random value of the class Y
@@ -328,48 +324,72 @@ public class TrainModelVerticle extends AbstractVerticle {
 
                                         // we restart the count of cols to zero and the temporal train data
                                         colCount = 0;
-                                        tempTrainData = new double[total_columns];
+                                        tempTrainData = new double[dimensions];
                                     }
                                 }
                                 
                                 LOGGER.log(Level.INFO, "Data points: " + dataPoints.toString());
                                 
-                                SimpleDataSet train = new SimpleDataSet(dataPoints);
+                                try {
+                                    SimpleDataSet train = new SimpleDataSet(dataPoints);
 
-                                // upload the train dataset
-                                saasyml.setDataSet(train, null);
-                                
-                                // 1.3. Here we enter ML pipeline for the given algorithm
-                                // 2. Serialize and save the resulting model.
-                                // Make sure it is uniquely identifiable with expId and datasetId, maybe as part
-                                // of the toGround folder file system:
-                                LOGGER.log(Level.INFO, "Executed method train");
-                                saasyml.train();
+                                    // upload the train dataset
+                                    saasyml.setDataSet(train, null);
+                                    
+                                    // enter ML pipeline for the given algorithm
+                                    // serialize and save the resulting model
+                                    saasyml.train();
 
-                                // 3. Return a message with a path to the serialized model
-                                JsonObject selectReponseReply = new JsonObject();
-                                selectReponseReply.put(Constants.KEY_TYPE, "outlier");
-                                selectReponseReply.put(Constants.KEY_ALGORITHM, algorithm);
-                                selectReponseReply.put(Constants.KEY_MODEL_PATH, saasyml.getModelPathSerialized());
-                                msg.reply(selectReponseReply);
+                                    // the path to the model file will be stored in the database
+                                    modelMetadata.put(Constants.KEY_FILEPATH, saasyml.getModelPathSerialized());
+
+                                } catch (Exception e) {
+                                    // the error message will be stored to the database
+                                    modelMetadata.put(Constants.KEY_ERROR, e.getMessage());
+                                }
+                            } else {
+                                // the error message
+                                String errorMsg = "No training dataset input was found to train outlier model.";
+
+                                // log error message
+                                LOGGER.log(Level.SEVERE, errorMsg);
                                 
+                                // save error message in the models metadata table
+                                modelMetadata.put(Constants.KEY_ERROR, errorMsg);
                             }
+                            
+                            // save model file path or error message in the models metadata table
+                            vertx.eventBus().send(Constants.ADDRESS_MODELS_SAVE, modelMetadata);
                         });
                     } else {
-                        LOGGER.log(Level.SEVERE, "Failed to get the total number of rows.");
+                        // the error message
+                        String errorMsg = "No training dataset input was found to train outlier model.";
 
-                        // response: error
-                        msg.reply("Failed to get the total number of rows.");
+                        // log error message
+                        LOGGER.log(Level.SEVERE, errorMsg);
+                         
+                        // save error message in the models metadata table
+                        modelMetadata.put(Constants.KEY_ERROR, errorMsg);
+                         
+                        // save model file path or error message in the models metadata table
+                        vertx.eventBus().send(Constants.ADDRESS_MODELS_SAVE, modelMetadata);
                     }
                 });
 
             } catch (Exception e) {
-                // log
-                LOGGER.log(Level.SEVERE, "Failed to get training data.", e);
+                // the error message
+                String errorMsg = "Failed to get training data.";
 
-                // response: error
-                msg.reply("Failed to get training data.");
+                // log
+                LOGGER.log(Level.SEVERE, errorMsg, e);
+
+                // save error message in the models metadata table
+                modelMetadata.put(Constants.KEY_ERROR, errorMsg + ": " + e.getMessage());
+                vertx.eventBus().send(Constants.ADDRESS_MODELS_SAVE, modelMetadata);
             }
+
+            // response
+            msg.reply("Training the model(s) has been triggered. Query the " + Constants.ENDPOINT_MODELS + " endpoint for training status.");
 
         });
 

@@ -79,14 +79,14 @@ public class PipeLineOutlierJSAT extends PipeLineAbstractJSAT{
 
         List<Object> result = new ArrayList<Object>();
 
-        // socre the test data with the trained model
+        // score the test data with the trained model
         Supplier<DoubleStream> recordsOutliersTest = () -> ((SimpleDataSet) test).getDataPoints().stream()
                 .mapToDouble(model::score);
         
         // store only the score that are outliers (any value less than )
         Supplier<DoubleStream> outliers = () -> recordsOutliersTest.get().filter(x -> x < 0);
 
-        // From now, we store the score of all outliers
+        // We store the score of all outliers
         // 
         // should we store only the outliers? If so, we should change recordsOutliersTest -> outliers
         recordsOutliersTest.get().forEach(n -> result.add(n));
@@ -94,7 +94,7 @@ public class PipeLineOutlierJSAT extends PipeLineAbstractJSAT{
         // get the number of outliers
         double numOutliers = outliers.get().count();
 
-        logger.info("original vs inference : " + (numOutliers / test.size()) + " vs " + 0.1); //Better say 90% are outliers!
+        logger.info("original vs inference : " + (numOutliers / test.size()) + " vs " + 0.1); // Better say 90% are outliers!
 
         return result;
     }
