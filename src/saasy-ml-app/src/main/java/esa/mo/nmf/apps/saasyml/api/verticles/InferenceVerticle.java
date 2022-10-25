@@ -44,8 +44,8 @@ public class InferenceVerticle extends AbstractVerticle {
                 final JsonArray data = payload.getJsonArray(Constants.KEY_DATA);
                 final JsonArray models = payload.getJsonArray(Constants.KEY_MODELS);
 
-                // prepare the test data of the classifier
-                DataSet[] testDataset = prepareClassifierOneTestData(data);
+                // prepare the test data for inference
+                DataSet[] testDatasetClassifier = prepareClassifierOneTestData(data);
                 DataSet[] testDatasetRegressor = prepareRegressorOneTestData(data);
 
                 // for each model 
@@ -69,26 +69,42 @@ public class InferenceVerticle extends AbstractVerticle {
                     saasyml.setModelPathSerialized(filePath);
 
                     if (type.equals("Regressor")) {
-                        testDataset = testDatasetRegressor;
+                        
+                        for (DataSet test : testDatasetRegressor) {
+
+                            // set the test data
+                            saasyml.setDataSet(null, test);
+
+                            // do the inference
+                            List<Object> objects = saasyml.inference();
+
+                            List<Double> inference = objects.stream()
+                                    .filter(element -> element instanceof Double)
+                                    .map(element -> (Double) element).collect(Collectors.toList());
+
+                            // store the inference in a list
+                            // if (!model.containsKey(Constants.LABEL_INFERENCE))
+                            model.put(Constants.KEY_INFERENCE, inference);
+                        }
                     }
+                    else {
+                        // for each test data
+                        for (DataSet test : testDatasetClassifier) {
 
-                    // for each test data
-                    for (DataSet test : testDataset) {
+                            // set the test data
+                            saasyml.setDataSet(null, test);
 
-                        // set the test data
-                        saasyml.setDataSet(null, test);
+                            // do the inference
+                            List<Object> objects = saasyml.inference();
 
-                        // do the inference
-                        List<Object> objects = saasyml.inference();
+                            List<Integer> inference = objects.stream()
+                                    .filter(element -> element instanceof Integer)
+                                    .map(element -> (Integer) element).collect(Collectors.toList());
 
-                        List<Integer> inference = objects.stream()
-                                .filter(element -> element instanceof Integer)
-                                .map(element -> (Integer) element).collect(Collectors.toList());
-
-                        // store the inference in a list
-                        // if (!model.containsKey(Constants.LABEL_INFERENCE))
-                        model.put(Constants.KEY_INFERENCE, inference);
-
+                            // store the inference in a list
+                            // if (!model.containsKey(Constants.LABEL_INFERENCE))
+                            model.put(Constants.KEY_INFERENCE, inference);
+                        }
                     }
                 }
                 
