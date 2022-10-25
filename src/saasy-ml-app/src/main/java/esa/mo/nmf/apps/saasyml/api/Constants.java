@@ -45,6 +45,7 @@ public final class Constants {
     public static final String KEY_FILEPATH = "filepath";
 
     public static final String KEY_MODEL_CLASSIFIER = "Classifier";
+    public static final String KEY_MODEL_OUTLIER = "Outlier";
 
 
     // labels for the endpoints
