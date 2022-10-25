@@ -85,14 +85,21 @@ public class InferenceVerticle extends AbstractVerticle {
                         // do the inference
                         List<Object> objects = saasyml.inference();
 
-                        List<Double> inference = objects.stream()
-                                .filter(element -> element instanceof Integer)
-                                .map(element -> (Double) element).collect(Collectors.toList());
-
-                        // store the inference in a list
-                        // if (!model.containsKey(Constants.LABEL_INFERENCE))
-                        model.put(Constants.KEY_INFERENCE, inference);
-
+                        if (type.equals("Regressor")) {
+                            List<Double> inference = objects.stream()
+                                    .filter(element -> element instanceof Double)
+                                    .map(element -> (Double) element).collect(Collectors.toList());
+                            // store the inference in a list
+                            // if (!model.containsKey(Constants.LABEL_INFERENCE))
+                            model.put(Constants.KEY_INFERENCE, inference);
+                        }
+                        else
+                        {
+                            List<Integer> inference = objects.stream()
+                                    .filter(element -> element instanceof Integer)
+                                    .map(element -> (Integer) element).collect(Collectors.toList());                            
+                            model.put(Constants.KEY_INFERENCE, inference);
+                        }
                     }
                 }
                 
