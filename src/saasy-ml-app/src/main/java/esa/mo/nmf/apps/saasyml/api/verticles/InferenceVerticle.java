@@ -85,21 +85,8 @@ public class InferenceVerticle extends AbstractVerticle {
                         // do the inference
                         List<Object> objects = saasyml.inference();
 
-                        if (type.equals("Regressor")) {
-                            List<Double> inference = objects.stream()
-                                    .filter(element -> element instanceof Double)
-                                    .map(element -> (Double) element).collect(Collectors.toList());
-                            // store the inference in a list
-                            // if (!model.containsKey(Constants.LABEL_INFERENCE))
-                            model.put(Constants.KEY_INFERENCE, inference);
-                        }
-                        else
-                        {
-                            List<Integer> inference = objects.stream()
-                                    .filter(element -> element instanceof Integer)
-                                    .map(element -> (Integer) element).collect(Collectors.toList());                            
-                            model.put(Constants.KEY_INFERENCE, inference);
-                        }
+                        List<Object> inference = mapInferenceObjects(objects, typeModel);
+                        model.put(Constants.KEY_INFERENCE, inference);
                     }
                 }
                 
@@ -122,6 +109,20 @@ public class InferenceVerticle extends AbstractVerticle {
             
         });
 
+    }
+
+    private List<Object> mapInferenceObjects(List<Object> objects, TypeModel typeModel) {
+
+        switch(typeModel){
+            case Regressor:
+                return objects.stream()
+                .filter(element -> element instanceof Double)
+                .map(element -> (Double) element).collect(Collectors.toList());
+            default:
+                return objects.stream()
+                .filter(element -> element instanceof Integer)
+                .map(element -> (Integer) element).collect(Collectors.toList());                    
+        }
     }
 
     private DataSet[] prepareOneTestData(JsonArray data, TypeModel typeModel) throws Exception {
