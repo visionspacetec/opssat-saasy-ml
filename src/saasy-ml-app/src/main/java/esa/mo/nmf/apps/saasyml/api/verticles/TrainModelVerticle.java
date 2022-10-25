@@ -274,11 +274,6 @@ public class TrainModelVerticle extends AbstractVerticle {
             // train the model 
             try{
 
-                // build Json payload object with just expId and datasetId
-                JsonObject payloadSelect = new JsonObject();
-                payloadSelect.put(Constants.KEY_EXPID, expId);
-                payloadSelect.put(Constants.KEY_DATASETID, datasetId);
-
                 // get the training input dimension
                 vertx.eventBus().request(Constants.ADDRESS_DATA_COUNT_DIMENSIONS, payload, dimensionResponse -> {
                     JsonObject dimensionJson = (JsonObject) (dimensionResponse.result().body());
@@ -295,67 +290,54 @@ public class TrainModelVerticle extends AbstractVerticle {
                             JsonObject trainingDataResponseJson = (JsonObject) (trainingDataResponse.result().body());
                             final JsonArray trainingDataJsonArray = trainingDataResponseJson.getJsonArray(Constants.KEY_DATA);
 
-                            // if the response_select object contains the data, we can continue
-                            if(trainingDataJsonArray != null) {
+                            // create variables for the k
+                            double[] tempTrainData = new double[dimensions]; 
+        
+                            List<DataPoint> dataPoints = new ArrayList<DataPoint>();
 
-                                // create variables for the k
-                                double[] tempTrainData = new double[dimensions]; // TRAIN
-                                CategoricalData[] catDataInfo = new CategoricalData[] { new CategoricalData(totalClasses)} ; 
-            
-                                List<DataPoint> dataPoints = new ArrayList<DataPoint>();
-                                Normal noiseSource = new Normal();
+                            // variable to control the number of columns
+                            int colCount = 0;
 
-                                // variable to control the number of columns
-                                int colCount = 0;
+                            // iterate throughout all the data
+                            for (int pos = 0; pos < trainingDataJsonArray.size(); pos++) {
 
-                                // iterate throughout all the data
-                                for (int pos = 0; pos < trainingDataJsonArray.size(); pos++) {
+                                // get the Json Object and store the value
+                                JsonObject object = trainingDataJsonArray.getJsonObject(pos);
+                                tempTrainData[colCount++] = colCount + Double.valueOf(object.getString(Constants.KEY_VALUE));
 
-                                    // get the Json Object and store the value
-                                    JsonObject object = trainingDataJsonArray.getJsonObject(pos);
-                                    tempTrainData[colCount++] = colCount + Double.valueOf(object.getString(Constants.KEY_VALUE));;
+                                // if colcount is equal to total columns, we add a new row
+                                if (colCount == dimensions) {
 
-                                    // if colcount is equal to total columns, we add a new row
-                                    if (colCount == dimensions) {
+                                    // add a data point to our train dataset 
+                                    // with a random value of the class Y
+                                    dataPoints.add(new DataPoint(new DenseVector(tempTrainData),
+                                        new int[] { rand.nextInt(totalClasses) },
+                                        new CategoricalData[] { new CategoricalData(totalClasses)}));
 
-                                        // we add a data point to our train dataset 
-                                        // with a random value of the class Y
-                                        dataPoints.add(new DataPoint(new DenseVector(tempTrainData), new int[] { rand.nextInt(totalClasses) }, catDataInfo));
-
-                                        // we restart the count of cols to zero and the temporal train data
-                                        colCount = 0;
-                                        tempTrainData = new double[dimensions];
-                                    }
+                                    // restart the count of cols to zero and the temporal train data
+                                    colCount = 0;
+                                    tempTrainData = new double[dimensions];
                                 }
+                            }
+                            
+                            LOGGER.log(Level.INFO, "Data points: " + dataPoints.toString());
+                            
+                            try {
+                                SimpleDataSet train = new SimpleDataSet(dataPoints);
+
+                                // upload the train dataset
+                                saasyml.setDataSet(train, null);
                                 
-                                LOGGER.log(Level.INFO, "Data points: " + dataPoints.toString());
-                                
-                                try {
-                                    SimpleDataSet train = new SimpleDataSet(dataPoints);
+                                // enter ML pipeline for the given algorithm
+                                // serialize and save the resulting model
+                                saasyml.train();
 
-                                    // upload the train dataset
-                                    saasyml.setDataSet(train, null);
-                                    
-                                    // enter ML pipeline for the given algorithm
-                                    // serialize and save the resulting model
-                                    saasyml.train();
+                                // the path to the model file will be stored in the database
+                                modelMetadata.put(Constants.KEY_FILEPATH, saasyml.getModelPathSerialized());
 
-                                    // the path to the model file will be stored in the database
-                                    modelMetadata.put(Constants.KEY_FILEPATH, saasyml.getModelPathSerialized());
-
-                                } catch (Exception e) {
-                                    // the error message will be stored to the database
-                                    modelMetadata.put(Constants.KEY_ERROR, e.getMessage());
-                                }
-                            } else {
-                                // the error message
-                                String errorMsg = "No training dataset input was found to train outlier model.";
-
-                                // log error message
-                                LOGGER.log(Level.SEVERE, errorMsg);
-                                
-                                // save error message in the models metadata table
-                                modelMetadata.put(Constants.KEY_ERROR, errorMsg);
+                            } catch (Exception e) {
+                                // the error message will be stored to the database
+                                modelMetadata.put(Constants.KEY_ERROR, e.getMessage());
                             }
                             
                             // save model file path or error message in the models metadata table

@@ -1,6 +1,7 @@
 package esa.mo.nmf.apps.saasyml.api.verticles;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -20,6 +21,7 @@ import jsat.DataSet;
 import jsat.classifiers.CategoricalData;
 import jsat.classifiers.ClassificationDataSet;
 import jsat.linear.DenseVector;
+import jsat.regression.RegressionDataSet;
 
 public class InferenceVerticle extends AbstractVerticle {
 
@@ -43,8 +45,8 @@ public class InferenceVerticle extends AbstractVerticle {
                 final JsonArray data = payload.getJsonArray(Constants.KEY_DATA);
                 final JsonArray models = payload.getJsonArray(Constants.KEY_MODELS);
 
-                // prepare the test data of the classifier
-                DataSet[] testDataset = prepareClassifierOneTestData(data);
+                // for efficiency we store the data in a hashmap
+                HashMap<TypeModel, DataSet[]> setTestData = new HashMap<TypeModel, DataSet[]>(4);
 
                 // for each model 
                 Iterator<Object> iter = models.iterator();
@@ -59,6 +61,14 @@ public class InferenceVerticle extends AbstractVerticle {
                     }
                     boolean serialize = true;
                     TypeModel typeModel = TypeModel.valueOf(type);
+
+                    // prepare and store the test data of the inference                    
+                    if (!setTestData.containsKey(typeModel)) {
+                        setTestData.put(typeModel, prepareOneTestData(data, typeModel));
+                    }
+
+                    // get the test data
+                    DataSet[] testDataset = setTestData.get(typeModel);
 
                     // create the pipeline with the minimun 
                     IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(expId, datasetId, thread, serialize, "test-" + type, typeModel);
@@ -75,9 +85,9 @@ public class InferenceVerticle extends AbstractVerticle {
                         // do the inference
                         List<Object> objects = saasyml.inference();
 
-                        List<Integer> inference = objects.stream()
+                        List<Double> inference = objects.stream()
                                 .filter(element -> element instanceof Integer)
-                                .map(element -> (Integer) element).collect(Collectors.toList());
+                                .map(element -> (Double) element).collect(Collectors.toList());
 
                         // store the inference in a list
                         // if (!model.containsKey(Constants.LABEL_INFERENCE))
@@ -107,8 +117,80 @@ public class InferenceVerticle extends AbstractVerticle {
 
     }
 
-    private DataSet[] prepareClassifierOneTestData(JsonArray data) {
+    private DataSet[] prepareOneTestData(JsonArray data, TypeModel typeModel) throws Exception {
 
+        switch (typeModel) {
+            case Classifier:
+                return prepareClassifierOneTestData(data);
+            case Cluster:
+                return prepareClusterOneTestData(data);
+            case Outlier:
+                return prepareOutlierOneTestData(data);
+            case Regressor:
+                return prepareRegressorOneTestData(data);
+            default:
+            case Unknown:
+                throw new Exception("There is not type of model");
+        }
+
+    }
+
+    private DataSet[] prepareRegressorOneTestData(JsonArray data) {
+
+        // create the lists of tests
+        List<DataSet> tests = new ArrayList<DataSet>();
+
+        int total_columns = ((JsonArray) data.getValue(0)).size();
+        tests.add(new RegressionDataSet(total_columns, new CategoricalData[0]));
+        int index = 0;
+
+        // fetch data
+        data.forEach(dataset -> {
+            JsonArray ds = (JsonArray) dataset;
+
+            // create the test data
+            double[] tempTestData = new double[total_columns];
+
+            int count = 0;
+
+            // iterate through the parameters
+            Iterator<Object> iter = ds.iterator();
+            while (iter.hasNext()) {
+                JsonObject p = (JsonObject) iter.next();
+
+                // store the values of the parameters
+                tempTestData[count++] = Double.parseDouble(p.getString(Constants.KEY_VALUE));
+            }
+
+            // create the data point of the test data
+            ((RegressionDataSet) tests.get(index)).addDataPoint(
+                new DenseVector(tempTestData), 
+                new int[0],
+                0.0);
+
+        });        
+
+        // retrieve the list of tests
+        return tests.toArray(new DataSet[0]);
+	}
+
+	private DataSet[] prepareOutlierOneTestData(JsonArray data) {
+        // create the lists of tests
+        List<DataSet> tests = new ArrayList<DataSet>();
+        
+        // retrieve the list of tests
+        return tests.toArray(new DataSet[0]);
+	}
+
+	private DataSet[] prepareClusterOneTestData(JsonArray data) {
+        // create the lists of tests
+        List<DataSet> tests = new ArrayList<DataSet>();
+
+        // retrieve the list of tests
+        return tests.toArray(new DataSet[0]);
+	}
+
+	private DataSet[] prepareClassifierOneTestData(JsonArray data) {
         // variables to generate the class randomly
         Random rand = new Random();
         int classification = 1;
