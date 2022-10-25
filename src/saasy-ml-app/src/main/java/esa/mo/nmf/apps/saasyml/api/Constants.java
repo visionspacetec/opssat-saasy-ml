@@ -45,6 +45,7 @@ public final class Constants {
     public static final String KEY_FILEPATH = "filepath";
 
     public static final String KEY_MODEL_CLASSIFIER = "Classifier";
+    public static final String KEY_MODEL_REGRESSOR = "Regressor";
     public static final String KEY_MODEL_OUTLIER = "Outlier";
 
 
@@ -64,6 +65,7 @@ public final class Constants {
     // labels to consume the verticles
     public static final String BASE_ADDRESS_TRAINING = "saasyml.training";
     public static final String ADDRESS_TRAINING_CLASSIFIER = BASE_ADDRESS_TRAINING + ".classifier";
+    public static final String ADDRESS_TRAINING_REGRESSOR = BASE_ADDRESS_TRAINING + ".regressor";
     public static final String ADDRESS_TRAINING_CLUSTER = BASE_ADDRESS_TRAINING + ".cluster";
     public static final String ADDRESS_TRAINING_OUTLIER = BASE_ADDRESS_TRAINING + ".outlier";
     public static final String ADDRESS_DATA_SAVE = BASE_ADDRESS_TRAINING + ".data.save";
