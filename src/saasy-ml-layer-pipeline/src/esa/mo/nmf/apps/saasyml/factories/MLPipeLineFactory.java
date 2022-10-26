@@ -1,5 +1,8 @@
 package esa.mo.nmf.apps.saasyml.factories;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import esa.mo.nmf.apps.saasyml.common.IPipeLineLayer;
 import esa.mo.nmf.apps.saasyml.service.PipeLineClassifierJSAT;
 import esa.mo.nmf.apps.saasyml.service.PipeLineClusterJSAT;
@@ -11,21 +14,16 @@ import jsat.classifiers.linear.NHERD;
 import jsat.classifiers.linear.PassiveAggressive;
 import jsat.classifiers.linear.SCW;
 import jsat.classifiers.linear.StochasticSTLinearL1;
+import jsat.classifiers.trees.DecisionTree;
 import jsat.clustering.Clusterer;
+import jsat.distributions.kernels.LinearKernel;
 import jsat.distributions.kernels.RBFKernel;
+import jsat.distributions.multivariate.MetricKDE;
 import jsat.linear.distancemetrics.EuclideanDistance;
 import jsat.lossfunctions.LogisticLoss;
-import jsat.outlier.DensityOutlier;
-import jsat.outlier.IsolationForest;
-import jsat.outlier.LOF;
-import jsat.outlier.LinearOCSVM;
-import jsat.outlier.LoOP;
 import jsat.outlier.Outlier;
-import jsat.regression.KernelRidgeRegression;
-import jsat.regression.MultipleLinearRegression;
-import jsat.regression.OrdinaryKriging;
+import jsat.regression.KernelRLS;
 import jsat.regression.Regressor;
-import jsat.regression.RidgeRegression;
 
 /**
  * Factory to create ML Pipeline, build ML models, identify the ML model type
@@ -221,14 +219,33 @@ public class MLPipeLineFactory {
 
         switch (modelName){
             default:
+            case "AveragedRegressor": {
+                List<Regressor> voters = new ArrayList<Regressor>();
+                voters.add(new KernelRLS(new LinearKernel(1), 1e-1));
+                voters.add(new KernelRLS(new LinearKernel(1), 1e-2));
+                voters.add(new KernelRLS(new LinearKernel(1), 1e-4));
+                return ModelRegressorFactory.buildModelAveragedRegressor(voters);
+            }
             case "KernelRidgeRegression":
-                return new KernelRidgeRegression();
+                return ModelRegressorFactory.buildModelKernelRidgeRegression();
+            case "KernelRLS":
+                return ModelRegressorFactory.buildModelKernelRLS(new LinearKernel(1), 1e-1);
             case "MultipleLinearRegression":
-                return new MultipleLinearRegression();
+                return ModelRegressorFactory.buildModelMultipleLinearRegression();
+            case "NadarayaWatson":
+                return ModelRegressorFactory.buildModelNadarayaWatson(new MetricKDE());
             case "OrdinaryKriging":
-                return new OrdinaryKriging();
+                return ModelRegressorFactory.buildModelOrdinaryKriging();
+            case "OrdinaryKriging.PowVariogram":
+                return ModelRegressorFactory.buildModelOrdinaryKrigingPowVariogram();
+            case "RANSAC":
+                return ModelRegressorFactory.buildModelRANSAC(new KernelRLS(new LinearKernel(1), 1e-1), 10, 20, 40, 5);
             case "RidgeRegression":
-                return new RidgeRegression();            
+                return ModelRegressorFactory.buildModelRidgeRegression();
+            case "StochasticGradientBoosting":
+                return ModelRegressorFactory.buildModelStochasticGradientBoosting(new DecisionTree(), 40);
+            case "StochasticRidgeRegression":
+                return ModelRegressorFactory.buildModelStochasticRidgeRegression(1e-9, 40, 10, 0.01);        
         }
     }
 
@@ -278,10 +295,17 @@ public class MLPipeLineFactory {
             case "LinearOCSVM":
                 return TypeModel.Outlier;
 
+            case "AveragedRegressor":
+            case "KernelRLS":
             case "KernelRidgeRegression":
             case "MultipleLinearRegression":
+            case "NadarayaWatson":
             case "OrdinaryKriging":
+            case "OrdinaryKriging.PowVariogram":
+            case "RANSAC":
             case "RidgeRegression":
+            case "StochasticGradientBoosting":
+            case "StochasticRidgeRegression":
                 return TypeModel.Regressor;
         }
 
