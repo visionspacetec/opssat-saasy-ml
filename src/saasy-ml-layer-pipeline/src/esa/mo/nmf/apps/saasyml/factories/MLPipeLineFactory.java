@@ -222,13 +222,13 @@ public class MLPipeLineFactory {
         switch (modelName){
             default:
             case "KernelRidgeRegression":
-                return new KernelRidgeRegression();
+                return ModelRegressorFactory.buildModelKernelRidgeRegression();
             case "MultipleLinearRegression":
-                return new MultipleLinearRegression();
+                return ModelRegressorFactory.buildModelMultipleLinearRegression();
             case "OrdinaryKriging":
-                return new OrdinaryKriging();
+                return ModelRegressorFactory.buildModelOrdinaryKriging();
             case "RidgeRegression":
-                return new RidgeRegression();            
+                return ModelRegressorFactory.buildModelRidgeRegression();            
         }
     }
 
