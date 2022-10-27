@@ -80,130 +80,106 @@ public class TrainModelVerticle extends AbstractVerticle {
                     if (distinctLabelsJsonArray.size() > 0) {
 
                         // get the training input dimension
-                        vertx.eventBus().request(Constants.ADDRESS_DATA_COUNT_DIMENSIONS, payload, dimensionResponse -> {
-                            JsonObject dimensionJson = (JsonObject) (dimensionResponse.result().body());
-                        
-                            // check if we actually have training input
-                            if (dimensionJson.containsKey(Constants.KEY_COUNT) && dimensionJson.getInteger(Constants.KEY_COUNT) > 0) {
+                        vertx.eventBus().request(Constants.ADDRESS_DATA_COUNT_DIMENSIONS, payload,
+                                dimensionResponse -> {
+                                    JsonObject dimensionJson = (JsonObject) (dimensionResponse.result().body());
 
-                                // the dimension count
-                                int dimensions = dimensionJson.getInteger(Constants.KEY_COUNT).intValue();
-                                
-                                // select all the expected labels/classes
-                                vertx.eventBus().request(Constants.ADDRESS_LABELS_SELECT, payload, labelsResponse -> {
-                                    JsonObject labelsResponseJson = (JsonObject) (labelsResponse.result().body());
-                                    final JsonArray labelsJsonArray = labelsResponseJson.getJsonArray(Constants.KEY_DATA);
+                                    // check if we actually have training input
+                                    if (dimensionJson.containsKey(Constants.KEY_COUNT)
+                                            && dimensionJson.getInteger(Constants.KEY_COUNT) > 0) {
 
-                                    // select all the training data
-                                    vertx.eventBus().request(Constants.ADDRESS_TRAINING_DATA_SELECT, payload, trainingDataResponse -> {
-                                        JsonObject trainingDataResponseJson = (JsonObject) (trainingDataResponse.result().body());
-                                        final JsonArray trainingDataJsonArray = trainingDataResponseJson.getJsonArray(Constants.KEY_DATA);
+                                        // the dimension count
+                                        int dimensions = dimensionJson.getInteger(Constants.KEY_COUNT).intValue();
 
-                                        // the JSAT training input dataset object
-                                        ClassificationDataSet train = new ClassificationDataSet(
-                                            dimensions, 
-                                            new CategoricalData[0], new CategoricalData(distinctLabelsJsonArray.size())
-                                        );
+                                        // select all the expected labels/classes
+                                        vertx.eventBus().request(Constants.ADDRESS_LABELS_SELECT, payload,
+                                                labelsResponse -> {
+                                                    JsonObject labelsResponseJson = (JsonObject) (labelsResponse.result().body());
+                                                    final JsonArray labelsJsonArray = labelsResponseJson.getJsonArray(Constants.KEY_DATA);
 
-                                        // the training input data point array
-                                        JsonArray trainingDatapointJsonArray = new JsonArray();
+                                                    // select all the training data
+                                                    vertx.eventBus().request(Constants.ADDRESS_TRAINING_DATA_SELECT,
+                                                            payload, trainingDataResponse -> {
+                                                                JsonObject trainingDataResponseJson = (JsonObject) (trainingDataResponse.result().body());
+                                                                final JsonArray trainingDataJsonArray = trainingDataResponseJson.getJsonArray(Constants.KEY_DATA);
 
-                                        // the map that will contain all the datapoints and their expected labels
-                                        SortedMap<Integer, JsonObject> trainingDatasetMap = new TreeMap<Integer, JsonObject>();
+                                                                // the JSAT training input dataset object
+                                                                ClassificationDataSet train = new ClassificationDataSet(
+                                                                        dimensions,
+                                                                        new CategoricalData[0], new CategoricalData(distinctLabelsJsonArray.size()));
 
-                                        // collect all data points into the training dataset map
-                                        for (int trainingDatasetIndex = 0; trainingDatasetIndex < trainingDataJsonArray.size(); trainingDatasetIndex++) {
+                                                                // the map that will contain all the datapoints and their expected labels
+                                                                SortedMap<Integer, JsonObject> trainingDatasetMap = trainDataToSortedMap(trainingDataJsonArray, dimensions);
 
-                                            // fetch a parameter value from the training data point
-                                            JsonObject trainingDataRow = trainingDataJsonArray.getJsonObject(trainingDatasetIndex);
+                                                                // collect all the expected labels into the training dataset map
+                                                                trainingDatasetMap = trainDataGetExpectedLabes(trainingDatasetMap, labelsJsonArray);
 
-                                            // include it in the training data point array
-                                            trainingDatapointJsonArray.add(trainingDataRow.getString(Constants.KEY_VALUE));
+                                                                // create the data points for training
+                                                                for (Map.Entry<Integer, JsonObject> entry : trainingDatasetMap.entrySet()) {
 
-                                            // keep adding data to the data point until all parameter values have been added for the given training input dimension
-                                            if ((trainingDatasetIndex+1) % dimensions == 0) {
+                                                                    if (entry.getValue().containsKey(Constants.KEY_LABEL)) {
 
-                                                // get the timestamp for the current training dataset input
-                                                int trainingDatasetTimestamp = trainingDataRow.getInteger(Constants.KEY_TIMESTAMP).intValue();
+                                                                        // build the training data point array
+                                                                        // FIXME: training datapoints values are not always of type double
+                                                                        // but maybe it's ok to always process as double?
+                                                                        // see esa.mo.helpertools.helpers.HelperAttributes.attribute2double(Attribute in)
+                                                                        double[] trainingDatapointArray = new double[dimensions];
 
-                                                JsonObject trainingDatasetJsonObject = new JsonObject();
-                                                trainingDatasetJsonObject.put(Constants.KEY_DATA_POINT, trainingDatapointJsonArray);
-                                                trainingDatasetMap.put(trainingDatasetTimestamp, trainingDatasetJsonObject);
+                                                                        for (int d = 0; d < dimensions; d++) {
+                                                                            // FIXME: training datapoints values are not always of type double
+                                                                            // but maybe it's ok to always process as double?
+                                                                            // see esa.mo.helpertools.helpers.HelperAttributes.attribute2double(Attribute in
+                                                                            trainingDatapointArray[d] = Double.valueOf(
+                                                                                    entry.getValue().getJsonArray(
+                                                                                            Constants.KEY_DATA_POINT)
+                                                                                            .getString(d));
+                                                                        }
 
-                                                // reset the traunung data point json array
-                                                trainingDatapointJsonArray = new JsonArray();
-                                            }
-                                        }
+                                                                        // add the data point array as a dense vector and set the expected label
+                                                                        train.addDataPoint(
+                                                                                new DenseVector(trainingDatapointArray),
+                                                                                new int[0],
+                                                                                entry.getValue()
+                                                                                        .getInteger(Constants.KEY_LABEL)
+                                                                                        .intValue());
+                                                                    }
+                                                                }
 
-                                        // collect all the expected labels into the training dataset map
-                                        for (int datasetLabelIndex = 0; datasetLabelIndex < labelsJsonArray.size(); datasetLabelIndex++) {
-                                            JsonObject labelRow = labelsJsonArray.getJsonObject(datasetLabelIndex);
-                                            int labelTimestamp = labelRow.getInteger(Constants.KEY_TIMESTAMP).intValue();
+                                                                try {
+                                                                    // upload the training dataset
+                                                                    saasyml.setDataSet(train, null);
 
-                                            if(trainingDatasetMap.containsKey(labelTimestamp)){
-                                                int label = labelRow.getInteger(Constants.KEY_LABEL).intValue();
-                                                trainingDatasetMap.get(labelTimestamp).put(Constants.KEY_LABEL, label);
-                                            }
-                                        }
+                                                                    // enter ML pipeline for the given algorithm
+                                                                    // serialize and save the resulting model
+                                                                    saasyml.train();
 
-                                        // create the data points for training
-                                        for (Map.Entry<Integer, JsonObject> entry : trainingDatasetMap.entrySet()) {
+                                                                    // the path to the model file will be stored in the database
+                                                                    modelMetadata.put(Constants.KEY_FILEPATH,
+                                                                            saasyml.getModelPathSerialized());
 
-                                            if (entry.getValue().containsKey(Constants.KEY_LABEL)) {
-                                                
-                                                // build the training data point array
-                                                // FIXME: training datapoints values are not always of type double
-                                                // but maybe it's ok to always process as double?
-                                                // see esa.mo.helpertools.helpers.HelperAttributes.attribute2double(Attribute in)
-                                                double[] trainingDatapointArray = new double[dimensions];
+                                                                } catch (Exception e) {
+                                                                    // the error message will be stored to the database
+                                                                    modelMetadata.put(Constants.KEY_ERROR,
+                                                                            e.getMessage());
+                                                                }
 
-                                                for(int d = 0; d < dimensions; d++){
-                                                    // FIXME: training datapoints values are not always of type double
-                                                    // but maybe it's ok to always process as double?
-                                                    // see esa.mo.helpertools.helpers.HelperAttributes.attribute2double(Attribute in
-                                                    trainingDatapointArray[d] = Double.valueOf(entry.getValue().getJsonArray(Constants.KEY_DATA_POINT).getString(d));
-                                                }
+                                                                // save model file path or error message in the models metadata table
+                                                                vertx.eventBus().send(Constants.ADDRESS_MODELS_SAVE,
+                                                                        modelMetadata);
+                                                            });
+                                                });
+                                    } else {
+                                        // the error message
+                                        String errorMsg = "No training dataset input was found to train classifier model.";
 
-                                                // add the data point array as a dense vector and set the expected label
-                                                train.addDataPoint(
-                                                    new DenseVector(trainingDatapointArray),
-                                                    new int[0],
-                                                    entry.getValue().getInteger(Constants.KEY_LABEL).intValue());
-                                            }
-                                        }
+                                        // log error message
+                                        LOGGER.log(Level.SEVERE, errorMsg);
 
-                                        try {
-                                            // upload the training dataset
-                                            saasyml.setDataSet(train, null);
-
-                                            // enter ML pipeline for the given algorithm
-                                            // serialize and save the resulting model
-                                            saasyml.train();
-                                            
-                                            // the path to the model file will be stored in the database
-                                            modelMetadata.put(Constants.KEY_FILEPATH, saasyml.getModelPathSerialized());
-
-                                        } catch (Exception e) {
-                                            // the error message will be stored to the database
-                                            modelMetadata.put(Constants.KEY_ERROR, e.getMessage());
-                                        }
-
-                                        // save model file path or error message in the models metadata table
+                                        // save error message in the models metadata table
+                                        modelMetadata.put(Constants.KEY_ERROR, errorMsg);
                                         vertx.eventBus().send(Constants.ADDRESS_MODELS_SAVE, modelMetadata);
-                                    });
+                                    }
                                 });
-                            } else {
-                                // the error message
-                                String errorMsg = "No training dataset input was found to train classifier model.";
-
-                                // log error message
-                                LOGGER.log(Level.SEVERE, errorMsg);
-                                
-                                // save error message in the models metadata table
-                                modelMetadata.put(Constants.KEY_ERROR, errorMsg);
-                                vertx.eventBus().send(Constants.ADDRESS_MODELS_SAVE, modelMetadata);
-                            }
-                        });
                     } else {
                         // the error message
                         String errorMsg = "Missing expected labels to train classifier model.";
@@ -216,7 +192,8 @@ public class TrainModelVerticle extends AbstractVerticle {
                         vertx.eventBus().send(Constants.ADDRESS_MODELS_SAVE, modelMetadata);
                     }
 
-                    LOGGER.log(Level.INFO, "Trained model will be stored in the filesystem and referenced from the database once training is complete.");
+                    LOGGER.log(Level.INFO,
+                            "Trained model will be stored in the filesystem and referenced from the database once training is complete.");
                 });
 
             } catch (Exception e) {
@@ -232,9 +209,9 @@ public class TrainModelVerticle extends AbstractVerticle {
             }
 
             // response
-            msg.reply("Training the model(s) has been triggered. Query the " + Constants.ENDPOINT_MODELS + " endpoint for training status.");
+            msg.reply("Training the model(s) has been triggered. Query the " + Constants.ENDPOINT_MODELS
+                    + " endpoint for training status.");
         });
-
 
         // train outlier
         vertx.eventBus().consumer(Constants.ADDRESS_TRAINING_OUTLIER, msg -> {
@@ -242,7 +219,7 @@ public class TrainModelVerticle extends AbstractVerticle {
             // variables to generate the class randomly
             Random rand = new Random();
             int totalClasses = 2;
-            
+
             // the request payload (Json)
             JsonObject payload = (JsonObject) (msg.body());
             LOGGER.log(Level.INFO, "Started training.outlier");
@@ -250,11 +227,11 @@ public class TrainModelVerticle extends AbstractVerticle {
             // parse the Json payload
             final int expId = payload.getInteger(Constants.KEY_EXPID).intValue();
             final int datasetId = payload.getInteger(Constants.KEY_DATASETID).intValue();
-            final String algorithm = payload.getString(Constants.KEY_ALGORITHM); 
+            final String algorithm = payload.getString(Constants.KEY_ALGORITHM);
 
-            boolean thread = (payload.containsKey(Constants.KEY_THREAD) 
+            boolean thread = (payload.containsKey(Constants.KEY_THREAD)
                     && payload.getBoolean(Constants.KEY_THREAD) != null) ? payload.getBoolean(Constants.KEY_THREAD)
-                    : PropertiesManager.getInstance().getThread();
+                            : PropertiesManager.getInstance().getThread();
             boolean serialize = PropertiesManager.getInstance().getSerialize();
 
             // the train model will be serialized and saved as a file in the filesystem
@@ -271,89 +248,93 @@ public class TrainModelVerticle extends AbstractVerticle {
 
             // build the model with parameters
             saasyml.build();
-            
+
             // train the model 
-            try{
+            try {
 
                 // get the training input dimension
                 vertx.eventBus().request(Constants.ADDRESS_DATA_COUNT_DIMENSIONS, payload, dimensionResponse -> {
                     JsonObject dimensionJson = (JsonObject) (dimensionResponse.result().body());
 
                     // check if we actually have training input
-                    if (dimensionJson.containsKey(Constants.KEY_COUNT) && dimensionJson.getInteger(Constants.KEY_COUNT) > 0) {
-                        
+                    if (dimensionJson.containsKey(Constants.KEY_COUNT)
+                            && dimensionJson.getInteger(Constants.KEY_COUNT) > 0) {
+
                         // the dimension count
                         int dimensions = dimensionJson.getInteger(Constants.KEY_COUNT).intValue();
-                    
+
                         // select all the training data
-                        vertx.eventBus().request(Constants.ADDRESS_TRAINING_DATA_SELECT, payload, trainingDataResponse -> {
-                            // get the response from the select
-                            JsonObject trainingDataResponseJson = (JsonObject) (trainingDataResponse.result().body());
-                            final JsonArray trainingDataJsonArray = trainingDataResponseJson.getJsonArray(Constants.KEY_DATA);
+                        vertx.eventBus().request(Constants.ADDRESS_TRAINING_DATA_SELECT, payload,
+                                trainingDataResponse -> {
+                                    // get the response from the select
+                                    JsonObject trainingDataResponseJson = (JsonObject) (trainingDataResponse.result()
+                                            .body());
+                                    final JsonArray trainingDataJsonArray = trainingDataResponseJson.getJsonArray(Constants.KEY_DATA);
 
-                            // create variables for the k
-                            double[] tempTrainData = new double[dimensions]; 
-        
-                            List<DataPoint> dataPoints = new ArrayList<DataPoint>();
+                                    // create variables for the k
+                                    double[] tempTrainData = new double[dimensions];
 
-                            // variable to control the number of columns
-                            int colCount = 0;
+                                    List<DataPoint> dataPoints = new ArrayList<DataPoint>();
 
-                            // iterate throughout all the data
-                            for (int pos = 0; pos < trainingDataJsonArray.size(); pos++) {
+                                    // variable to control the number of columns
+                                    int colCount = 0;
 
-                                // get the Json Object and store the value
-                                JsonObject object = trainingDataJsonArray.getJsonObject(pos);
-                                tempTrainData[colCount++] = colCount + Double.valueOf(object.getString(Constants.KEY_VALUE));
+                                    // iterate throughout all the data
+                                    for (int pos = 0; pos < trainingDataJsonArray.size(); pos++) {
 
-                                // if colcount is equal to total columns, we add a new row
-                                if (colCount == dimensions) {
+                                        // get the Json Object and store the value
+                                        tempTrainData[colCount++] = colCount
+                                                + Double.valueOf(trainingDataJsonArray.getJsonObject(pos).getString(Constants.KEY_VALUE));
 
-                                    // add a data point to our train dataset 
-                                    // with a random value of the class Y
-                                    dataPoints.add(new DataPoint(new DenseVector(tempTrainData),
-                                        new int[] { rand.nextInt(totalClasses) },
-                                        new CategoricalData[] { new CategoricalData(totalClasses)}));
+                                        // if colcount is equal to total columns, we add a new row
+                                        if (colCount == dimensions) {
 
-                                    // restart the count of cols to zero and the temporal train data
-                                    colCount = 0;
-                                    tempTrainData = new double[dimensions];
-                                }
-                            }
-                            
-                            LOGGER.log(Level.INFO, "Data points: " + dataPoints.toString());
-                            
-                            try {
-                                SimpleDataSet train = new SimpleDataSet(dataPoints);
+                                            // add a data point to our train dataset 
+                                            // with a random value of the class Y
+                                            dataPoints.add(new DataPoint(new DenseVector(tempTrainData),
+                                                    new int[] { rand.nextInt(totalClasses) },
+                                                    new CategoricalData[] { new CategoricalData(totalClasses) }));
 
-                                // upload the train dataset
-                                saasyml.setDataSet(train, null);
-                                
-                                // enter ML pipeline for the given algorithm
-                                // serialize and save the resulting model
-                                saasyml.train();
+                                            // restart the count of cols to zero and the temporal train data
+                                            colCount = 0;
+                                            tempTrainData = new double[dimensions];
+                                        }
+                                    }
 
-                                // the path to the model file will be stored in the database
-                                modelMetadata.put(Constants.KEY_FILEPATH, saasyml.getModelPathSerialized());
+                                    LOGGER.log(Level.INFO, "Data points: " + dataPoints.toString());
 
-                            } catch (Exception e) {
-                                // the error message will be stored to the database
-                                modelMetadata.put(Constants.KEY_ERROR, e.getMessage());
-                            }
-                            
-                            // save model file path or error message in the models metadata table
-                            vertx.eventBus().send(Constants.ADDRESS_MODELS_SAVE, modelMetadata);
-                        });
+                                    try {
+                                        // create the train dataset
+                                        SimpleDataSet train = new SimpleDataSet(dataPoints);
+
+                                        // upload the train dataset
+                                        saasyml.setDataSet(train, null);
+
+                                        // enter ML pipeline for the given algorithm
+                                        // serialize and save the resulting model
+                                        saasyml.train();
+
+                                        // the path to the model file will be stored in the database
+                                        modelMetadata.put(Constants.KEY_FILEPATH, saasyml.getModelPathSerialized());
+
+                                    } catch (Exception e) {
+                                        // the error message will be stored to the database
+                                        modelMetadata.put(Constants.KEY_ERROR, e.getMessage());
+                                    }
+
+                                    // save model file path or error message in the models metadata table
+                                    vertx.eventBus().send(Constants.ADDRESS_MODELS_SAVE, modelMetadata);
+                                });
                     } else {
                         // the error message
                         String errorMsg = "No training dataset input was found to train outlier model.";
 
                         // log error message
                         LOGGER.log(Level.SEVERE, errorMsg);
-                         
+
                         // save error message in the models metadata table
                         modelMetadata.put(Constants.KEY_ERROR, errorMsg);
-                         
+
                         // save model file path or error message in the models metadata table
                         vertx.eventBus().send(Constants.ADDRESS_MODELS_SAVE, modelMetadata);
                     }
@@ -372,7 +353,8 @@ public class TrainModelVerticle extends AbstractVerticle {
             }
 
             // response
-            msg.reply("Training the model(s) has been triggered. Query the " + Constants.ENDPOINT_MODELS + " endpoint for training status.");
+            msg.reply("Training the model(s) has been triggered. Query the " + Constants.ENDPOINT_MODELS
+                    + " endpoint for training status.");
 
         });
 
@@ -557,125 +539,158 @@ public class TrainModelVerticle extends AbstractVerticle {
                     if (distinctLabelsJsonArray.size() > 0) {
 
                         // get the training input dimension
-                        vertx.eventBus().request(Constants.ADDRESS_DATA_COUNT_DIMENSIONS, payload, dimensionResponse -> {
-                            JsonObject dimensionJson = (JsonObject) (dimensionResponse.result().body());
+                        vertx.eventBus().request(Constants.ADDRESS_DATA_COUNT_DIMENSIONS, payload,
+                                dimensionResponse -> {
+                                    JsonObject dimensionJson = (JsonObject) (dimensionResponse.result().body());
 
-                            // check if we actually have training input
-                            if (dimensionJson.containsKey(Constants.KEY_COUNT) && dimensionJson.getInteger(Constants.KEY_COUNT) > 0) {
+                                    // check if we actually have training input
+                                    if (dimensionJson.containsKey(Constants.KEY_COUNT)
+                                            && dimensionJson.getInteger(Constants.KEY_COUNT) > 0) {
 
-                                // the dimension count
-                                int dimensions = dimensionJson.getInteger(Constants.KEY_COUNT).intValue();
+                                        // the dimension count
+                                        int dimensions = dimensionJson.getInteger(Constants.KEY_COUNT).intValue();
 
-                                // select all the expected values
-                                vertx.eventBus().request(Constants.ADDRESS_LABELS_SELECT, payload, labelsResponse -> {
-                                    JsonObject labelsResponseJson = (JsonObject) (labelsResponse.result().body());
-                                    final JsonArray expectedValuesJsonArray = labelsResponseJson.getJsonArray(Constants.KEY_DATA);
-                                
+                                        // select all the expected values
+                                        vertx.eventBus().request(Constants.ADDRESS_LABELS_SELECT, payload,
+                                                labelsResponse -> {
+                                                    JsonObject labelsResponseJson = (JsonObject) (labelsResponse
+                                                            .result().body());
+                                                    final JsonArray expectedValuesJsonArray = labelsResponseJson
+                                                            .getJsonArray(Constants.KEY_DATA);
 
-                                    // select all the training data
-                                    vertx.eventBus().request(Constants.ADDRESS_TRAINING_DATA_SELECT, payload, trainingDataResponse -> {
-                                        JsonObject trainingDataResponseJson = (JsonObject) (trainingDataResponse.result().body());
-                                        final JsonArray trainingDataJsonArray = trainingDataResponseJson.getJsonArray(Constants.KEY_DATA);
+                                                    // select all the training data
+                                                    vertx.eventBus().request(Constants.ADDRESS_TRAINING_DATA_SELECT,
+                                                            payload, trainingDataResponse -> {
+                                                                JsonObject trainingDataResponseJson = (JsonObject) (trainingDataResponse
+                                                                        .result().body());
+                                                                final JsonArray trainingDataJsonArray = trainingDataResponseJson
+                                                                        .getJsonArray(Constants.KEY_DATA);
 
-                                        // the JSAT training input dataset object
-                                        RegressionDataSet train = new RegressionDataSet(
-                                            dimensions, 
-                                            new CategoricalData[0]
-                                        );
+                                                                // the JSAT training input dataset object
+                                                                RegressionDataSet train = new RegressionDataSet(
+                                                                        dimensions,
+                                                                        new CategoricalData[0]);
 
-                                        // the training input data point array
-                                        JsonArray trainingDatapointJsonArray = new JsonArray();
+                                                                // the training input data point array
+                                                                JsonArray trainingDatapointJsonArray = new JsonArray();
 
-                                        // the map that will contain all the datapoints and their expected values
-                                        SortedMap<Integer, JsonObject> trainingDatasetMap = new TreeMap<Integer, JsonObject>();
+                                                                // the map that will contain all the datapoints and their expected values
+                                                                SortedMap<Integer, JsonObject> trainingDatasetMap = new TreeMap<Integer, JsonObject>();
 
-                                        // collect all data points into the training dataset map
-                                        for (int trainingDatasetIndex = 0; trainingDatasetIndex < trainingDataJsonArray.size(); trainingDatasetIndex++) {
-                                            
-                                            // fetch a parameter value from the training dataset point
-                                            JsonObject trainingDataRow = trainingDataJsonArray.getJsonObject(trainingDatasetIndex);
+                                                                // collect all data points into the training dataset map
+                                                                for (int trainingDatasetIndex = 0; trainingDatasetIndex < trainingDataJsonArray
+                                                                        .size(); trainingDatasetIndex++) {
 
-                                            // include it in the training data point array
-                                            trainingDatapointJsonArray.add(trainingDataRow.getString(Constants.KEY_VALUE));
+                                                                    // fetch a parameter value from the training dataset point
+                                                                    JsonObject trainingDataRow = trainingDataJsonArray
+                                                                            .getJsonObject(trainingDatasetIndex);
 
-                                            // keep adding data to the data point until all parameter values have been added for the given training input dimension
-                                            if ((trainingDatasetIndex+1) % dimensions == 0) {
+                                                                    // include it in the training data point array
+                                                                    trainingDatapointJsonArray.add(trainingDataRow
+                                                                            .getString(Constants.KEY_VALUE));
 
-                                                // get the timestamp for the current training dataset input
-                                                int trainingDatasetTimestamp = trainingDataRow.getInteger(Constants.KEY_TIMESTAMP).intValue();
+                                                                    // keep adding data to the data point until all parameter values have been added for the given training input dimension
+                                                                    if ((trainingDatasetIndex + 1) % dimensions == 0) {
 
-                                                JsonObject trainingDatasetJsonObject = new JsonObject();
-                                                trainingDatasetJsonObject.put(Constants.KEY_DATA_POINT, trainingDatapointJsonArray);
-                                                trainingDatasetMap.put(trainingDatasetTimestamp, trainingDatasetJsonObject);
+                                                                        // get the timestamp for the current training dataset input
+                                                                        int trainingDatasetTimestamp = trainingDataRow
+                                                                                .getInteger(Constants.KEY_TIMESTAMP)
+                                                                                .intValue();
 
-                                                // reset the training data point json array
-                                                trainingDatapointJsonArray = new JsonArray();
-                                            }
-                                        }
+                                                                        JsonObject trainingDatasetJsonObject = new JsonObject();
+                                                                        trainingDatasetJsonObject.put(
+                                                                                Constants.KEY_DATA_POINT,
+                                                                                trainingDatapointJsonArray);
+                                                                        trainingDatasetMap.put(trainingDatasetTimestamp,
+                                                                                trainingDatasetJsonObject);
 
-                                        // collect all the expected values into the training dataset map
-                                        for (int datasetExpectedValueIndex = 0; datasetExpectedValueIndex < expectedValuesJsonArray.size(); datasetExpectedValueIndex++) {
-                                            JsonObject expectedValueRow = expectedValuesJsonArray.getJsonObject(datasetExpectedValueIndex);
-                                            int expectedValueTimestamp = expectedValueRow.getInteger(Constants.KEY_TIMESTAMP).intValue();
+                                                                        // reset the training data point json array
+                                                                        trainingDatapointJsonArray = new JsonArray();
+                                                                    }
+                                                                }
 
-                                            if (trainingDatasetMap.containsKey(expectedValueTimestamp)) {
-                                                double expectedValue = expectedValueRow.getDouble(Constants.KEY_LABEL).doubleValue();
-                                                trainingDatasetMap.get(expectedValueTimestamp).put(Constants.KEY_LABEL, expectedValue);
-                                            }
-                                        }
+                                                                // collect all the expected values into the training dataset map
+                                                                for (int datasetExpectedValueIndex = 0; datasetExpectedValueIndex < expectedValuesJsonArray
+                                                                        .size(); datasetExpectedValueIndex++) {
+                                                                    JsonObject expectedValueRow = expectedValuesJsonArray
+                                                                            .getJsonObject(datasetExpectedValueIndex);
+                                                                    int expectedValueTimestamp = expectedValueRow
+                                                                            .getInteger(Constants.KEY_TIMESTAMP)
+                                                                            .intValue();
 
-                                        // create the data points for training
-                                        for (Map.Entry<Integer, JsonObject> entry : trainingDatasetMap.entrySet()) {
-                                                                
-                                            if (entry.getValue().containsKey(Constants.KEY_LABEL)) {
-                                                
-                                                // build the training data point array
-                                                double[] trainingDatapointArray = new double[dimensions];
+                                                                    if (trainingDatasetMap
+                                                                            .containsKey(expectedValueTimestamp)) {
+                                                                        double expectedValue = expectedValueRow
+                                                                                .getDouble(Constants.KEY_LABEL)
+                                                                                .doubleValue();
+                                                                        trainingDatasetMap.get(expectedValueTimestamp)
+                                                                                .put(Constants.KEY_LABEL,
+                                                                                        expectedValue);
+                                                                    }
+                                                                }
 
-                                                for (int d=0; d < dimensions; d++){
-                                                    trainingDatapointArray[d] = Double.valueOf(entry.getValue().getJsonArray(Constants.KEY_DATA_POINT).getString(d));
-                                                }
-                                                
-                                                // add the data point array as a dense vector and set the expected value
-                                                train.addDataPoint(
-                                                    new DenseVector(trainingDatapointArray),
-                                                    new int[0],
-                                                    entry.getValue().getDouble(Constants.KEY_LABEL).doubleValue());
-                                            }
-                                        }
+                                                                // create the data points for training
+                                                                for (Map.Entry<Integer, JsonObject> entry : trainingDatasetMap
+                                                                        .entrySet()) {
 
-                                        try {
-                                            // upload the training dataset
-                                            saasyml.setDataSet(train, null);
+                                                                    if (entry.getValue()
+                                                                            .containsKey(Constants.KEY_LABEL)) {
 
-                                            // enter ML pipeline for the given algorithm
-                                            // serialize amd save the resulting model
-                                            saasyml.train();
+                                                                        // build the training data point array
+                                                                        double[] trainingDatapointArray = new double[dimensions];
 
-                                            // the path to the model file will be stored in the database
-                                            modelMetadata.put(Constants.KEY_FILEPATH, saasyml.getModelPathSerialized());
+                                                                        for (int d = 0; d < dimensions; d++) {
+                                                                            trainingDatapointArray[d] = Double.valueOf(
+                                                                                    entry.getValue().getJsonArray(
+                                                                                            Constants.KEY_DATA_POINT)
+                                                                                            .getString(d));
+                                                                        }
 
-                                        } catch (Exception e) {
-                                            // the error message will be stored to the database
-                                            modelMetadata.put(Constants.KEY_ERROR, e.getMessage());
-                                        }
+                                                                        // add the data point array as a dense vector and set the expected value
+                                                                        train.addDataPoint(
+                                                                                new DenseVector(trainingDatapointArray),
+                                                                                new int[0],
+                                                                                entry.getValue()
+                                                                                        .getDouble(Constants.KEY_LABEL)
+                                                                                        .doubleValue());
+                                                                    }
+                                                                }
 
-                                        // save model file path or error message in the models metadata table
+                                                                try {
+                                                                    // upload the training dataset
+                                                                    saasyml.setDataSet(train, null);
+
+                                                                    // enter ML pipeline for the given algorithm
+                                                                    // serialize amd save the resulting model
+                                                                    saasyml.train();
+
+                                                                    // the path to the model file will be stored in the database
+                                                                    modelMetadata.put(Constants.KEY_FILEPATH,
+                                                                            saasyml.getModelPathSerialized());
+
+                                                                } catch (Exception e) {
+                                                                    // the error message will be stored to the database
+                                                                    modelMetadata.put(Constants.KEY_ERROR,
+                                                                            e.getMessage());
+                                                                }
+
+                                                                // save model file path or error message in the models metadata table
+                                                                vertx.eventBus().send(Constants.ADDRESS_MODELS_SAVE,
+                                                                        modelMetadata);
+                                                            });
+                                                });
+                                    } else {
+                                        // the error message
+                                        String errorMsg = "No training dataset input was found to train regressor model.";
+
+                                        // log error message
+                                        LOGGER.log(Level.SEVERE, errorMsg);
+
+                                        // save error message in the models metadata table
+                                        modelMetadata.put(Constants.KEY_ERROR, errorMsg);
                                         vertx.eventBus().send(Constants.ADDRESS_MODELS_SAVE, modelMetadata);
-                                    });
+                                    }
                                 });
-                            } else {
-                                // the error message
-                                String errorMsg = "No training dataset input was found to train regressor model.";
-
-                                // log error message
-                                LOGGER.log(Level.SEVERE, errorMsg);
-
-                                // save error message in the models metadata table
-                                modelMetadata.put(Constants.KEY_ERROR, errorMsg);
-                                vertx.eventBus().send(Constants.ADDRESS_MODELS_SAVE, modelMetadata);
-                            }
-                        });
                     } else {
                         // the error message
                         String errorMsg = "Missing expected target values to train regressor model.";
@@ -685,10 +700,11 @@ public class TrainModelVerticle extends AbstractVerticle {
 
                         // save error message in the models metadata table
                         modelMetadata.put(Constants.KEY_ERROR, errorMsg);
-                        vertx.eventBus().send(Constants.ADDRESS_MODELS_SAVE, modelMetadata);                        
-                    }  
-                    
-                    LOGGER.log(Level.INFO, "Trained model will be stored in the filesystem and referenced from the database once training is complete.");
+                        vertx.eventBus().send(Constants.ADDRESS_MODELS_SAVE, modelMetadata);
+                    }
+
+                    LOGGER.log(Level.INFO,
+                            "Trained model will be stored in the filesystem and referenced from the database once training is complete.");
                 });
 
             } catch (Exception e) {
@@ -704,13 +720,79 @@ public class TrainModelVerticle extends AbstractVerticle {
             }
 
             // response
-            msg.reply("Training the model(s) has been triggered. Query the " + Constants.ENDPOINT_MODELS + " endpoint for training status.");            
+            msg.reply("Training the model(s) has been triggered. Query the " + Constants.ENDPOINT_MODELS
+                    + " endpoint for training status.");
 
         });
 
+    }
 
+    /**
+     * Function that add the expected labels from Json Expected label to the SortedMap
+     * 
+     * @param trainingDatasetMap sorted map by timestamp with the training data
+     * @param labelsJsonArray Json with the expected labels of the training data
+     * 
+     * @return sorted map by timestamp with the train data
+     */
+    private SortedMap<Integer, JsonObject> trainDataGetExpectedLabes(SortedMap<Integer, JsonObject> trainingDatasetMap,
+            JsonArray labelsJsonArray) {
 
+        labelsJsonArray.forEach(e -> {
 
+            JsonObject labelRow = (JsonObject) e;
+            
+            int labelTimestamp = labelRow.getInteger(Constants.KEY_TIMESTAMP).intValue();
+
+            if (trainingDatasetMap.containsKey(labelTimestamp)) {
+                int label = labelRow.getInteger(Constants.KEY_LABEL).intValue();
+                trainingDatasetMap.get(labelTimestamp).put(Constants.KEY_LABEL, label);
+            }
+        });
+
+        return trainingDatasetMap;
+    }
+
+    /**
+     * Function that convert the train data from JSON to SortedMap
+     * 
+     * @param trainingDataJsonArray Json with the database information
+     * @param dimensions total number of columns in the database
+     * 
+     * @return a sorted map by timestamp with the training data
+     */
+    private SortedMap<Integer, JsonObject> trainDataToSortedMap(JsonArray trainingDataJsonArray, int dimensions) {
+        
+        SortedMap<Integer, JsonObject> trainingDatasetMap = new TreeMap<Integer, JsonObject>();
+
+        // the training input data point array
+        JsonArray trainingDatapointJsonArray = new JsonArray();
+
+        // collect all data points into the training dataset map
+        for (int trainingDatasetIndex = 0; trainingDatasetIndex < trainingDataJsonArray.size(); trainingDatasetIndex++) {
+
+            // fetch a parameter value from the training data point
+            JsonObject trainingDataRow = trainingDataJsonArray.getJsonObject(trainingDatasetIndex);
+
+            // include it in the training data point array
+            trainingDatapointJsonArray.add(trainingDataRow.getString(Constants.KEY_VALUE));
+
+            // keep adding data to the data point until all parameter values have been added for the given training input dimension
+            if ((trainingDatasetIndex + 1) % dimensions == 0) {
+
+                // get the timestamp for the current training dataset input
+                int trainingDatasetTimestamp = trainingDataRow.getInteger(Constants.KEY_TIMESTAMP).intValue();
+
+                JsonObject trainingDatasetJsonObject = new JsonObject();
+                trainingDatasetJsonObject.put(Constants.KEY_DATA_POINT, trainingDatapointJsonArray);
+                trainingDatasetMap.put(trainingDatasetTimestamp, trainingDatasetJsonObject);
+
+                // reset the training data point json array
+                trainingDatapointJsonArray = new JsonArray();
+            }
+        }
+        
+        return trainingDatasetMap;
     }
 
 }
