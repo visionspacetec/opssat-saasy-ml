@@ -571,63 +571,11 @@ public class TrainModelVerticle extends AbstractVerticle {
                                                                         dimensions,
                                                                         new CategoricalData[0]);
 
-                                                                // the training input data point array
-                                                                JsonArray trainingDatapointJsonArray = new JsonArray();
+                                                                // the map that will contain all the datapoints and their expected labels
+                                                                SortedMap<Integer, JsonObject> trainingDatasetMap = trainDataToSortedMap(trainingDataJsonArray, dimensions);
 
-                                                                // the map that will contain all the datapoints and their expected values
-                                                                SortedMap<Integer, JsonObject> trainingDatasetMap = new TreeMap<Integer, JsonObject>();
-
-                                                                // collect all data points into the training dataset map
-                                                                for (int trainingDatasetIndex = 0; trainingDatasetIndex < trainingDataJsonArray
-                                                                        .size(); trainingDatasetIndex++) {
-
-                                                                    // fetch a parameter value from the training dataset point
-                                                                    JsonObject trainingDataRow = trainingDataJsonArray
-                                                                            .getJsonObject(trainingDatasetIndex);
-
-                                                                    // include it in the training data point array
-                                                                    trainingDatapointJsonArray.add(trainingDataRow
-                                                                            .getString(Constants.KEY_VALUE));
-
-                                                                    // keep adding data to the data point until all parameter values have been added for the given training input dimension
-                                                                    if ((trainingDatasetIndex + 1) % dimensions == 0) {
-
-                                                                        // get the timestamp for the current training dataset input
-                                                                        int trainingDatasetTimestamp = trainingDataRow
-                                                                                .getInteger(Constants.KEY_TIMESTAMP)
-                                                                                .intValue();
-
-                                                                        JsonObject trainingDatasetJsonObject = new JsonObject();
-                                                                        trainingDatasetJsonObject.put(
-                                                                                Constants.KEY_DATA_POINT,
-                                                                                trainingDatapointJsonArray);
-                                                                        trainingDatasetMap.put(trainingDatasetTimestamp,
-                                                                                trainingDatasetJsonObject);
-
-                                                                        // reset the training data point json array
-                                                                        trainingDatapointJsonArray = new JsonArray();
-                                                                    }
-                                                                }
-
-                                                                // collect all the expected values into the training dataset map
-                                                                for (int datasetExpectedValueIndex = 0; datasetExpectedValueIndex < expectedValuesJsonArray
-                                                                        .size(); datasetExpectedValueIndex++) {
-                                                                    JsonObject expectedValueRow = expectedValuesJsonArray
-                                                                            .getJsonObject(datasetExpectedValueIndex);
-                                                                    int expectedValueTimestamp = expectedValueRow
-                                                                            .getInteger(Constants.KEY_TIMESTAMP)
-                                                                            .intValue();
-
-                                                                    if (trainingDatasetMap
-                                                                            .containsKey(expectedValueTimestamp)) {
-                                                                        double expectedValue = expectedValueRow
-                                                                                .getDouble(Constants.KEY_LABEL)
-                                                                                .doubleValue();
-                                                                        trainingDatasetMap.get(expectedValueTimestamp)
-                                                                                .put(Constants.KEY_LABEL,
-                                                                                        expectedValue);
-                                                                    }
-                                                                }
+                                                                // collect all the expected labels into the training dataset map
+                                                                trainingDatasetMap = trainDataGetExpectedLabes(trainingDatasetMap, expectedValuesJsonArray);
 
                                                                 // create the data points for training
                                                                 for (Map.Entry<Integer, JsonObject> entry : trainingDatasetMap
