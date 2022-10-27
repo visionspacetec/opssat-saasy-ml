@@ -85,8 +85,7 @@ public class InferenceVerticle extends AbstractVerticle {
                         // do the inference
                         List<Object> objects = saasyml.inference();
 
-                        List<Object> inference = mapInferenceObjects(objects, typeModel);
-                        model.put(Constants.KEY_INFERENCE, inference);
+                        model.put(Constants.KEY_INFERENCE, mapInferenceObjects(objects, typeModel));
                     }
                 }
                 
@@ -119,6 +118,7 @@ public class InferenceVerticle extends AbstractVerticle {
                 .filter(element -> element instanceof Double)
                 .map(element -> (Double) element).collect(Collectors.toList());
             default:
+            case Classifier:
                 return objects.stream()
                 .filter(element -> element instanceof Integer)
                 .map(element -> (Integer) element).collect(Collectors.toList());                    
