@@ -34,6 +34,7 @@ public final class Constants {
     public static final String KEY_LABEL = "label";
     public static final String KEY_LABELS = "labels";
     public static final String KEY_LABELS_PLUGIN = "labelsPlugin";
+    public static final String KEY_CLUSTER_NUMBER = "clusterNumber";
     public static final String KEY_PARAMS = "params";
     public static final String KEY_COUNT = "count";
     public static final String KEY_STARTED_COUNT = "startedCount";
@@ -47,7 +48,7 @@ public final class Constants {
     public static final String KEY_MODEL_CLASSIFIER = "Classifier";
     public static final String KEY_MODEL_REGRESSOR = "Regressor";
     public static final String KEY_MODEL_OUTLIER = "Outlier";
-
+    public static final String KEY_MODEL_CLUSTER = "Cluster";
 
     // labels for the endpoints
     public static final String ENDPOINT_API = "/api/";

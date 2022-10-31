@@ -362,8 +362,7 @@ public class TrainModelVerticle extends AbstractVerticle {
         vertx.eventBus().consumer(Constants.ADDRESS_TRAINING_CLUSTER, msg -> {
 
             // variables to generate the class randomly
-            Random rand = new Random();
-            int totalClasses = 2;
+            Random rand = new Random();         
 
             // the request payload (Json)
             JsonObject payload = (JsonObject) (msg.body());
@@ -373,122 +372,136 @@ public class TrainModelVerticle extends AbstractVerticle {
             final int expId = payload.getInteger(Constants.KEY_EXPID).intValue();
             final int datasetId = payload.getInteger(Constants.KEY_DATASETID).intValue();
             final String algorithm = payload.getString(Constants.KEY_ALGORITHM);
+            final int clusterNumber = payload.getInteger(Constants.KEY_CLUSTER_NUMBER).intValue();
+
+            LOGGER.log(Level.INFO, "Required number of clusters: " + clusterNumber);
+
             boolean thread = (payload.containsKey(Constants.KEY_THREAD)
                     && payload.getBoolean(Constants.KEY_THREAD) != null) ? payload.getBoolean(Constants.KEY_THREAD)
                             : PropertiesManager.getInstance().getThread();
             boolean serialize = PropertiesManager.getInstance().getSerialize();
 
+            // the train model will be serialized and saved as a file in the filesystem
+            // a reference to the file as well as some metadata will be stored in the database
+            // collect all metadata in a Json object
+            JsonObject modelMetadata = new JsonObject();
+            modelMetadata.put(Constants.KEY_EXPID, expId);
+            modelMetadata.put(Constants.KEY_DATASETID, datasetId);
+            modelMetadata.put(Constants.KEY_TYPE, Constants.KEY_MODEL_CLUSTER);
+            modelMetadata.put(Constants.KEY_ALGORITHM, algorithm);
+
             // create the pipeline
             IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(expId, datasetId, thread, serialize, algorithm);
-
-            // build the model with parameters
-            saasyml.build(new Integer[] { totalClasses });
 
             // Train the model 
             try {
 
-                // build Json payload object with just expId and datasetId
-                JsonObject payloadSelect = new JsonObject();
-                payloadSelect.put(Constants.KEY_EXPID, expId);
-                payloadSelect.put(Constants.KEY_DATASETID, datasetId);
+                // build the model with parameters
+                saasyml.build(new Integer[] { clusterNumber });
 
                 // get the total number of columns 
-                vertx.eventBus().request(Constants.ADDRESS_DATA_COUNT_DIMENSIONS, payloadSelect, reply -> {
+                vertx.eventBus().request(Constants.ADDRESS_DATA_COUNT_DIMENSIONS, payload, reply -> {
                     JsonObject response = (JsonObject) (reply.result().body());
 
                     // if the total number of columns exists and it is different from zero, continue
                     if (response.containsKey(Constants.KEY_COUNT)
                             && response.getInteger(Constants.KEY_COUNT) > 0) {
 
-                        payloadSelect.put(Constants.KEY_COUNT, response.getInteger(Constants.KEY_COUNT).intValue());
+                        payload.put(Constants.KEY_COUNT, response.getInteger(Constants.KEY_COUNT).intValue());
+
+                        // the total number of columns
+                        int dimensions = payload.getInteger(Constants.KEY_COUNT);
 
                         // select all the data from the dataset
-                        vertx.eventBus().request(Constants.ADDRESS_TRAINING_DATA_SELECT, payloadSelect, selectReply -> {
+                        vertx.eventBus().request(Constants.ADDRESS_TRAINING_DATA_SELECT, payload, trainingDataResponse -> {
 
-                            // get the response from the select
-                            JsonObject selectResponse = (JsonObject) (selectReply.result().body());
+                            // get the response
+                            JsonObject trainingDataResponseJson = (JsonObject) (trainingDataResponse.result().body());
 
-                            // if the response_select object contains the data, we can continue
-                            if (selectResponse.containsKey(Constants.KEY_DATA)) {
+                            // if the response object contains the data, we can continue
+                            if (trainingDataResponseJson.containsKey(Constants.KEY_DATA)) {
 
                                 LOGGER.log(Level.INFO, "Prepare data ");
 
-                                // the total number of columns
-                                int total_columns = payloadSelect.getInteger(Constants.KEY_COUNT);
-
                                 // get the data with the result of the select
-                                final JsonArray data = selectResponse.getJsonArray(Constants.KEY_DATA);
+                                final JsonArray data = trainingDataResponseJson.getJsonArray(Constants.KEY_DATA);
 
-                                // create variables for the k
-                                double[] tempTrainData = new double[total_columns]; // TRAIN
-                                CategoricalData[] catDataInfo = new CategoricalData[] {
-                                        new CategoricalData(totalClasses) };
-
+                                // Initialize predictors
                                 List<DataPoint> dataPoints = new ArrayList<DataPoint>();
-                                Normal noiseSource = new Normal(0, 0.05);
+                                double[] trainDataRow = new double[dimensions];   
+                                // TODO DataPoints need this but won't use its value for training, create issue
+                                CategoricalData[] catDataInfo = new CategoricalData[] { 
+                                    new CategoricalData(clusterNumber) 
+                                };
 
                                 // variable to control the number of columns
                                 int colCount = 0;
 
-                                // iterate throughout all the data
-                                for (int pos = 0; pos < data.size(); pos++) {
+                                // iterate throughout all the rows in the data
+                                for (int rowIndex = 0; rowIndex < data.size(); rowIndex++) {
 
                                     // get the Json Object and store the value
-                                    JsonObject object = data.getJsonObject(pos);
-                                    tempTrainData[colCount++] = Double.valueOf(object.getString(Constants.KEY_VALUE));
+                                    JsonObject object = data.getJsonObject(rowIndex);
+                                    trainDataRow[colCount++] = Double.valueOf(object.getString(Constants.KEY_VALUE));
 
                                     // if colcount is equal to total columns, we add a new row
-                                    if (colCount == total_columns) {
+                                    if (colCount == dimensions) {
 
                                         // we add a data point to our train dataset 
-                                        // with a random value of the class Y
-                                        dataPoints.add(new DataPoint(new DenseVector(tempTrainData),
-                                                new int[] { rand.nextInt(totalClasses) }, catDataInfo));
+                                        // with a random value of the class Y, it won't use it
+                                        dataPoints.add(new DataPoint(
+                                            new DenseVector(trainDataRow),
+                                            new int[] { rand.nextInt(clusterNumber) },
+                                            catDataInfo));
 
                                         // we restart the count of cols to zero and the temporal train data
                                         colCount = 0;
-                                        tempTrainData = new double[total_columns];
+                                        trainDataRow = new double[dimensions];
                                     }
                                 }
 
                                 LOGGER.log(Level.INFO, "Data points: " + dataPoints.toString());
-
                                 SimpleDataSet train = new SimpleDataSet(dataPoints);
 
-                                // upload the train dataset
-                                saasyml.setDataSet(train, null);
+                                try{
+                                    // upload the train dataset
+                                    saasyml.setDataSet(train, null);
 
-                                // 1.3. Here we enter ML pipeline for the given algorithm
-                                // 2. Serialize and save the resulting model.
-                                // Make sure it is uniquely identifiable with expId and datasetId, maybe as part
-                                // of the toGround folder file system:
-                                LOGGER.log(Level.INFO, "Executed method train");
-                                saasyml.train();
+                                    // Train, serialize and save the resulting model
+                                    LOGGER.log(Level.INFO, "Executed method train");
+                                    saasyml.train();
 
-                                // 3. Return a message with a path to the serialized model
-                                JsonObject selectReponseReply = new JsonObject();
-                                selectReponseReply.put(Constants.KEY_TYPE, "cluster");
-                                selectReponseReply.put(Constants.KEY_ALGORITHM, algorithm);
-                                selectReponseReply.put(Constants.KEY_MODEL_PATH, saasyml.getModelPathSerialized());
-                                msg.reply(selectReponseReply);
-
+                                    // Return a message with a path to the serialized model
+                                    modelMetadata.put(Constants.KEY_FILEPATH, saasyml.getModelPathSerialized());
+                                } catch (Exception e) {
+                                    modelMetadata.put(Constants.KEY_ERROR, e.getMessage());
+                                }
+                                
+                                // save model file path or error message in the models metadata table
+                                vertx.eventBus().send(Constants.ADDRESS_MODELS_SAVE, modelMetadata);
                             }
                         });
                     } else {
-                        LOGGER.log(Level.SEVERE, "Failed to get the total number of rows.");
+                        String errorMsg = "Failed to get the total number of rows.";
 
-                        // response: error
-                        msg.reply("Failed to get the total number of rows.");
+                        LOGGER.log(Level.SEVERE, errorMsg);
+
+                        modelMetadata.put(Constants.KEY_ERROR, errorMsg);
+                        vertx.eventBus().send(Constants.ADDRESS_MODELS_SAVE, modelMetadata);
                     }
                 });
 
             } catch (Exception e) {
-                // log
-                LOGGER.log(Level.SEVERE, "Failed to get training data.", e);
+                String errorMsg = "Failed to get training data.";
 
-                // response: error
-                msg.reply("Failed to get training data.");
+                LOGGER.log(Level.SEVERE, errorMsg, e);
+
+                modelMetadata.put(Constants.KEY_ERROR, errorMsg);
+                vertx.eventBus().send(Constants.ADDRESS_MODELS_SAVE, modelMetadata);
             }
+            // response
+            msg.reply("Training the model(s) has been triggered. Query the " + Constants.ENDPOINT_MODELS
+                    + " endpoint for training status.");
         });
 
         // train regression
