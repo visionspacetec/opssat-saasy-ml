@@ -185,6 +185,8 @@ public class MLPipeLineFactory {
             default:
             case "FLAME":
                 return ModelClusteringFactory.buildModelFLAME(new EuclideanDistance(), k, 800); 
+            case "GMeans":
+                return ModelClusteringFactory.buildModelGMeans();
         }
     }
 
@@ -286,6 +288,7 @@ public class MLPipeLineFactory {
                 return TypeModel.Classifier;
 
             case "FLAME":
+            case "GMeans":
                 return TypeModel.Cluster;
             
             case "IsolationForest": 

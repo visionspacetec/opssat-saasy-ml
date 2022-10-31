@@ -4,7 +4,6 @@ import esa.mo.nmf.apps.saasyml.factories.MLPipeLineFactory;
 
 import jsat.classifiers.DataPoint;
 import jsat.clustering.Clusterer;
-import jsat.utils.IntSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +70,7 @@ public class PipeLineClusterJSAT extends PipeLineAbstractJSAT{
 
         if (serialize){
             // serialize the model
-            this.modelPathSerialized = serializeModel(model);
+            this.modelPathSerialized = serializeModel(this.clusters);
         }
     }
 
@@ -79,23 +78,21 @@ public class PipeLineClusterJSAT extends PipeLineAbstractJSAT{
 
         if (serialize){
             // deserialize the model
-            this.model = deserializeCluster(modelPathSerialized);
+            this.clusters = deserializeCluster(modelPathSerialized);
         }
 
         // test the model
-        Set<Integer> seenBefore = new IntSet();
+        List<Object> result = new ArrayList<Object>();
         for(List<DataPoint> cluster : this.clusters)
         {
             int thisClass = cluster.get(0).getCategoricalValue(0);
-
-            if (!seenBefore.contains(thisClass)) {
-                for(DataPoint dp : cluster) {
-                    logger.info(thisClass + " vs " + dp.getCategoricalValue(0));
-                }
+            for (DataPoint dp : cluster) {
+                result.add(dp.getCategoricalValue(0));
+                logger.info(thisClass + " vs " + dp.getCategoricalValue(0));
             }
         }
 
-        return null;
+        return result;
     }
 
 
@@ -108,12 +105,12 @@ public class PipeLineClusterJSAT extends PipeLineAbstractJSAT{
      * @param modelPathSerialized full path name of the serialized model
      * @return the model
      */
-    private Clusterer deserializeCluster(String modelPathSerialized) {
+    private List<List<DataPoint>> deserializeCluster(String modelPathSerialized) {
 
-        Clusterer model = null;
+        List<List<DataPoint>> model = null;
 
         try (ObjectInputStream objectinputstream = new ObjectInputStream(new FileInputStream(modelPathSerialized));) {
-            model = (Clusterer) objectinputstream.readObject();
+            model = (List<List<DataPoint>>) objectinputstream.readObject();
         } catch (Exception e){ logger.debug("Error deserializing the model"); }
 
         return model;
