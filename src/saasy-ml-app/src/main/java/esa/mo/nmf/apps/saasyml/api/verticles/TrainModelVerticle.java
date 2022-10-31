@@ -413,8 +413,6 @@ public class TrainModelVerticle extends AbstractVerticle {
 
                                 LOGGER.log(Level.INFO, "Prepare data ");
 
-                                // 1.2. Prepare data
-
                                 // the total number of columns
                                 int total_columns = payloadSelect.getInteger(Constants.KEY_COUNT);
 
@@ -437,9 +435,7 @@ public class TrainModelVerticle extends AbstractVerticle {
 
                                     // get the Json Object and store the value
                                     JsonObject object = data.getJsonObject(pos);
-                                    tempTrainData[colCount++] = colCount
-                                            + Double.valueOf(object.getString(Constants.KEY_VALUE));
-                                    ;
+                                    tempTrainData[colCount++] = Double.valueOf(object.getString(Constants.KEY_VALUE));
 
                                     // if colcount is equal to total columns, we add a new row
                                     if (colCount == total_columns) {

@@ -1,7 +1,10 @@
 package esa.mo.nmf.apps.saasyml.dataset.utils;
 
+import jsat.DataSet;
+import jsat.SimpleDataSet;
 import jsat.classifiers.CategoricalData;
 import jsat.classifiers.ClassificationDataSet;
+import jsat.classifiers.DataPoint;
 import jsat.distributions.multivariate.NormalM;
 import jsat.linear.ConstantVector;
 import jsat.linear.DenseVector;
@@ -9,6 +12,7 @@ import jsat.linear.Matrix;
 import jsat.linear.Vec;
 import jsat.regression.RegressionDataSet;
 import jsat.utils.random.RandomUtil;
+import jsat.utils.GridDataGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +53,57 @@ public class GenerateDataset
         return train;
     }
 
+
+    public static DataSet getOutlierDataOwnData(int dataSetSize, int totalClass, int totalCol) {
+
+        List<DataPoint> dataPoints = new ArrayList<DataPoint>(dataSetSize);
+
+        // we fixed the number of columns in the dataset
+
+        // we generate a set of data
+        List<Vec> c0 = generateConstantVectorData(dataSetSize, totalCol, 0, 10);
+
+        CategoricalData[] catDataInfo = new CategoricalData[] { new CategoricalData(totalClass) };
+
+        // we add in our data all the generated data with its associated label 0
+        for(Vec s : c0)
+            dataPoints.add(new DataPoint(s, new int[0], catDataInfo));
+
+        return new SimpleDataSet(dataPoints);
+    }
+
+    /**
+     * 
+        RegressionDataSet rds = new RegressionDataSet(2, new CategoricalData[0]);
+        for(int i = 0; i < dataSetSize; i++)
+        {
+        Vec s = new DenseVector(new double[]{rand.nextDouble()*4, rand.nextDouble()*4});
+        rds.addDataPoint(s, new int[0], s.get(0)+4*Math.cos(s.get(1)));
+        }
+        return rds;
+    
+        int totalClasses = 1;
+        for (int d : dimensions)
+            totalClasses *= d;
+        catDataInfo = new CategoricalData[] { new CategoricalData(totalClasses) };
+    
+        List<DataPoint> dataPoints = new ArrayList<DataPoint>(totalClasses * samples);
+    
+        int[] curClassPointer = new int[1];
+    
+        for (int i = 0; i < dimensions[0]; i++) {
+            int[] curDim = new int[dimensions.length];
+            curDim[0] = i;
+            // addSamples(curClassPointer, 0, samples, dataPoints, curDim);
+    
+            DenseVector dv = new DenseVector(dim.length);
+            for (int j = 0; j < dim.length; j++)
+                dv.set(j, dim[j] + noiseSource.invCdf(rand.nextDouble()));
+            dataPoints.add(new DataPoint(dv, new int[] { curClass[0] }, catDataInfo));
+    
+        }
+     */
+    
     /**
      * Generates a linearly separable binary classification problem
      * @param dataSetSize the number of points to generated
@@ -63,14 +118,14 @@ public class GenerateDataset
         int length = 7;
 
         // we generate a set of data
-        List<Vec> c0 = generateConstantVectorData(dataSetSize, length);
+        List<Vec> c0 = generateConstantVectorData(dataSetSize, length, 0, 1);
 
         // we add in our data all the generated data with its associated label 0
         for(Vec s : c0)
             classificationDataSet.addDataPoint(s, new int[0], 0);
 
         // we generate a set of data
-        List<Vec> c1 = generateConstantVectorData(dataSetSize, length);
+        List<Vec> c1 = generateConstantVectorData(dataSetSize, length, 10, 11);
 
         // we add in our data all the generated data with its associated label 1
         for(Vec s : c1)
@@ -86,7 +141,7 @@ public class GenerateDataset
      * @param length the number of columns to generated
      * @return a binary classification data set that is linearly separable
      */
-    private static List<Vec> generateConstantVectorData(int dataSetSize, int length) {
+    private static List<Vec> generateConstantVectorData(int dataSetSize, int length, int min, int max) {
 
         // initialize the list of vector
         List<Vec> dataSet = new ArrayList<Vec>(dataSetSize);
@@ -95,7 +150,7 @@ public class GenerateDataset
         for(int i = 0; i < dataSetSize; i++)
         {
             // generate a random number
-            double randomNum = ThreadLocalRandom.current().nextDouble(0, 1);
+            double randomNum = ThreadLocalRandom.current().nextDouble(min, max);
 
             // create a vector with length columns and the same randon number in each column
             Vec sample = new ConstantVector(randomNum, length);
@@ -296,14 +351,14 @@ public class GenerateDataset
     
     public static ClassificationDataSet getHalfCircles(int dataSetSize, Random rand, double... radi )
     {
-        ClassificationDataSet train = new ClassificationDataSet(2, new CategoricalData[0], new CategoricalData(radi.length));
-        
-        int n = dataSetSize/2 ;
+        ClassificationDataSet train = new ClassificationDataSet(2, new CategoricalData[0],
+                new CategoricalData(radi.length));
 
-        for(int r_i = 0; r_i < radi.length; r_i++)
-            for (int i = 0; i < n; i++)
-            {
-                double t = 2 * Math.PI * (i/2) / n;
+        int n = dataSetSize / 2;
+
+        for (int r_i = 0; r_i < radi.length; r_i++)
+            for (int i = 0; i < n; i++) {
+                double t = 2 * Math.PI * (i / 2) / n;
                 double x = radi[r_i] * Math.cos(t) + (rand.nextDouble() - 0.5) / 5;
                 double y = radi[r_i] * Math.sin(t) + (rand.nextDouble() - 0.5) / 5;
                 train.addDataPoint(DenseVector.toDenseVec(x, y), new int[0], r_i);
