@@ -193,9 +193,9 @@ public class InferenceVerticle extends AbstractVerticle {
 	private DataSet[] prepareClusterOneTestData(JsonArray data) {
         // create the lists of tests
         List<DataSet> tests = new ArrayList<DataSet>();
-
+        
         // retrieve the list of tests
-        return tests.toArray(new DataSet[0]);
+        return tests.toArray(new DataSet[1]);
 	}
 
 	private DataSet[] prepareClassifierOneTestData(JsonArray data) {
