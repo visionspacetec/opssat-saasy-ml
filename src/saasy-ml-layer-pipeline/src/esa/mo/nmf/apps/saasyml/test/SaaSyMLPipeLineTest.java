@@ -167,11 +167,11 @@ public class SaaSyMLPipeLineTest {
 
         logger.info("Generate training dataset...");
         int N = 20;
-        DataSet train = GenerateDataset.getOutlierDataOwnData(N, 4);
+        DataSet train = GenerateDataset.getOutlierDataOwnData(N, 4, 2);
 
         logger.info("train data: "+ Arrays.toString(train.getDataVectors().toArray()));
         
-        DataSet test = GenerateDataset.getOutlierDataOwnData(10, 4);
+        DataSet test = GenerateDataset.getOutlierDataOwnData(10, 4, 2);
 
         // build the model
         saasyml.build();
