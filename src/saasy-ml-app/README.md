@@ -626,7 +626,7 @@ Sample payload:
 }
 ```
 
-### Train a model
+### Train a classification or regression model
 
 Make a POST request to the following endpoints:
 
@@ -657,6 +657,41 @@ Sample payload:
     "algorithm": "AROW"
 }
 ```
+
+### Perform clustering
+
+Make a POST request to the following endpoints:
+
+```
+http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/cluster/:algorithm
+```
+
+Sample payload:
+
+```json
+{
+    "expId": 123,
+    "datasetId": 1,
+    "clusterNumber": 2
+}
+```
+
+
+```
+http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/cluster
+```
+
+Sample payload:
+
+```json
+{
+    "expId": 123,
+    "datasetId": 1,
+    "algorithm": "GMeans",
+    "clusterNumber": 2
+}
+```
+
 
 **TODO:** filter out parameters from training.
 
@@ -742,6 +777,31 @@ Sample payload:
 
 }
 ```
+
+### Clustering Inference
+
+Request for clustering inference does not require inference data.
+The response of clustering inference contains the cluster assignment for observation in the train data set.
+
+```json
+{
+    "expId": 123,
+    "datasetId": 1,
+    "models": [
+        {
+            "filepath": "FULL-PATH-OF-SERIALIZED-THE-MODEL",
+            "type": "Cluster",
+            "thread" : true
+        },
+        {
+            "filepath": "FULL-PATH-OF-SERIALIZED-THE-MODEL",
+            "type": "Cluster"
+        }
+    ]
+
+}
+```
+
 
 ## References
 
