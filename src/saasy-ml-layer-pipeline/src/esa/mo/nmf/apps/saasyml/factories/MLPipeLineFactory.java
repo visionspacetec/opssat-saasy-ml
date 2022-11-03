@@ -16,6 +16,12 @@ import jsat.classifiers.linear.SCW;
 import jsat.classifiers.linear.StochasticSTLinearL1;
 import jsat.classifiers.trees.DecisionTree;
 import jsat.clustering.Clusterer;
+import jsat.clustering.SeedSelectionMethods.SeedSelection;
+import jsat.clustering.dissimilarity.SingleLinkDissimilarity;
+import jsat.clustering.evaluation.DaviesBouldinIndex;
+import jsat.clustering.kmeans.ElkanKMeans;
+import jsat.clustering.kmeans.HamerlyKMeans;
+import jsat.clustering.kmeans.NaiveKMeans;
 import jsat.distributions.kernels.LinearKernel;
 import jsat.distributions.kernels.RBFKernel;
 import jsat.distributions.multivariate.MetricKDE;
@@ -24,6 +30,7 @@ import jsat.lossfunctions.LogisticLoss;
 import jsat.outlier.Outlier;
 import jsat.regression.KernelRLS;
 import jsat.regression.Regressor;
+import jsat.utils.random.RandomUtil;
 
 /**
  * Factory to create ML Pipeline, build ML models, identify the ML model type
@@ -183,10 +190,40 @@ public class MLPipeLineFactory {
 
         switch (modelName){
             default:
-            case "FLAME":
-                return ModelClusteringFactory.buildModelFLAME(new EuclideanDistance(), k, 800); 
+
+            // no clusterer require a value for k
+            case "DBSCAN":
+                return ModelClusteringFactory.buildModelDBSCAN(new EuclideanDistance());
+            case "DivisiveGlobalClusterer":
+                return ModelClusteringFactory.buildModelDivisiveGlobalClusterer(new NaiveKMeans(), new DaviesBouldinIndex(new EuclideanDistance()));
+            case "DivisiveLocalClusterer":
+                return ModelClusteringFactory.buildModelDivisiveGlobalClusterer(new ElkanKMeans(), new DaviesBouldinIndex(new EuclideanDistance()));
+            case "GapStatistic":
+                return ModelClusteringFactory.buildModelGapStatistic(new HamerlyKMeans(new EuclideanDistance(), SeedSelection.FARTHEST_FIRST));
             case "GMeans":
                 return ModelClusteringFactory.buildModelGMeans();
+            case "HamerlyKMeans":
+                return ModelClusteringFactory.buildModelHamerlyKMeans();
+            case "HDBSCAN":
+                return ModelClusteringFactory.buildModelHDBSCAN();
+            case "LSDBC":
+                return ModelClusteringFactory.buildModelLSDBC();
+            case "MeanShift":
+                return ModelClusteringFactory.buildModelMeanShift();
+            case "NNChainHAC":
+                return ModelClusteringFactory.buildModelNNChainHAC(new SingleLinkDissimilarity());
+            case "OPTICS":
+                return ModelClusteringFactory.buildModelOPTICS();
+            case "PAM":
+                return ModelClusteringFactory.buildModelPAM(new EuclideanDistance(), RandomUtil.getRandom(), SeedSelection.FARTHEST_FIRST);
+            case "SimpleHAC":
+                return ModelClusteringFactory.buildModelSimpleHAC(new SingleLinkDissimilarity(new EuclideanDistance()));
+
+            case "CLARA":
+                return ModelClusteringFactory.buildModelCLARA();
+            case "FLAME":
+                return ModelClusteringFactory.buildModelFLAME(new EuclideanDistance(), 30, 800); 
+
         }
     }
 
@@ -287,8 +324,21 @@ public class MLPipeLineFactory {
             case "StochasticMultinomialLogisticRegression":
                 return TypeModel.Classifier;
 
+            case "CLARA":
+            case "DBSCAN":
+            case "DivisiveGlobalClusterer": 
+            case "DivisiveLocalClusterer":
             case "FLAME":
+            case "GapStatistic":
             case "GMeans":
+            case "HamerlyKMeans":
+            case "HDBSCAN":
+            case "LSDBC":
+            case "MeanShift":
+            case "NNChainHAC":
+            case "OPTICS":
+            case "PAM":
+            case "SimpleHAC":
                 return TypeModel.Cluster;
             
             case "IsolationForest": 
