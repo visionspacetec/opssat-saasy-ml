@@ -18,8 +18,10 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import jsat.DataSet;
+import jsat.SimpleDataSet;
 import jsat.classifiers.CategoricalData;
 import jsat.classifiers.ClassificationDataSet;
+import jsat.classifiers.DataPoint;
 import jsat.linear.DenseVector;
 import jsat.regression.RegressionDataSet;
 
@@ -113,6 +115,7 @@ public class InferenceVerticle extends AbstractVerticle {
     private List<Object> mapInferenceObjects(List<Object> objects, TypeModel typeModel) {
 
         switch(typeModel){
+            case Outlier:
             case Regressor:
                 return objects.stream()
                 .filter(element -> element instanceof Double)
@@ -138,7 +141,7 @@ public class InferenceVerticle extends AbstractVerticle {
                 return prepareRegressorOneTestData(data);
             default:
             case Unknown:
-                throw new Exception("There is not type of model");
+                throw new Exception("Unknown model type.");
         }
 
     }
@@ -183,14 +186,46 @@ public class InferenceVerticle extends AbstractVerticle {
 	}
 
 	private DataSet[] prepareOutlierOneTestData(JsonArray data) {
+       
         // create the lists of tests
         List<DataSet> tests = new ArrayList<DataSet>();
-        
+
+        int total_columns = ((JsonArray) data.getValue(0)).size();
+        tests.add(new SimpleDataSet(total_columns, new CategoricalData[0]));
+        int index = 0;
+
+        // fetch data
+        data.forEach(dataset -> {
+            JsonArray ds = (JsonArray) dataset;
+
+            // create the test data
+            double[] tempTestData = new double[total_columns];
+
+            int count = 0;
+
+            // iterate through the parameters
+            Iterator<Object> iter = ds.iterator();
+            while (iter.hasNext()) {
+                JsonObject p = (JsonObject) iter.next();
+
+                // store the values of the parameters
+                tempTestData[count++] = Double.parseDouble(p.getString(Constants.KEY_VALUE));
+            }
+
+            // create the data point of the test data
+            DataPoint newDataPoint = new DataPoint(new DenseVector(tempTestData), new int[0], new CategoricalData[0]);
+            ((SimpleDataSet) tests.get(index)).add(newDataPoint);
+
+        });        
+
         // retrieve the list of tests
         return tests.toArray(new DataSet[0]);
 	}
 
 	private DataSet[] prepareClusterOneTestData(JsonArray data) {
+        // Clustering does not make inference on new data observations.
+        // Inference request will return cluster assignments of train set observations.
+
         // create the lists of tests
         List<DataSet> tests = new ArrayList<DataSet>();
         
