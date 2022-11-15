@@ -33,6 +33,7 @@ import esa.mo.nmf.apps.ApplicationManager;
 import esa.mo.nmf.apps.ExtensionManager;
 import esa.mo.nmf.apps.saasyml.api.Constants;
 import esa.mo.nmf.apps.saasyml.api.utils.Pair;
+import esa.mo.nmf.apps.saasyml.api.utils.SqliteHelper;
 import esa.mo.nmf.apps.PropertiesManager;
 
 public class DatabaseVerticle extends AbstractVerticle {
@@ -43,22 +44,27 @@ public class DatabaseVerticle extends AbstractVerticle {
     // database connection
     private Connection conn = null;
 
+    // table names
+    private static final String TABLE_TRAINING_DATA = "training_data";
+    private static final String TABLE_MODELS = "models";
+    private static final String TABLE_LABELS = "labels";
+
     // sql query strings
-    private final String SQL_INSERT_TRAINING_DATA = "INSERT INTO training_data(exp_id, dataset_id, param_name, data_type, value, timestamp) VALUES(?, ?, ?, ?, ?, ?)";
-    private final String SQL_INSERT_LABELS = "INSERT INTO labels(exp_id, dataset_id, timestamp, label) VALUES(?, ?, ?, ?)";
-    private final String SQL_INSERT_MODELS = "INSERT INTO models(exp_id, dataset_id, timestamp, type, algorithm, filepath, error) VALUES(?, ?, ?, ?, ?, ?, ?)";
-    private final String SQL_COUNT_TRAINING_DATA = "SELECT count(*) FROM  training_data WHERE exp_id = ? AND dataset_id = ?";
-    private final String SQL_COUNT_COLUMNS_TRAINING_DATA = "SELECT count(*) FROM  training_data WHERE exp_id = ? AND dataset_id = ? AND param_name != 'label' GROUP BY timestamp LIMIT 1"; // "SELECT count(DISTINCT param_name) FROM training_data WHERE exp_id=? AND dataset_id=?" 
-    private final String SQL_SELECT_TRAINING_DATA = "SELECT * FROM training_data WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp ASC";
-    private final String SQL_SELECT_LABELS = "SELECT * FROM labels WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp ASC";
-    private final String SQL_SELECT_MODELS = "SELECT exp_id as expId, dataset_id as datasetId, timestamp, type, algorithm, filepath, error FROM models WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp DESC";
-    private final String SQL_SELECT_MODELS_TO_INFERENCE = "SELECT type, filepath, error FROM models WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp DESC";
-    private final String SQL_SELECT_DISTINCT_LABELS = "SELECT DISTINCT label FROM labels  WHERE exp_id = ? AND dataset_id = ? ORDER BY label ASC";
-    private final String SQL_DELETE_TRAINING_DATA = "DELETE FROM training_data WHERE exp_id = ? AND dataset_id = ?";
-    private final String SQL_DELETE_LABELS = "DELETE FROM labels WHERE exp_id = ? AND dataset_id = ?";
+    private final String SQL_INSERT_TRAINING_DATA = "INSERT INTO "+TABLE_TRAINING_DATA+"(exp_id, dataset_id, param_name, data_type, value, timestamp) VALUES(?, ?, ?, ?, ?, ?)";
+    private final String SQL_INSERT_LABELS = "INSERT INTO "+TABLE_LABELS+"(exp_id, dataset_id, timestamp, label) VALUES(?, ?, ?, ?)";
+    private final String SQL_INSERT_MODELS = "INSERT INTO "+TABLE_MODELS+"(exp_id, dataset_id, timestamp, type, algorithm, filepath, error) VALUES(?, ?, ?, ?, ?, ?, ?)";
+    private final String SQL_COUNT_TRAINING_DATA = "SELECT count(*) FROM  "+TABLE_TRAINING_DATA+" WHERE exp_id = ? AND dataset_id = ?";
+    private final String SQL_COUNT_COLUMNS_TRAINING_DATA = "SELECT count(*) FROM  "+TABLE_TRAINING_DATA+" WHERE exp_id = ? AND dataset_id = ? AND param_name != 'label' GROUP BY timestamp LIMIT 1"; // "SELECT count(DISTINCT param_name) FROM training_data WHERE exp_id=? AND dataset_id=?" 
+    private final String SQL_SELECT_TRAINING_DATA = "SELECT * FROM "+TABLE_TRAINING_DATA+" WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp ASC";
+    private final String SQL_SELECT_LABELS = "SELECT * FROM "+TABLE_LABELS+" WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp ASC";
+    private final String SQL_SELECT_MODELS = "SELECT exp_id as expId, dataset_id as datasetId, timestamp, type, algorithm, filepath, error FROM "+TABLE_MODELS+" WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp DESC";
+    private final String SQL_SELECT_MODELS_TO_INFERENCE = "SELECT type, filepath, error FROM "+TABLE_MODELS+" WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp DESC";
+    private final String SQL_SELECT_DISTINCT_LABELS = "SELECT DISTINCT label FROM "+TABLE_LABELS+"  WHERE exp_id = ? AND dataset_id = ? ORDER BY label ASC";
+    private final String SQL_DELETE_TRAINING_DATA = "DELETE FROM "+TABLE_TRAINING_DATA+" WHERE exp_id = ? AND dataset_id = ?";
+    private final String SQL_DELETE_LABELS = "DELETE FROM "+TABLE_LABELS+" WHERE exp_id = ? AND dataset_id = ?";
     
     private final String SQL_CREATE_TABLE_TRAINING_DATA = 
-        "CREATE TABLE IF NOT EXISTS training_data(" +
+        "CREATE TABLE IF NOT EXISTS "+TABLE_TRAINING_DATA+"(" +
             "exp_id INTEGER NOT NULL, " +
             "dataset_id INTEGER NOT NULL, " +
             "param_name TEXT NOT NULL, " +
@@ -68,7 +74,7 @@ public class DatabaseVerticle extends AbstractVerticle {
         ")";
 
     private final String SQL_CREATE_TABLE_LABELS = 
-        "CREATE TABLE IF NOT EXISTS labels(" +
+        "CREATE TABLE IF NOT EXISTS "+TABLE_LABELS+"(" +
             "exp_id INTEGER NOT NULL, " +
             "dataset_id INTEGER NOT NULL, " +
             "timestamp TIMESTAMP NOT NULL, " +
@@ -76,7 +82,7 @@ public class DatabaseVerticle extends AbstractVerticle {
         ")";
 
     private final String SQL_CREATE_TABLE_MODELS = 
-        "CREATE TABLE IF NOT EXISTS models(" +
+        "CREATE TABLE IF NOT EXISTS "+TABLE_MODELS+"(" +
             "exp_id INTEGER NOT NULL, " +
             "dataset_id INTEGER NOT NULL, " +
             "timestamp TIMESTAMP NOT NULL, " +
@@ -86,51 +92,34 @@ public class DatabaseVerticle extends AbstractVerticle {
             "error TEXT" +
                     ")";
 
-    // table names
-    private static final String TABLE_TRAINING_DATA = "training_data";
-    private static final String TABLE_MODELS = "models";
-    private static final String TABLE_LABELS = "labels";
+    public synchronized Connection connect() throws Exception {
 
-    public Connection connect() throws Exception {
         if(this.conn == null || this.conn.isClosed())
         {
             try {
+                // get a unique connection of the database
+                this.conn = SqliteHelper.getConnection();
 
-                // register the database driver
-                Class.forName(PropertiesManager.getInstance().getDatabaseDriver());
-                
-                // create the connection with the diven database connection configuration
-                // by default a single write to the database locks the database for a short time, nothing, even reading, can access the database file at all.
-                // use the "Write Ahead Logging" (WAL) option is available to enable reading and writing can proceed concurrently.
-                SQLiteConfig config = new SQLiteConfig();
-                config.setJournalMode(SQLiteConfig.JournalMode.WAL);
-                this.conn = DriverManager.getConnection(PropertiesManager.getInstance().getDatabaseUrl(), config.toProperties());
-                
-                if (this.conn != null) {
-                    // log error
-                    LOGGER.log(Level.INFO, "Database connection created successfully.");
+                // log error
+                LOGGER.log(Level.INFO, "Database connection {0} created successfully.", this.conn);
 
-                    List<Pair<String, String>> pairTableAndSQLCreate = Arrays.asList(
-                        new Pair<String, String>(TABLE_TRAINING_DATA, SQL_CREATE_TABLE_TRAINING_DATA), 
-                        new Pair<String, String>(TABLE_LABELS, SQL_CREATE_TABLE_LABELS), 
-                        new Pair<String, String>(TABLE_MODELS, SQL_CREATE_TABLE_MODELS));
-                    
-                    for (Pair<String, String> pair : pairTableAndSQLCreate) {    
-                        // check if training data table exists and create it if it does not.
-                        if(!this.tableExists(pair.getKey())) {
-                            this.createTable(pair.getValue());
-                            LOGGER.log(Level.INFO, String.format("Created the %s table.", pair.getKey()));
-                        }else {
-                            LOGGER.log(Level.INFO, String.format("The %s table already exists.", pair.getKey()));
-                        }
+                List<Pair<String, String>> pairTableAndSQLCreate = Arrays.asList(
+                    new Pair<String, String>(TABLE_TRAINING_DATA, SQL_CREATE_TABLE_TRAINING_DATA), 
+                    new Pair<String, String>(TABLE_LABELS, SQL_CREATE_TABLE_LABELS), 
+                    new Pair<String, String>(TABLE_MODELS, SQL_CREATE_TABLE_MODELS));
+                
+                for (Pair<String, String> pair : pairTableAndSQLCreate) {    
+                    // check if training data table exists and create it if it does not.
+                    if(!this.tableExists(pair.getKey())) {
+                        this.createTable(pair.getValue());
+                        LOGGER.log(Level.INFO, "Created the {0} table.", pair.getKey());
+                    }else {
+                        LOGGER.log(Level.INFO, "The {0} table already exists.", pair.getKey());
                     }
-                    
-                }else {
-                    this.conn = null;
-                    throw new Exception("Failed to create database connection");
                 }
+                    
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "[Error] It was not possible to create the connection");
+                LOGGER.log(Level.SEVERE, "[Error] It was not possible to create the connection", e);
                 // close connection in case it is open despite the exception.
                 this.closeConnection();
             }            
@@ -153,6 +142,8 @@ public class DatabaseVerticle extends AbstractVerticle {
 
     @Override
     public void start() throws Exception {
+
+        LOGGER.log(Level.INFO, "Starting a Verticle instance with deployment id {0}", this.deploymentID());
 
         // save training data
         vertx.eventBus().consumer(Constants.ADDRESS_DATA_SAVE, msg -> {
@@ -228,7 +219,7 @@ public class DatabaseVerticle extends AbstractVerticle {
                         if(extensionClasspath != null){
                             try {
                                 // populate extension input map
-                                extensionInputMap.put(p.getString(Constants.KEY_NAME), new Double(p.getString(Constants.KEY_VALUE)));
+                                extensionInputMap.put(p.getString(Constants.KEY_NAME), p.getDouble(Constants.KEY_VALUE));
                             } catch (Exception e) {
                                 extensionInputMap.clear();
                                 LOGGER.log(Level.SEVERE, "The expected labels plugin cannot be invoked because the fetched parameter values are uncastable to the Double type", e);
@@ -243,7 +234,7 @@ public class DatabaseVerticle extends AbstractVerticle {
                             expectedLabelsExtMap.put(currentLabelTimestamp, expLbls);
                             extensionInputMap.clear();
                         }else{
-                            LOGGER.log(Level.SEVERE, "Could not retrieve expected label from extension " + extensionClasspath + ". The fetched training data will be persisted without expected labels.");
+                            LOGGER.log(Level.SEVERE, "Could not retrieve expected label from extension {0}. The fetched training data will be persisted without expected labels.", extensionClasspath );
                         }
                     }
 
@@ -499,18 +490,18 @@ public class DatabaseVerticle extends AbstractVerticle {
 
             // determine the query to perform between "select all the data in the models" or "select the needed to the inference"
             // With format to inference, we add the expId outside. To see all the fields of the dataset, we should execute with formatToInference = false
-            String SQL_QUERY = SQL_SELECT_MODELS;            
+            String sqlQuery = SQL_SELECT_MODELS;            
             if (payload.containsKey(Constants.KEY_FORMAT_TO_INFERENCE)
                 && payload.getBoolean(Constants.KEY_FORMAT_TO_INFERENCE).booleanValue())
             {
-                SQL_QUERY = SQL_SELECT_MODELS_TO_INFERENCE;
+                sqlQuery = SQL_SELECT_MODELS_TO_INFERENCE;
                 response.put(Constants.KEY_EXPID, payload.getInteger(Constants.KEY_EXPID));
             }
 
             // select models records
             JsonArray models = null;
             try {
-                models = this.selectQueryByExpIdAndDatasetId(expId, datasetId, SQL_QUERY);
+                models = this.selectQueryByExpIdAndDatasetId(expId, datasetId, sqlQuery);
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Error while trying to get models from the database.", e);
             }
@@ -631,7 +622,7 @@ public class DatabaseVerticle extends AbstractVerticle {
         while(iter.hasNext()){
             Map.Entry<String, Boolean> label = iter.next();
 
-            if(label.getValue()) {
+            if(Boolean.TRUE.equals(label.getValue())) {
 
                 // set satement parameters
                 prep.setInt(1, expId); // the experiment id
@@ -795,7 +786,4 @@ public class DatabaseVerticle extends AbstractVerticle {
         }
     }
 
-    public Connection getConnection() {
-        return this.conn;
-    }
 }
