@@ -56,6 +56,36 @@ public class SaaSyMLPipeLineTest {
     }
 
     /**
+     * test the classifier ML model with own data
+     *
+     * @param thread boolean variable that holds the activation of the thread
+     * @param serialize boolean variable that holds if we should serialize the model or not
+     */
+    public static void testClassifierOwnData(boolean thread, boolean serialize) {
+        // name of the model
+        String modelName = "NewGLMNET";
+
+        // instantiate the class
+        IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(123, 1, thread, serialize, modelName);
+
+        logger.info("Generate training and test dataset...");
+        DataSet train = GenerateDataset.get2ClassLinearOwnData(200);
+        DataSet test = GenerateDataset.get2ClassLinearOwnData(200);
+
+        // build the model
+        saasyml.build();
+
+        // upload the train dataset
+        saasyml.setDataSet(train, test);
+
+        // start training the model
+        saasyml.train();
+
+        // inference the model
+        saasyml.inference();
+    }
+
+    /**
      * test the clustering ML model
      *
      * @param thread boolean variable that holds the activation of the thread
@@ -101,7 +131,80 @@ public class SaaSyMLPipeLineTest {
 
         logger.info("Generate training dataset...");
         int N = 5000;
-        DataSet train = new GridDataGenerator(new Normal(), 1,1,1).generateData(N);
+        DataSet train = new GridDataGenerator(new Normal(), 1, 1, 1).generateData(N);
+
+        DataSet test = new GridDataGenerator(new Normal(10, 1.0), 1, 1, 1).generateData(10);
+
+        // build the model
+        saasyml.build();
+
+        // upload the train dataset
+        saasyml.setDataSet(train, test);
+
+        // start training the model
+        saasyml.train();
+
+        // inference the model
+        List<Object> result = saasyml.inference();
+
+        logger.info("test data: " + Arrays.toString(test.getDataVectors().toArray()));
+        logger.info("outlier result: " + Arrays.toString(result.toArray()));
+
+    }
+
+    /**
+     * test the Outlier ML model
+     *
+     * @param thread boolean variable that holds the activation of the thread
+     * @param serialize boolean variable that holds if we should serialize the model or not
+     */
+    public static void testOutlierOwnData(boolean thread, boolean serialize) {
+        // name of the model
+        String modelName = "IsolationForest";
+
+        // instantiate the class
+        IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(123, 1, thread, serialize, modelName);
+
+        logger.info("Generate training dataset...");
+        int N = 20;
+        DataSet train = GenerateDataset.getOutlierDataOwnData(N, 4, 2);
+
+        logger.info("train data: "+ Arrays.toString(train.getDataVectors().toArray()));
+        
+        DataSet test = GenerateDataset.getOutlierDataOwnData(10, 4, 2);
+
+        // build the model
+        saasyml.build();
+
+        // upload the train dataset
+        saasyml.setDataSet(train, test);
+
+        // start training the model
+        saasyml.train();
+
+        // inference the model
+        List<Object> result = saasyml.inference();
+
+        logger.info("test data: "+ Arrays.toString(test.getDataVectors().toArray()));
+        logger.info("outlier result: "+ Arrays.toString(result.toArray()));
+
+    }
+
+    /**
+     * test the Regressor ML model
+     *
+     * @param thread boolean variable that holds the activation of the thread
+     * @param serialize boolean variable that holds if we should serialize the model or not
+     */
+    public static void testRegressor(boolean thread, boolean serialize) {
+        // name of the model
+        String modelName = "MultipleLinearRegression";
+
+        // instantiate the class
+        IPipeLineLayer saasyml = MLPipeLineFactory.createPipeLine(123, 1, thread, serialize, modelName);
+
+        logger.info("Generate training dataset...");
+        DataSet train = GenerateDataset.getLinearRegression(200, RandomUtil.getRandom());        
 
         // build the model
         saasyml.build();

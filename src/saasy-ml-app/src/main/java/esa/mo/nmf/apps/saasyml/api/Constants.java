@@ -9,6 +9,8 @@ public final class Constants {
     public static final int EXPERIMENT_ID = 213;
 
     // labels 
+    public static final String KEY_CONTENT_TYPE = "content-type";
+    public static final String KEY_CONTENT_TYPE_JSON = "application/json; charset=utf-8";
     public static final String KEY_TYPE = "type";
     public static final String KEY_ALGORITHM = "algorithm";
     public static final String KEY_REQUEST = "request";
@@ -32,6 +34,7 @@ public final class Constants {
     public static final String KEY_LABEL = "label";
     public static final String KEY_LABELS = "labels";
     public static final String KEY_LABELS_PLUGIN = "labelsPlugin";
+    public static final String KEY_CLUSTER_NUMBER = "clusterNumber";
     public static final String KEY_PARAMS = "params";
     public static final String KEY_COUNT = "count";
     public static final String KEY_STARTED_COUNT = "startedCount";
@@ -43,7 +46,9 @@ public final class Constants {
     public static final String KEY_FILEPATH = "filepath";
 
     public static final String KEY_MODEL_CLASSIFIER = "Classifier";
-
+    public static final String KEY_MODEL_REGRESSOR = "Regressor";
+    public static final String KEY_MODEL_OUTLIER = "Outlier";
+    public static final String KEY_MODEL_CLUSTER = "Cluster";
 
     // labels for the endpoints
     public static final String ENDPOINT_API = "/api/";
@@ -61,6 +66,7 @@ public final class Constants {
     // labels to consume the verticles
     public static final String BASE_ADDRESS_TRAINING = "saasyml.training";
     public static final String ADDRESS_TRAINING_CLASSIFIER = BASE_ADDRESS_TRAINING + ".classifier";
+    public static final String ADDRESS_TRAINING_REGRESSOR = BASE_ADDRESS_TRAINING + ".regressor";
     public static final String ADDRESS_TRAINING_CLUSTER = BASE_ADDRESS_TRAINING + ".cluster";
     public static final String ADDRESS_TRAINING_OUTLIER = BASE_ADDRESS_TRAINING + ".outlier";
     public static final String ADDRESS_DATA_SAVE = BASE_ADDRESS_TRAINING + ".data.save";
@@ -81,11 +87,6 @@ public final class Constants {
 
 
     public static final String BASE_ADDRESS_INFERENCE = "saasyml.inference";
-    public static final String ADDRESS_INFERENCE_CLASSIFIER = BASE_ADDRESS_INFERENCE + ".classifier";
-
-
-
-
-    
+    public static final String ADDRESS_INFERENCE_CLASSIFIER = BASE_ADDRESS_INFERENCE + ".classifier";    
 
 }

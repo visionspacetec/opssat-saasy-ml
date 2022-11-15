@@ -89,7 +89,10 @@ public class ApplicationManager {
     }
 
     public String getExtentionClasspath(int expId, int datasetId) {
-        String extensionClasspath = this.extensionClasspathMap.get(new Pair<Integer, Integer>(expId, datasetId));
+        Pair<Integer, Integer> tokenToFind = new Pair<Integer, Integer>(expId, datasetId);
+        if (!this.extensionClasspathMap.containsKey(tokenToFind))
+            return null;
+        String extensionClasspath = this.extensionClasspathMap.get(tokenToFind);
         return extensionClasspath.equals("null")?null:extensionClasspath;
     }
 

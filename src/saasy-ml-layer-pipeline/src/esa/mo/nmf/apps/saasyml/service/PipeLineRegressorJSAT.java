@@ -2,35 +2,32 @@ package esa.mo.nmf.apps.saasyml.service;
 
 import esa.mo.nmf.apps.saasyml.factories.MLPipeLineFactory;
 
-import jsat.classifiers.DataPoint;
-import jsat.clustering.Clusterer;
+import jsat.regression.RegressionDataSet;
+import jsat.regression.Regressor;
+import jsat.classifiers.DataPointPair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class that uses the JSAT library inside the PipeLine
- *
- * @author Dr. Cesar Guzman
+ * 
+ * @author Liliana Medina
  */
-public class PipeLineClusterJSAT extends PipeLineAbstractJSAT{
+public class PipeLineRegressorJSAT extends PipeLineAbstractJSAT {
 
-    private static Logger logger = LoggerFactory.getLogger(PipeLineClusterJSAT.class);
+    private static Logger logger = LoggerFactory.getLogger(PipeLineRegressorJSAT.class);
 
     /**********************************/
     /************ ATTRIBUTES **********/
     /**********************************/
 
-    private Clusterer model = null;
+    private Regressor model = null;
 
-    // clusters getting during the train model
-    private List<List<DataPoint>> clusters;
-
-    // number of k-neightbors
-    private int k = 4;
 
     /***********************************/
     /************ CONSTRUCTOR **********/
@@ -46,7 +43,7 @@ public class PipeLineClusterJSAT extends PipeLineAbstractJSAT{
      * @param modelName String that holds the name of the model
      * @param typeModel TypeModel that holds the kind of model
      */
-    public PipeLineClusterJSAT(int expId, int datasetId, boolean thread, boolean serialize, String modelName, MLPipeLineFactory.TypeModel typeModel){
+    public PipeLineRegressorJSAT(int expId, int datasetId, boolean thread, boolean serialize, String modelName, MLPipeLineFactory.TypeModel typeModel){
         super(expId, datasetId, thread, serialize, modelName, typeModel);
     }
 
@@ -55,46 +52,40 @@ public class PipeLineClusterJSAT extends PipeLineAbstractJSAT{
     /**************************************/
 
     public void build(){
-        // build the model
-        this.model = MLPipeLineFactory.buildModelCluster(this.modelName, this.k);
+        // build the model using the factory pattern
+        this.model = MLPipeLineFactory.buildModelRegressor(this.modelName);
     }
 
-    public void build(Object[] parameters) {
-        this.k = (int) parameters[0];
+    public void build(Object[] parameters){
         this.build();
     }
 
-    public void train(){
+    public void train() {
         // train the model
-        this.clusters = model.cluster(train);
+        model.train((RegressionDataSet) train, thread);
 
-        if (serialize){
+        if (serialize) {
             // serialize the model
-            this.modelPathSerialized = serializeModel(this.clusters);
+            this.modelPathSerialized = serializeModel(model);
         }
     }
 
     public List<Object> inference(){
-
         if (serialize){
             // deserialize the model
-            this.clusters = deserializeCluster(modelPathSerialized);
+            this.model = deserializeRegressor(this.modelPathSerialized);
         }
 
         // test the model
         List<Object> result = new ArrayList<Object>();
-        for(List<DataPoint> cluster : this.clusters)
-        {
-            int thisClass = cluster.get(0).getCategoricalValue(0);
-            for (DataPoint dp : cluster) {
-                result.add(dp.getCategoricalValue(0));
-                logger.info(thisClass + " vs " + dp.getCategoricalValue(0));
-            }
+        for(DataPointPair<Double> dpp : ((RegressionDataSet)test).getAsDPPList()){
+            logger.info(String.valueOf(dpp.getPair().longValue()));
+            double predicted = model.regress(dpp.getDataPoint());
+            logger.info(dpp.getPair().longValue()+ " vs " + predicted);
+            result.add(predicted);
         }
-
         return result;
     }
-
 
     /***************************************/
     /************ PRIVATE METHODS **********/
@@ -105,12 +96,12 @@ public class PipeLineClusterJSAT extends PipeLineAbstractJSAT{
      * @param modelPathSerialized full path name of the serialized model
      * @return the model
      */
-    private List<List<DataPoint>> deserializeCluster(String modelPathSerialized) {
+    private Regressor deserializeRegressor(String modelPathSerialized) {
 
-        List<List<DataPoint>> model = null;
+        Regressor model = null;
 
         try (ObjectInputStream objectinputstream = new ObjectInputStream(new FileInputStream(modelPathSerialized));) {
-            model = (List<List<DataPoint>>) objectinputstream.readObject();
+            model = (Regressor) objectinputstream.readObject();
         } catch (Exception e){ logger.debug("Error deserializing the model"); }
 
         return model;
