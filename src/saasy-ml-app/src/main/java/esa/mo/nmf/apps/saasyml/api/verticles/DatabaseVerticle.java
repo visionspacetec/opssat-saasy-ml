@@ -219,7 +219,7 @@ public class DatabaseVerticle extends AbstractVerticle {
                         if(extensionClasspath != null){
                             try {
                                 // populate extension input map
-                                extensionInputMap.put(p.getString(Constants.KEY_NAME), p.getDouble(Constants.KEY_VALUE));
+                                extensionInputMap.put(p.getString(Constants.KEY_NAME), new Double(p.getString(Constants.KEY_VALUE)));
                             } catch (Exception e) {
                                 extensionInputMap.clear();
                                 LOGGER.log(Level.SEVERE, "The expected labels plugin cannot be invoked because the fetched parameter values are uncastable to the Double type", e);
