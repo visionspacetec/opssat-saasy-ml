@@ -1,0 +1,210 @@
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (esa.saasyml.api.client.App).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+
+real	0m2.244s
+user	0m0.000s
+sys	0m0.015s
+
+real	0m2.435s
+user	0m0.000s
+sys	0m0.015s
+
+real	0m2.531s
+user	0m0.015s
+sys	0m0.000s
+
+real	0m2.597s
+user	0m0.000s
+sys	0m0.015s
+
+real	0m2.600s
+user	0m0.015s
+sys	0m0.016s
+
+real	0m2.588s
+user	0m0.000s
+sys	0m0.031s
+
+real	0m2.574s
+user	0m0.000s
+sys	0m0.031s
+
+real	0m2.709s
+user	0m0.000s
+sys	0m0.030s
+
+real	0m2.715s
+user	0m0.000s
+sys	0m0.015s
+
+real	0m2.761s
+user	0m0.000s
+
+real	0m2.847s
+user	0m0.000s
+sys	0m0.015s
+sys	0m0.015s
+
+real	0m2.766s
+user	0m0.000s
+sys	0m0.031s
+
+real	0m2.833s
+user	0m0.000s
+sys	0m0.015s
+
+real	0m2.785s
+user	0m0.000s
+sys	0m0.015s
+
+real	0m2.863s
+user	0m0.015s
+sys	0m0.015s
+
+real	0m2.875s
+user	0m0.015s
+sys	0m0.031s
+
+real	0m2.875s
+user	0m0.000s
+sys	0m0.030s
+
+real	0m2.955s
+user	0m0.015s
+sys	0m0.000s
+
+real	0m2.884s
+user	0m0.000s
+sys	0m0.015s
+
+real	0m2.986s
+user	0m0.015s
+sys	0m0.000s
+
+real	0m3.021s
+user	0m0.015s
+sys	0m0.015s
+
+real	0m3.062s
+user	0m0.000s
+sys	0m0.015s
+
+real	0m3.026s
+
+real	0m3.076s
+user	0m0.000s
+
+real	0m3.142s
+user	0m0.000s
+user	0m0.000s
+sys	0m0.030s
+sys	0m0.046s
+sys	0m0.031s
+
+real	0m3.145s
+user	0m0.000s
+sys	0m0.015s
+
+real	0m3.095s
+user	0m0.000s
+sys	0m0.015s
+
+real	0m3.353s
+user	0m0.000s
+sys	0m0.047s
+
+real	0m3.095s
+user	0m0.015s
+sys	0m0.015s
+
+real	0m3.113s
+user	0m0.000s
+sys	0m0.015s

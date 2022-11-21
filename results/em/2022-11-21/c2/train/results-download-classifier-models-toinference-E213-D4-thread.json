@@ -1,0 +1,55 @@
+{
+    "response": {
+        "expId": 213,
+        "models": [
+            {
+                "type": "Classifier",
+                "filepath": "./models/E213-D4-LinearBatch-2022-11-21_02-25-53.model"
+            },
+            {
+                "type": "Classifier",
+                "filepath": "./models/E213-D4-BBR-2022-11-21_02-25-52.model"
+            },
+            {
+                "type": "Classifier",
+                "filepath": "./models/E213-D4-PassiveAggressive-2022-11-21_02-25-52.model"
+            },
+            {
+                "type": "Classifier",
+                "filepath": "./models/E213-D4-NewGLMNET-2022-11-21_02-25-51.model"
+            },
+            {
+                "type": "Classifier",
+                "filepath": "./models/E213-D4-LogisticRegressionDCD-2022-11-21_02-25-51.model"
+            },
+            {
+                "type": "Classifier",
+                "filepath": "./models/E213-D4-ALMA2K-2022-11-21_02-25-50.model"
+            },
+            {
+                "type": "Classifier",
+                "filepath": "./models/E213-D4-NewGLMNET-2022-11-21_02-25-39.model"
+            },
+            {
+                "type": "Classifier",
+                "filepath": "./models/E213-D4-LogisticRegressionDCD-2022-11-21_02-25-39.model"
+            },
+            {
+                "type": "Classifier",
+                "filepath": "./models/E213-D4-BBR-2022-11-21_02-25-38.model"
+            },
+            {
+                "type": "Classifier",
+                "filepath": "./models/E213-D4-PassiveAggressive-2022-11-21_02-25-38.model"
+            },
+            {
+                "type": "Classifier",
+                "filepath": "./models/E213-D4-LinearBatch-2022-11-21_02-25-36.model"
+            },
+            {
+                "type": "Classifier",
+                "filepath": "./models/E213-D4-ALMA2K-2022-11-21_02-25-31.model"
+            }
+        ]
+    }
+}
