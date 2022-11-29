@@ -83,20 +83,19 @@ public class AggregationWriter implements CompleteAggregationReceivedListener {
 
             // the payload json object that will be parsed to persist the training data into the database
             JsonObject payload = new JsonObject();
-            payload.put("expId", expId);
-            payload.put("datasetId", datasetId);
+            payload.put(Constants.KEY_EXPID, expId);
+            payload.put(Constants.KEY_DATASETID, datasetId);
 
             // build the params array
             JsonArray params = new JsonArray();
 
             for(int i = 0; i < paramNames.size(); i++) {                          
-
                 // populate the Json array
                 JsonObject param = new JsonObject();
-                param.put("name", paramNames.get(i));
-                param.put("value", paramValues.get(i).getValue());
-                param.put("dataType", paramValues.get(i).getKey());
-                param.put("timestamp", timestamp);
+                param.put(Constants.KEY_NAME, paramNames.get(i));
+                param.put(Constants.KEY_VALUE, paramValues.get(i).getValue());
+                param.put(Constants.KEY_DATA_TYPE, paramValues.get(i).getKey());
+                param.put(Constants.KEY_TIMESTAMP, timestamp);
                 params.add(param);
             }
 
@@ -105,7 +104,7 @@ public class AggregationWriter implements CompleteAggregationReceivedListener {
             data.add(params);
 
             // put the training data array into the payload json object
-            payload.put("data", data);
+            payload.put(Constants.KEY_DATA, data);
 
             // send the payload to the database verticle
             this.vertx.eventBus().send(Constants.ADDRESS_DATA_SAVE, payload);   

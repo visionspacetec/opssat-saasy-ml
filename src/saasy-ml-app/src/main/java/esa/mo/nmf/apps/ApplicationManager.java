@@ -6,7 +6,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.ccsds.moims.mo.mal.structures.LongList;
 
+import esa.mo.nmf.apps.saasyml.api.Constants;
 import esa.mo.nmf.apps.saasyml.api.utils.Pair;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 public class ApplicationManager {
 
@@ -30,6 +33,12 @@ public class ApplicationManager {
     // map that contains all instances of aggregation handlers
     private Map<Pair<Integer, Integer>, AggregationHandler> aggregationHandlerMap;
 
+    // map that tracks which datapool parameter feed subscriptions are inference subscriptions
+    private Map<Pair<Integer, Integer>, Boolean> inferenceMap;
+
+    // map to track the inference models
+    private Map<Pair<Integer, Integer>, JsonArray> inferenceFeedModelsMap;
+
 
     // hide the constructor
     private ApplicationManager() {
@@ -38,6 +47,8 @@ public class ApplicationManager {
         this.labelMap = new ConcurrentHashMap<Pair<Integer, Integer>, Map<String, Boolean>>();
         this.extensionClasspathMap = new ConcurrentHashMap<Pair<Integer, Integer>, String>();
         this.aggregationHandlerMap = new ConcurrentHashMap<Pair<Integer, Integer>, AggregationHandler>();
+        this.inferenceMap = new ConcurrentHashMap<Pair<Integer, Integer>, Boolean>();
+        this.inferenceFeedModelsMap = new ConcurrentHashMap<Pair<Integer, Integer>, JsonArray>();
     }
 
     public static ApplicationManager getInstance() {
@@ -113,6 +124,30 @@ public class ApplicationManager {
         if(this.aggregationHandlerMap.containsKey(id)){
             this.aggregationHandlerMap.get(id).enableSupervisorParametersSubscription(enable);
         }
+    }
+
+    public void markInferenceFeed(int expId, int datasetId) {
+        this.inferenceMap.put(new Pair<Integer, Integer>(expId, datasetId), true);
+    }
+
+    public void unmarkInferenceFeed(int expId, int datasetId) {
+        this.inferenceMap.remove(new Pair<Integer, Integer>(expId, datasetId));
+    }
+
+    public boolean isInferenceFeed(int expId, int datasetId) {
+        Pair<Integer, Integer> id = new Pair<Integer, Integer>(expId, datasetId);
+        if(this.inferenceMap.containsKey(id)){
+            return this.inferenceMap.get(id);
+        }
+        return false;
+    }
+
+    public void addInferenceFeedModels(int expId, int datasetId, JsonArray models) {
+        this.inferenceFeedModelsMap.put(new Pair<Integer, Integer>(expId, datasetId), models);
+    }
+
+    public JsonArray getInferenceFeedModels(int expId, int datasetId) {
+        return this.inferenceFeedModelsMap.get(new Pair<Integer, Integer>(expId, datasetId));
     }
 
     public AggregationHandler createAggregationHandler(int expId, int datasetId, double interval, List<String> paramNameList, boolean subscribeToFeed) throws Exception{

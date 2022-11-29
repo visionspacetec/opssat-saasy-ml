@@ -2,6 +2,9 @@ package esa.mo.nmf.apps.saasyml.api.verticles;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
@@ -18,7 +21,6 @@ import io.vertx.core.json.JsonArray;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -26,15 +28,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 
-
-import org.sqlite.SQLiteConfig;
-
 import esa.mo.nmf.apps.ApplicationManager;
 import esa.mo.nmf.apps.ExtensionManager;
 import esa.mo.nmf.apps.saasyml.api.Constants;
 import esa.mo.nmf.apps.saasyml.api.utils.Pair;
 import esa.mo.nmf.apps.saasyml.api.utils.SqliteHelper;
-import esa.mo.nmf.apps.PropertiesManager;
 
 public class DatabaseVerticle extends AbstractVerticle {
 
@@ -46,25 +44,30 @@ public class DatabaseVerticle extends AbstractVerticle {
 
     // table names
     private static final String TABLE_TRAINING_DATA = "training_data";
+    private static final String TABLE_INFERENCE_INPUTS = "inference_inputs";
     private static final String TABLE_MODELS = "models";
     private static final String TABLE_LABELS = "labels";
+    private static final String TABLE_INFERENCES = "inferences";
 
     // sql query strings
-    private final String SQL_INSERT_TRAINING_DATA = "INSERT INTO "+TABLE_TRAINING_DATA+"(exp_id, dataset_id, param_name, data_type, value, timestamp) VALUES(?, ?, ?, ?, ?, ?)";
-    private final String SQL_INSERT_LABELS = "INSERT INTO "+TABLE_LABELS+"(exp_id, dataset_id, timestamp, label) VALUES(?, ?, ?, ?)";
-    private final String SQL_INSERT_MODELS = "INSERT INTO "+TABLE_MODELS+"(exp_id, dataset_id, timestamp, type, algorithm, filepath, error) VALUES(?, ?, ?, ?, ?, ?, ?)";
-    private final String SQL_COUNT_TRAINING_DATA = "SELECT count(*) FROM  "+TABLE_TRAINING_DATA+" WHERE exp_id = ? AND dataset_id = ?";
-    private final String SQL_COUNT_COLUMNS_TRAINING_DATA = "SELECT count(*) FROM  "+TABLE_TRAINING_DATA+" WHERE exp_id = ? AND dataset_id = ? AND param_name != 'label' GROUP BY timestamp LIMIT 1"; // "SELECT count(DISTINCT param_name) FROM training_data WHERE exp_id=? AND dataset_id=?" 
-    private final String SQL_SELECT_TRAINING_DATA = "SELECT * FROM "+TABLE_TRAINING_DATA+" WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp ASC";
-    private final String SQL_SELECT_LABELS = "SELECT * FROM "+TABLE_LABELS+" WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp ASC";
-    private final String SQL_SELECT_MODELS = "SELECT exp_id as expId, dataset_id as datasetId, timestamp, type, algorithm, filepath, error FROM "+TABLE_MODELS+" WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp DESC";
-    private final String SQL_SELECT_MODELS_TO_INFERENCE = "SELECT type, filepath, error FROM "+TABLE_MODELS+" WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp DESC";
-    private final String SQL_SELECT_DISTINCT_LABELS = "SELECT DISTINCT label FROM "+TABLE_LABELS+"  WHERE exp_id = ? AND dataset_id = ? ORDER BY label ASC";
-    private final String SQL_DELETE_TRAINING_DATA = "DELETE FROM "+TABLE_TRAINING_DATA+" WHERE exp_id = ? AND dataset_id = ?";
-    private final String SQL_DELETE_LABELS = "DELETE FROM "+TABLE_LABELS+" WHERE exp_id = ? AND dataset_id = ?";
+    private final String SQL_INSERT_TRAINING_DATA = "INSERT INTO " + TABLE_TRAINING_DATA + "(exp_id, dataset_id, param_name, data_type, value, timestamp) VALUES(?, ?, ?, ?, ?, ?)";
+    private final String SQL_INSERT_INFERENCE_INPUTS = "INSERT INTO " + TABLE_INFERENCE_INPUTS + "(exp_id, dataset_id, param_name, data_type, value, timestamp) VALUES(?, ?, ?, ?, ?, ?)";
+    private final String SQL_INSERT_LABELS = "INSERT INTO " + TABLE_LABELS + "(exp_id, dataset_id, timestamp, label) VALUES(?, ?, ?, ?)";
+    private final String SQL_INSERT_MODELS = "INSERT INTO " + TABLE_MODELS + "(exp_id, dataset_id, timestamp, type, algorithm, filepath, error) VALUES(?, ?, ?, ?, ?, ?, ?)";
+    private final String SQL_INSERT_INFERENCES = "INSERT INTO " + TABLE_INFERENCES + "(exp_id, dataset_id, model, inference, timestamp) VALUES(?, ?, ?, ?, ?)";
+    private final String SQL_COUNT_TRAINING_DATA = "SELECT count(*) FROM " + TABLE_TRAINING_DATA + " WHERE exp_id = ? AND dataset_id = ?";
+    private final String SQL_COUNT_INFERENCE_INPUTS = "SELECT count(*) FROM " + TABLE_INFERENCE_INPUTS + " WHERE exp_id = ? AND dataset_id = ?";
+    private final String SQL_COUNT_COLUMNS_TRAINING_DATA = "SELECT count(*) FROM " + TABLE_TRAINING_DATA + " WHERE exp_id = ? AND dataset_id = ? AND param_name != 'label' GROUP BY timestamp LIMIT 1"; // "SELECT count(DISTINCT param_name) FROM training_data WHERE exp_id=? AND dataset_id=?" 
+    private final String SQL_SELECT_TRAINING_DATA = "SELECT * FROM " + TABLE_TRAINING_DATA + " WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp ASC";
+    private final String SQL_SELECT_LABELS = "SELECT * FROM " + TABLE_LABELS + " WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp ASC";
+    private final String SQL_SELECT_MODELS = "SELECT exp_id as expId, dataset_id as datasetId, timestamp, type, algorithm, filepath, error FROM " + TABLE_MODELS + " WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp DESC";
+    private final String SQL_SELECT_MODELS_FOR_INFERENCE = "SELECT type, filepath, error FROM " + TABLE_MODELS + " WHERE exp_id = ? AND dataset_id = ? ORDER BY timestamp DESC";
+    private final String SQL_SELECT_DISTINCT_LABELS = "SELECT DISTINCT label FROM " + TABLE_LABELS + " WHERE exp_id = ? AND dataset_id = ? ORDER BY label ASC";
+    private final String SQL_DELETE_TRAINING_DATA = "DELETE FROM " + TABLE_TRAINING_DATA + " WHERE exp_id = ? AND dataset_id = ?";
+    private final String SQL_DELETE_LABELS = "DELETE FROM " + TABLE_LABELS + " WHERE exp_id = ? AND dataset_id = ?";
     
     private final String SQL_CREATE_TABLE_TRAINING_DATA = 
-        "CREATE TABLE IF NOT EXISTS "+TABLE_TRAINING_DATA+"(" +
+        "CREATE TABLE IF NOT EXISTS " + TABLE_TRAINING_DATA + "(" +
             "exp_id INTEGER NOT NULL, " +
             "dataset_id INTEGER NOT NULL, " +
             "param_name TEXT NOT NULL, " +
@@ -74,7 +77,7 @@ public class DatabaseVerticle extends AbstractVerticle {
         ")";
 
     private final String SQL_CREATE_TABLE_LABELS = 
-        "CREATE TABLE IF NOT EXISTS "+TABLE_LABELS+"(" +
+        "CREATE TABLE IF NOT EXISTS " + TABLE_LABELS + "(" +
             "exp_id INTEGER NOT NULL, " +
             "dataset_id INTEGER NOT NULL, " +
             "timestamp TIMESTAMP NOT NULL, " +
@@ -82,7 +85,7 @@ public class DatabaseVerticle extends AbstractVerticle {
         ")";
 
     private final String SQL_CREATE_TABLE_MODELS = 
-        "CREATE TABLE IF NOT EXISTS "+TABLE_MODELS+"(" +
+        "CREATE TABLE IF NOT EXISTS " + TABLE_MODELS + "(" +
             "exp_id INTEGER NOT NULL, " +
             "dataset_id INTEGER NOT NULL, " +
             "timestamp TIMESTAMP NOT NULL, " +
@@ -90,7 +93,26 @@ public class DatabaseVerticle extends AbstractVerticle {
             "algorithm TEXT NOT NULL, " +
             "filepath TEXT, " +
             "error TEXT" +
-                    ")";
+        ")";
+
+    private final String SQL_CREATE_TABLE_INFERENCE_INPUTS = 
+        "CREATE TABLE IF NOT EXISTS " + TABLE_INFERENCE_INPUTS + "(" +
+            "exp_id INTEGER NOT NULL, " +
+            "dataset_id INTEGER NOT NULL, " +
+            "param_name TEXT NOT NULL, " +
+            "data_type INTEGER NOT NULL, " +
+            "value TEXT NOT NULL, " +
+            "timestamp TIMESTAMP NOT NULL" +
+        ")";
+
+    private final String SQL_CREATE_TABLE_INFERENCES = 
+        "CREATE TABLE IF NOT EXISTS " + TABLE_INFERENCES + "(" +
+            "exp_id INTEGER NOT NULL, " +
+            "dataset_id INTEGER NOT NULL, " +
+            "model TEXT NOT NULL, " +
+            "inference TEXT NOT NULL, " +
+            "timestamp TIMESTAMP NOT NULL" +
+        ")";
 
     public synchronized Connection connect() throws Exception {
 
@@ -103,10 +125,13 @@ public class DatabaseVerticle extends AbstractVerticle {
                 // log error
                 LOGGER.log(Level.INFO, "Database connection {0} created successfully.", this.conn);
 
+                // list of tables to create
                 List<Pair<String, String>> pairTableAndSQLCreate = Arrays.asList(
                     new Pair<String, String>(TABLE_TRAINING_DATA, SQL_CREATE_TABLE_TRAINING_DATA), 
+                    new Pair<String, String>(TABLE_INFERENCE_INPUTS, SQL_CREATE_TABLE_INFERENCE_INPUTS),
                     new Pair<String, String>(TABLE_LABELS, SQL_CREATE_TABLE_LABELS), 
-                    new Pair<String, String>(TABLE_MODELS, SQL_CREATE_TABLE_MODELS));
+                    new Pair<String, String>(TABLE_MODELS, SQL_CREATE_TABLE_MODELS),
+                    new Pair<String, String>(TABLE_INFERENCES, SQL_CREATE_TABLE_INFERENCES));
                 
                 for (Pair<String, String> pair : pairTableAndSQLCreate) {    
                     // check if training data table exists and create it if it does not.
@@ -141,9 +166,14 @@ public class DatabaseVerticle extends AbstractVerticle {
     }
 
     @Override
+    public void stop() throws Exception {
+        this.closeConnection();
+    }
+
+    @Override
     public void start() throws Exception {
 
-        LOGGER.log(Level.INFO, "Starting a Verticle instance with deployment id {0}", this.deploymentID());
+        LOGGER.log(Level.INFO, "Starting a " + this.getClass().getSimpleName() + " Verticle instance with deployment id {0}", this.deploymentID());
 
         // save training data
         vertx.eventBus().consumer(Constants.ADDRESS_DATA_SAVE, msg -> {
@@ -162,7 +192,7 @@ public class DatabaseVerticle extends AbstractVerticle {
             // create map of param name and double values in case we need it for the plugin
             Map<String, Double> extensionInputMap = new HashMap<String, Double>();
 
-            // the expected labels retrived from the extension
+            // the expected labels retrieved from the extension
             LinkedHashMap<Long, Map<String, Boolean>> expectedLabelsExtMap = new LinkedHashMap<Long, Map<String, Boolean>>();
 
             List<Pair<Integer, String>> paramValues = new ArrayList<Pair<Integer, String>>();
@@ -243,7 +273,7 @@ public class DatabaseVerticle extends AbstractVerticle {
                 LOGGER.log(Level.SEVERE, "Error preparing training data and labels to insert into the database.", e);
 
                 // response
-                msg.reply("error preparing training data to insert into the database.");
+                msg.reply("error preparing training data or inference inputs to insert into the database.");
                 return;
             }
 
@@ -257,59 +287,100 @@ public class DatabaseVerticle extends AbstractVerticle {
                 // no commit per statement
                 this.conn.setAutoCommit(false);
 
-                // init the prepared statement to insert training data
+                // init the prepared statement to insert the fetched data
+                // could be inference inputs or training data depending on the request
                 prep = this.conn.prepareStatement(
-                    SQL_INSERT_TRAINING_DATA
-                );
+                        ApplicationManager.getInstance().isInferenceFeed(expId, datasetId)
+                        ? SQL_INSERT_INFERENCE_INPUTS
+                        : SQL_INSERT_TRAINING_DATA
+                    );
 
-                this.setInsertTrainingDataPreparedStatementParameters(prep, expId, datasetId, paramNames, paramValues, paramTimestamps);
+            
+                this.setInsertDatapoolParamsPreparedStatementParameters(prep, expId, datasetId, paramNames, paramValues, paramTimestamps);
+
                 prep.executeBatch();
                 prep.close();
 
-                // re-init the prepared statement to insert labels
-                prep = this.conn.prepareStatement(
-                    SQL_INSERT_LABELS
-                );
+                // insert inference results if we fetching inference inputs
+                if(ApplicationManager.getInstance().isInferenceFeed(expId, datasetId)) {
 
-                // if expected labels are fetcched from the extension
-                if(extensionClasspath != null) {
-                    for (Map.Entry<Long, Map<String, Boolean>> entry : expectedLabelsExtMap.entrySet()){
-                        // set the expected label calculate by the extension
-                        ApplicationManager.getInstance().addLabels(expId, datasetId, entry.getValue());
-    
-                        // persist the expected label in the database
-                        this.setInsertLabelsPreparedStatementParameters(prep, expId, datasetId, entry.getKey());
-                    }
-                } else {
-                    // if labels are provided as part of the request payload
-                    for(Long t : labelTimestamps){
-                        this.setInsertLabelsPreparedStatementParameters(prep, expId, datasetId, t);
-                    }
+                    // include the models we want to use for inference
+                    payload.put(Constants.KEY_MODELS, ApplicationManager.getInstance().getInferenceFeedModels(expId, datasetId));
+
+                    // trigger inference
+                    vertx.eventBus().request(Constants.BASE_ADDRESS_INFERENCE, payload, reply -> {
+                        
+                        try{
+                            // prepared statement
+                            PreparedStatement prepInsertInferences = this.conn.prepareStatement(
+                                SQL_INSERT_INFERENCES
+                            );
+
+                            // get inference result
+                            JsonObject result = (JsonObject) reply.result().body();
+                            JsonArray modelsInferences = result.getJsonArray(Constants.KEY_MODELS);
+
+                            // save data in database
+                            // all param names fetched via subscription will have the same timestamp so just fetch one value and use it for all model inferences
+                            this.setInsertInferencesPreparedStatementParameters(prepInsertInferences, expId, datasetId, modelsInferences, paramTimestamps.get(0));
+
+                            prepInsertInferences.executeBatch();
+                            prepInsertInferences.close();
+
+                        } catch(Exception e){
+                            LOGGER.log(Level.SEVERE, "error inserting inference results into database.", e);
+                        }   
+                    });
                 }
                 
 
-                prep.executeBatch();
-                prep.close();
+                // insert labels if we are fetching training data
+                if(!ApplicationManager.getInstance().isInferenceFeed(expId, datasetId)) {
+                    // re-init the prepared statement to insert labels
+                    prep = this.conn.prepareStatement(
+                        SQL_INSERT_LABELS
+                    );
+
+                    // if expected labels are fetched from the extension
+                    if(extensionClasspath != null) {
+                        for (Map.Entry<Long, Map<String, Boolean>> entry : expectedLabelsExtMap.entrySet()){
+                            // set the expected label calculate by the extension
+                            ApplicationManager.getInstance().addLabels(expId, datasetId, entry.getValue());
+        
+                            // persist the expected label in the database
+                            this.setInsertLabelsPreparedStatementParameters(prep, expId, datasetId, entry.getKey());
+                        }
+                    } else {
+                        // if labels are provided as part of the request payload
+                        for(Long t : labelTimestamps){
+                            // won't insert anything if no labels were given
+                            this.setInsertLabelsPreparedStatementParameters(prep, expId, datasetId, t);
+                        }
+                    }
+                    
+                    prep.executeBatch();
+                    prep.close();
+                }
 
             } catch (Exception e) {
                 try {
 
+                    // an error has occured: rollback
+                    LOGGER.log(Level.SEVERE, "failed to insert training data and labels (or inference inputs) into the database: rolling back.", e);
+                    this.conn.rollback();
+
                     // reset auto-commit to true
                     this.conn.setAutoCommit(true); 
 
-                    // an error has occured: rollback
-                    LOGGER.log(Level.SEVERE, "Failed to insert training data and labels into the database: rolling back.", e);
-                    this.conn.rollback();
-
                     // response
-                    msg.reply("failed to insert training data and labels into the database.");
+                    msg.reply("failed to insert training data and labels (or inference inputs) into the database.");
                     return;
 
                 } catch(SQLException sqle) {
                     LOGGER.log(Level.SEVERE, "Error rolling back.", sqle);
 
                     // response
-                    msg.reply("failed to insert training data and labels, could not rollback.");
+                    msg.reply("failed to insert training data and labels (or inference inputs), could not rollback.");
                     return;
                 } 
             }
@@ -348,7 +419,7 @@ public class DatabaseVerticle extends AbstractVerticle {
             }
            
             // response
-            msg.reply("saved training data.");
+            msg.reply("saved training data or inference inputs.");
         });
 
         // delete training data
@@ -385,12 +456,23 @@ public class DatabaseVerticle extends AbstractVerticle {
             final int expId = payload.getInteger(Constants.KEY_EXPID).intValue();
             final int datasetId = payload.getInteger(Constants.KEY_DATASETID).intValue();
 
+            // check if we are counting collected training data or collected inference data input.
+            final boolean isInference = payload.containsKey(Constants.KEY_INTERVAL)
+                ? payload.getBoolean(Constants.KEY_INTERVAL)
+                : false;
+
             // count training data records
             int counter = -1;
             try {
-                counter = this.executeCountQuery(expId, datasetId, SQL_COUNT_TRAINING_DATA);
+                counter = ApplicationManager.getInstance().isInferenceFeed(expId, datasetId)
+                    ? this.executeCountQuery(expId, datasetId, SQL_COUNT_INFERENCE_INPUTS)
+                    : this.executeCountQuery(expId, datasetId, SQL_COUNT_TRAINING_DATA);
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Error while trying to count training data rows in the database.", e);
+                if(isInference){
+                    LOGGER.log(Level.SEVERE, "Error while trying to inferences input rows in the database.", e);
+                }else{
+                    LOGGER.log(Level.SEVERE, "Error while trying to count training data rows in the database.", e);
+                }
             }
 
             // response
@@ -494,7 +576,7 @@ public class DatabaseVerticle extends AbstractVerticle {
             if (payload.containsKey(Constants.KEY_FORMAT_TO_INFERENCE)
                 && payload.getBoolean(Constants.KEY_FORMAT_TO_INFERENCE).booleanValue())
             {
-                sqlQuery = SQL_SELECT_MODELS_TO_INFERENCE;
+                sqlQuery = SQL_SELECT_MODELS_FOR_INFERENCE;
                 response.put(Constants.KEY_EXPID, payload.getInteger(Constants.KEY_EXPID));
             }
 
@@ -581,12 +663,7 @@ public class DatabaseVerticle extends AbstractVerticle {
         });
     }
 
-    @Override
-    public void stop() throws Exception {
-        this.closeConnection();
-    }
-
-    private void setInsertTrainingDataPreparedStatementParameters(PreparedStatement prep,
+    private void setInsertDatapoolParamsPreparedStatementParameters(PreparedStatement prep,
         int expId, int datasetId, List<String> paramNames, List<Pair<Integer, String>> paramValues, List<Long>timestamps) throws Exception {
             
         // prepare a prepared statement for each fetched parameter
@@ -605,12 +682,32 @@ public class DatabaseVerticle extends AbstractVerticle {
         }
     }
 
+    private void setInsertInferencesPreparedStatementParameters(PreparedStatement prep,
+        int expId, int datasetId, JsonArray modelsInferences, Long timestamp) throws Exception {
+            
+        // prepare a prepared statement for each fetched parameter
+        for (int i = 0; i < modelsInferences.size(); i++) {
+
+            // set satement parameters
+            prep.setInt(1, expId); // experiment id
+            prep.setInt(2, datasetId); // dataset id
+            prep.setString(3, modelsInferences.getJsonObject(i).getString(Constants.KEY_FILEPATH)); // the model used to make the inference
+            prep.setString(4, 
+                StringUtils.join(modelsInferences.getJsonObject(i).getJsonArray(Constants.KEY_INFERENCE).getList(), ",")); // get the inference
+            prep.setTimestamp(5, new Timestamp(timestamp)); // the timestamp returned by NMF marking when the data was fetched
+
+            // add to batch
+            prep.addBatch();
+        }
+    }
+
     private void setInsertLabelsPreparedStatementParameters(PreparedStatement prep,
         int expId, int datasetId, Long timestamp) throws Exception {
 
         // fetch the label map for the given experiment and dataset ids
         Map<String, Boolean> labelMap = ApplicationManager.getInstance().getLabels(expId, datasetId);
         
+        // no expected labels
         if (labelMap == null){
             return;
         }

@@ -7,6 +7,8 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import esa.mo.nmf.apps.saasyml.api.verticles.FetchDatapoolParamsVerticle;
+
 public class PropertiesManager {
     private static final Logger LOGGER = Logger.getLogger(PropertiesManager.class.getName());
 
@@ -97,8 +99,8 @@ public class PropertiesManager {
         return Integer.parseInt(getProperty("vertical.instance.count." + verticalClassName, "1"));
     }
 
-    public int getFetchTrainingDataVerticlePeriodicTimer() {
-         return Integer.parseInt(getProperty("vertical.instance.FetchTrainingDataVerticle.PeriodicTimer"));
+    public int getFetchDatapoolParamsVerticlePeriodicTimer() {
+         return Integer.parseInt(getProperty("vertical.instance." + FetchDatapoolParamsVerticle.class.getSimpleName() + ".PeriodicTimer"));
     }
 
     public String getDatabaseDriver() {

@@ -36,6 +36,9 @@ public class TrainModelVerticle extends AbstractVerticle {
     @Override
     public void start() throws Exception {
 
+        // log
+        LOGGER.log(Level.INFO, "Starting a " + this.getClass().getSimpleName() + " Verticle instance with deployment id " + this.deploymentID() + ".");
+
         // train classifier
         vertx.eventBus().consumer(Constants.ADDRESS_TRAINING_CLASSIFIER, msg -> {
 
