@@ -43,7 +43,16 @@ public class MainVerticle extends AbstractVerticle {
     }
 
     @Override
+    public void stop() throws Exception {
+        // stop and unload the plugins
+        ExtensionManager.getInstance().stopPlugins();
+    }
+
+    @Override
     public void start() throws Exception {
+
+        // log
+        LOGGER.log(Level.INFO, "Starting the " + this.getClass().getSimpleName() + " Verticle instance.");
 
         // load and start the plugins
         ExtensionManager.getInstance().startPlugins();
@@ -67,16 +76,9 @@ public class MainVerticle extends AbstractVerticle {
 
     }
 
-    @Override
-    public void stop() throws Exception {
-        // stop and unload the plugins
-        ExtensionManager.getInstance().stopPlugins();
-    }
-
     /**
      * Function to create and deploy the verticles
      * 
-     * TODO: make this configurable from a config file.
      * deployment options for multi-core and multi-threded goodness
      * specify the number of verticle instances that you want to deploy
      * this is useful for scaling easily across multiple cores
@@ -84,12 +86,12 @@ public class MainVerticle extends AbstractVerticle {
     private void deployVerticles() {
 
         // get the name of the Verticles
-        String[] simpleNames = new String[] { FetchTrainingDataVerticle.class.getSimpleName(),
+        String[] simpleNames = new String[] { FetchDatapoolParamsVerticle.class.getSimpleName(),
                 TrainModelVerticle.class.getSimpleName(), DatabaseVerticle.class.getSimpleName(),
                 InferenceVerticle.class.getSimpleName() };
                 
         // get the canonical path/name of the Verticles
-        String[] classNames = new String[] { FetchTrainingDataVerticle.class.getCanonicalName(),
+        String[] classNames = new String[] { FetchDatapoolParamsVerticle.class.getCanonicalName(),
                 TrainModelVerticle.class.getCanonicalName(), DatabaseVerticle.class.getCanonicalName(),
                 InferenceVerticle.class.getCanonicalName() };
 
@@ -127,12 +129,12 @@ public class MainVerticle extends AbstractVerticle {
         // route for training data feed subscription
         router.post(Constants.ENDPOINT_DATA_SUBSCRIBE)
                 .handler(BodyHandler.create())
-                .handler(this::trainingDataSubscribe);
+                .handler(this::subscribeDatapoolParameterTrainingDataFeed);
 
         // route for training data feed unsubscription
         router.post(Constants.ENDPOINT_DATA_UNSUBSCRIBE)
                 .handler(BodyHandler.create())
-                .handler(this::trainingDataUnsubscribe);
+                .handler(this::unsubscribeDatapoolParameterFeed);
 
         // route for downloading training data feed 
         router.post(Constants.ENDPOINT_DATA_DOWNLOAD)
@@ -168,6 +170,16 @@ public class MainVerticle extends AbstractVerticle {
         router.post(Constants.ENDPOINT_INFERENCE)
                 .handler(BodyHandler.create())
                 .handler(this::inference);
+
+        // route to subscribe to inference feed
+        router.post(Constants.ENDPOINT_INFERENCE_SUBSCRIBE)
+                .handler(BodyHandler.create())
+                .handler(this::subscribeDatapoolParameterInferenceFeed);
+
+        // route to unsubscribe to inference feed
+        router.post(Constants.ENDPOINT_INFERENCE_UNSUBSCRIBE)
+                .handler(BodyHandler.create())
+                .handler(this::unsubscribeDatapoolParameterFeed);
 
         return router;
     }
@@ -210,7 +222,7 @@ public class MainVerticle extends AbstractVerticle {
      * 
      * @param ctx body context of the request
      */
-    void trainingDataSubscribe(RoutingContext ctx) {
+    void subscribeDatapoolParameterTrainingDataFeed(RoutingContext ctx) {
 
         // payload
         JsonObject payload = ctx.getBodyAsJson();
@@ -235,7 +247,7 @@ public class MainVerticle extends AbstractVerticle {
             });
         } catch (Exception e) {
             // error response message
-            responseMap.put(Constants.KEY_RESPONSE, "error");
+            responseMap.put(Constants.KEY_RESPONSE, Constants.VALUE_ERROR);
             responseMap.put(Constants.KEY_MESSAGE, "error while subscribing to a training data feed.");
 
             ctx.request().response()
@@ -245,11 +257,11 @@ public class MainVerticle extends AbstractVerticle {
     }
 
     /**
-     * unsubscribe to training data feed
+     * unsubscribe to training data or inference feed
      * 
      * @param ctx body context of the request
      */
-    void trainingDataUnsubscribe(RoutingContext ctx) {
+    void unsubscribeDatapoolParameterFeed(RoutingContext ctx) {
 
         // payload
         JsonObject payload = ctx.getBodyAsJson();
@@ -269,8 +281,8 @@ public class MainVerticle extends AbstractVerticle {
             });
         } catch (Exception e) {
             // error response message
-            responseMap.put(Constants.KEY_RESPONSE, "error");
-            responseMap.put(Constants.KEY_MESSAGE, "error while unsubscribing to a training data feed.");
+            responseMap.put(Constants.KEY_RESPONSE, Constants.VALUE_ERROR);
+            responseMap.put(Constants.KEY_MESSAGE, "error while unsubscribing to datapool parameter feed.");
 
             // error response
             ctx.request().response()
@@ -309,7 +321,7 @@ public class MainVerticle extends AbstractVerticle {
 
         } catch (Exception e) {
             // error response message
-            responseMap.put(Constants.KEY_RESPONSE, "error");
+            responseMap.put(Constants.KEY_RESPONSE, Constants.VALUE_ERROR);
             responseMap.put(Constants.KEY_MESSAGE, "error while saving training data.");
 
             // error response
@@ -351,7 +363,7 @@ public class MainVerticle extends AbstractVerticle {
 
         } catch (Exception e) {
             // error response message
-            responseMap.put(Constants.KEY_RESPONSE, "error");
+            responseMap.put(Constants.KEY_RESPONSE, Constants.VALUE_ERROR);
             responseMap.put(Constants.KEY_MESSAGE, "error while download the training data.");
 
             // error response
@@ -437,7 +449,7 @@ public class MainVerticle extends AbstractVerticle {
 
         } catch (Exception e) {
             // error response message
-            responseMap.put(Constants.KEY_RESPONSE, "error");
+            responseMap.put(Constants.KEY_RESPONSE, Constants.VALUE_ERROR);
             responseMap.put(Constants.KEY_MESSAGE, "error while deleting training data.");
             
             // error response
@@ -483,7 +495,7 @@ public class MainVerticle extends AbstractVerticle {
             });
         } catch (Exception e) {
             // error object
-            responseMap.put(Constants.KEY_RESPONSE, "error");
+            responseMap.put(Constants.KEY_RESPONSE, Constants.VALUE_ERROR);
             responseMap.put(Constants.KEY_MESSAGE, "unsupported or invalid training request");            
             
             ctx.request().response()
@@ -522,7 +534,7 @@ public class MainVerticle extends AbstractVerticle {
             });
         } catch (Exception e) {   
             // error response message
-            responseMap.put(Constants.KEY_RESPONSE, "error");
+            responseMap.put(Constants.KEY_RESPONSE, Constants.VALUE_ERROR);
             responseMap.put(Constants.KEY_MESSAGE, "unsupported or invalid models request");
 
             // error response
@@ -560,7 +572,7 @@ public class MainVerticle extends AbstractVerticle {
 
         } catch (Exception e) {
             // error object
-            responseMap.put(Constants.KEY_RESPONSE, "error");
+            responseMap.put(Constants.KEY_RESPONSE, Constants.VALUE_ERROR);
             responseMap.put(Constants.KEY_MESSAGE, "unsupported or invalid inference request");
 
             ctx.request().response()
@@ -568,6 +580,41 @@ public class MainVerticle extends AbstractVerticle {
                 .end(Json.encodePrettily(responseMap));
         }
     }
+
+
+    /**
+     * Subscribe to a datapool parameter feed and execute inferences
+     * @param ctx context of the request
+     */
+    void subscribeDatapoolParameterInferenceFeed(RoutingContext ctx) {
+        // get the payload
+        JsonObject payload = ctx.getBodyAsJson();
+
+        // response map
+        Map<String, String> responseMap = new HashMap<String, String>();
+
+        // forward request to event bus
+        try {
+            vertx.eventBus().request(Constants.BASE_ADDRESS_INFERENCE_SUBSCRIBE, payload, reply -> {
+                responseMap.put(Constants.KEY_RESPONSE, reply.result().body().toString());
+
+                ctx.request().response()
+                    .putHeader(Constants.KEY_CONTENT_TYPE, Constants.KEY_CONTENT_TYPE_JSON)
+                    .end(Json.encodePrettily(responseMap));
+            });
+
+        } catch (Exception e) {
+            // error object
+            responseMap.put(Constants.KEY_RESPONSE, Constants.VALUE_ERROR);
+            responseMap.put(Constants.KEY_MESSAGE, "unsupported or invalid inference subscription request");
+
+            ctx.request().response()
+                .putHeader(Constants.KEY_CONTENT_TYPE, Constants.KEY_CONTENT_TYPE_JSON)
+                .end(Json.encodePrettily(responseMap));
+        }
+
+    }
+
 
     /**
      * Function to parse the expected labels or the plugins. 

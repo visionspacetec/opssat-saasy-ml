@@ -293,7 +293,9 @@ In some cases, clients generate their own training data to send to the app to tr
 http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/data/save
 ```
 
-Sample payload (The training parameter is optional and used to auto-trigger training the model(s)):
+Sample payload, note that:
+ - The training parameter is optional and used to auto-trigger training the model(s).
+ - The timestamps are optional and will be generated if not included.
 
 ```json
 {
@@ -714,7 +716,9 @@ Note that the `formatToInference` attribute is optional. It formats a valid outp
 
 
 ### Inference
+Inferences can be made using input values directly provided by the experiment or by creating and subscribing to a datapool parameter feed. The latter will store the inference results in the app's database.
 
+#### Input provided by experimenters
 Make a POST request to the following endpoint:
 
 ```
@@ -765,16 +769,60 @@ Sample payload:
     ],
     "models": [
         {
-            "filepath": "FULL-PATH-OF-SERIALIZED-THE-MODEL",
+            "filepath": "<FULL-PATH-OF-SERIALIZED-THE-MODEL>",
             "type": "Classifier",
             "thread" : true
         },
         {
-            "filepath": "FULL-PATH-OF-SERIALIZED-THE-MODEL",
+            "filepath": "<FULL-PATH-OF-SERIALIZED-THE-MODEL>",
             "type": "Classifier"
         }
     ]
 
+}
+```
+
+#### Input from datapool parameter feed
+
+Make a POST request to the following endpoint:
+
+```
+http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/inference/subscribe
+```
+
+```json
+{
+    "expId": 123,
+    "datasetId": 3,
+    "iterations": 10,
+    "interval": 2,
+    "params": ["CADC0884", "CADC0886", "CADC0888", "CADC0890", "CADC0892", "CADC0894"],
+    "models": [
+        {
+            "filepath": "<FULL-PATH-OF-SERIALIZED-MODEL>",
+            "type": "Classifier",
+            "thread" : true
+        },
+        {
+            "filepath": "<FULL-PATH-OF-SERIALIZED-MODEL>",
+            "type": "Classifier"
+        }
+    ]
+}
+```
+
+Unsubscribe to the inference feed with a POST request to the following endpoint:
+
+```
+http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/inference/unsubscribe
+```
+
+Sample payload:
+
+```json
+{
+    "expId": 123,
+    "datasetId": 3
 }
 ```
 
@@ -789,12 +837,12 @@ The response of clustering inference contains the cluster assignment for observa
     "datasetId": 1,
     "models": [
         {
-            "filepath": "FULL-PATH-OF-SERIALIZED-THE-MODEL",
+            "filepath": "<FULL-PATH-OF-SERIALIZED-MODEL>",
             "type": "Cluster",
             "thread" : true
         },
         {
-            "filepath": "FULL-PATH-OF-SERIALIZED-THE-MODEL",
+            "filepath": "<FULL-PATH-OF-SERIALIZED-MODEL>",
             "type": "Cluster"
         }
     ]

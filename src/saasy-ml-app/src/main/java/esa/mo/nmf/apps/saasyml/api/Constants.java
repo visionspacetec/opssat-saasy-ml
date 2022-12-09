@@ -50,6 +50,10 @@ public final class Constants {
     public static final String KEY_MODEL_OUTLIER = "Outlier";
     public static final String KEY_MODEL_CLUSTER = "Cluster";
 
+    // values
+    public static final String VALUE_ERROR = "error";
+    public static final String VALUE_SUCCESS = "success";
+
     // labels for the endpoints
     public static final String ENDPOINT_API = "/api/";
     public static final String ENDPOINT_VERSION = ENDPOINT_API + "v1/";
@@ -62,6 +66,8 @@ public final class Constants {
     public static final String ENDPOINT_TRAINING_ALGORITHM = ENDPOINT_TRAINING + "/:algorithm";
     public static final String ENDPOINT_MODELS = ENDPOINT_VERSION + "download/models";
     public static final String ENDPOINT_INFERENCE = ENDPOINT_VERSION + "inference";
+    public static final String ENDPOINT_INFERENCE_SUBSCRIBE = ENDPOINT_INFERENCE + "/subscribe";
+    public static final String ENDPOINT_INFERENCE_UNSUBSCRIBE = ENDPOINT_INFERENCE + "/unsubscribe" ;
 
     // labels to consume the verticles
     public static final String BASE_ADDRESS_TRAINING = "saasyml.training";
@@ -87,6 +93,8 @@ public final class Constants {
 
 
     public static final String BASE_ADDRESS_INFERENCE = "saasyml.inference";
+    public static final String BASE_ADDRESS_INFERENCE_SUBSCRIBE = BASE_ADDRESS_INFERENCE + ".subscribe";
+    public static final String BASE_ADDRESS_INFERENCE_UNSUBSCRIBE = BASE_ADDRESS_INFERENCE + ".unsubscribe";
     public static final String ADDRESS_INFERENCE_CLASSIFIER = BASE_ADDRESS_INFERENCE + ".classifier";    
 
 }

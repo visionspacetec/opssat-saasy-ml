@@ -33,6 +33,9 @@ public class InferenceVerticle extends AbstractVerticle {
     @Override
     public void start() throws Exception {
 
+        // log
+        LOGGER.log(Level.INFO, "Starting a " + this.getClass().getSimpleName() + " Verticle instance with deployment id " + this.deploymentID() + ".");
+
         // inference classifier
         vertx.eventBus().consumer(Constants.BASE_ADDRESS_INFERENCE, msg -> {
 
@@ -91,10 +94,11 @@ public class InferenceVerticle extends AbstractVerticle {
                     }
                 }
                 
-                LOGGER.log(Level.INFO, "Stoped "+Constants.BASE_ADDRESS_INFERENCE);
+                LOGGER.log(Level.INFO, "Stopped " + Constants.BASE_ADDRESS_INFERENCE);
 
                 // retrieve the response
                 JsonObject response = new JsonObject();
+                response.put(Constants.KEY_RESPONSE, Constants.VALUE_SUCCESS);
                 response.put(Constants.KEY_EXPID, expId);
                 response.put(Constants.KEY_MODELS, models);
                 msg.reply(response);
@@ -102,10 +106,13 @@ public class InferenceVerticle extends AbstractVerticle {
                 
             } catch (Exception e) {
                 // log
-                LOGGER.log(Level.SEVERE, "Failed to inference data.", e);
+                LOGGER.log(Level.SEVERE, "Failed inference.", e);
 
                 // response: error
-                msg.reply("Failed to inference data.");
+                JsonObject errorResponse = new JsonObject();
+                errorResponse.put(Constants.KEY_RESPONSE, Constants.VALUE_ERROR);
+                errorResponse.put(Constants.KEY_MESSAGE, "unsupported or invalid inference request");
+                msg.reply(errorResponse);
             }
             
         });
