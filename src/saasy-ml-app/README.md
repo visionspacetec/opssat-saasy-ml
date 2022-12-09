@@ -1,16 +1,28 @@
 # OPS-SAT SaaSyML App
+- The SaaSyML NMF App for the OPS-SAT spacecraft.
+- The app uses ML to train AI models.
+- Via API requests, training data can be sent by experimenters or fetched from the spacecraft's OBSW datapool.
 
-An NMF App for the OPS-SAT spacecraft. The app uses ML to train AI models with the spacecraft's OBSW datapool parameters as training data. 
+## Table of Content
 
-# Table of Content
-
+- [Motivation](#motivation)
+- [References](#references)
 - [Requirements](#requirements)
 - [Quick Install](#quick-install)
 - [Run App](#run-app)
 - [Known Issue](#known-issue)
 - [Training Data Types](training-data-types)
 - [API](#api)
-- [References](#references)
+
+## Motivation
+
+The OPS-SAT spacecraft has accomplished many firsts in space powered by open source and rapid prototyping, from the first securities trade to pioneering the use of Artificial Intelligence (AI) frameworks for on-board Machine Learning (ML) training and inferences with payload and telemetry data. The SaaSyML app presented in this project is an effort to consolidate the broad interest in running ML experiments on a spacecraft. Experimenters can use SaaSyML to subscribe to a stream of hand-picked in-flight data which are persisted as training data in an on-board database. Once enough training data is collected, users can trigger pre-implemented ML training algorithms to produce prediction models. This model can then be used to run predictions / inferences with new data inputs. SaaSyML is a Software as a Service (SaaS) app by design that is openly accessible to experiments through an Application Programming Interface (API), either from the ground station via telecommand or from their own apps running on the spacecraft. Traditional SaaS is a way of delivering an application's capabilities over the Internet — as a service. Instead of installing and maintaining their own software, users become clients who can remotely access the functionalities they need from existing third-party hosted software thus avoiding the complexities and costs of developing, hosting, and maintaining their own systems. The Web's "as-a-Service" ecosystem has rapidly matured in recent years with the developments of options such as Infrastructure as a Service (IaaS), Platform as a Service (PaaS), and Everything as a Service (XaaS). As a technology demonstrator, the SaaSyML experiment proposes to introduce this approach to software in the space segment thus contributing the concept of Satellite Platform as a Service (SaaS) to the ``as-a-Service".
+
+## References
+
+- [The NMF quick start guide.](https://nanosat-mo-framework.readthedocs.io/en/latest/quickstart.html)
+- [The NMF deployment guide.](https://nanosat-mo-framework.readthedocs.io/en/latest/apps/packaging.html)
+- [Vert.x Core Manual.](https://vertx.io/docs/vertx-core/java/)
 
 ## Requirements
 
@@ -849,10 +861,3 @@ The response of clustering inference contains the cluster assignment for observa
 
 }
 ```
-
-
-## References
-
-- [The NMF quick start guide](https://nanosat-mo-framework.readthedocs.io/en/latest/quickstart.html)
-- [The NMF deployment guide](https://nanosat-mo-framework.readthedocs.io/en/latest/apps/packaging.html)
-- [Vert.x Core Manual](https://vertx.io/docs/vertx-core/java/)
