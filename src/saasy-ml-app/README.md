@@ -221,7 +221,7 @@ Sample payload with label values (expected output) provided by the client:
 }
 ```
 
-Sample payload with label values calculated by a plugin given fetched parameters:
+Sample payload with label values calculated by a plugin with given fetched parameters:
 
 ```json
 {
@@ -229,7 +229,7 @@ Sample payload with label values calculated by a plugin given fetched parameters
     "datasetId": 1,
     "iterations": 10,
     "interval": 2,
-    "labelsPlugin": "esa.mo.nmf.apps.saasyml.plugins.CameraStateLabels",
+    "labelsPlugin": "esa.mo.nmf.apps.saasyml.plugins.CameraFdirPlugin.CameraStateLabels",
     "params": ["CADC0884", "CADC0886", "CADC0888", "CADC0890", "CADC0892", "CADC0894"]
 }
 ```
@@ -480,7 +480,7 @@ Sample payload with the label extension provided by the client:
 {
     "expId": 123,
     "datasetId": 2,
-    "labelsPlugin": "esa.mo.nmf.apps.saasyml.plugins.CameraStateLabels",
+    "labelsPlugin": "esa.mo.nmf.apps.saasyml.plugins.CameraFdirPlugin.CameraStateLabels",
     "data": [
         [
             {
