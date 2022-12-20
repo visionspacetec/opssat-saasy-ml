@@ -82,7 +82,9 @@
     </build>
 
     <modules>
+        <!-- Plugin modules -->
         <module>camera-fdir</module>
+        <module>magnetometer-filter</module>
 
         <!-- List new plugins here. -->
         <!--module></module-->
