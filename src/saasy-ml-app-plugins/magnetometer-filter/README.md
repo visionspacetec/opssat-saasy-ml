@@ -35,7 +35,7 @@ Training in the 1D input space using the dipole moment X set in the `CADC0872` d
 }
 ```
 
-#### Dipole Moment Y
+### Dipole Moment Y
 Training in the 1D input space using the dipole moment Y set in the `CADC0873` datapool parameter:
 
 ```json
@@ -49,7 +49,7 @@ Training in the 1D input space using the dipole moment Y set in the `CADC0873` d
 }
 ```
 
-#### Dipole Moment Z
+### Dipole Moment Z
 Training in the 1D input space using the dipole moment Z set in the `CADC0874` datapool parameter:
 
 ```json
@@ -63,7 +63,7 @@ Training in the 1D input space using the dipole moment Z set in the `CADC0874` d
 }
 ```
 
-#### Dipole Moments X, Y, and Z
+### Dipole Moments X, Y, and Z
 Training in the 3D input space using the dipole moments X, Y, and Z set in the `CADC0872`, `CADC0873`, and `CADC0874` datapool parameters, respectively:
 
 ```json
