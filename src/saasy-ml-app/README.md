@@ -659,7 +659,7 @@ Sample payload:
 
 
 ```
-http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/:type
+http://<SUPERVISOR_HOST>:<APP_PORT>/api/v1/training/classifier
 ```
 
 Sample payload:
