@@ -118,7 +118,7 @@ OS name: "linux", version: "5.10.16.3-microsoft-standard-wsl2", arch: "amd64", f
 - Click the **Fetch information** button.
 - Click the **Connect to Selected Provider** button.
 - A new tab appears: **nanosat-mo-supervisor**. 
-- Select the **saasy-ml** app under the **Apps Launcher Servce" table.
+- Select the **saasy-ml** app under the *Apps Launcher Servce* table.
 - Click the **runApp** button.
 
 

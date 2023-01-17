@@ -12,9 +12,9 @@ The `labelsPlugin` payload property is set to the  `CameraStateLabels` extension
 
 ```json
 {
-  "expId": 123,
+  "expId": 1,
   "datasetId": 1,
-  "iterations": 10,
+  "iterations": 1800,
   "interval": 2,
   "labelsPlugin": "esa.mo.nmf.apps.saasyml.plugins.CameraFdirPlugin.CameraStateLabels",
   "params": ["CADC0884", "CADC0886", "CADC0888", "CADC0890", "CADC0892", "CADC0894"]
@@ -25,14 +25,14 @@ The `labelsPlugin` payload property is set to the  `CameraStateLabels` extension
 The following are references to the OrbitAI experiment.
 
 ### Plain Text
-Labrèche, G., Evans, D., Marszk, D., Mladenov, T., Shiradhonkar, V., Soto, T., & Zelenevskiy, V. (2022). OPS-SAT Spacecraft Autonomy with TensorFlow Lite, Unsupervised Learning, and Online Machine Learning]. _2022 IEEE Aerospace Conference (AERO)_, 2022, pp. 1-17, doi: [10.1109/AERO53065.2022.9843402](https://ieeexplore.ieee.org/document/9843402).
+Labrèche, G., Evans, D., Marszk, D., Mladenov, T., Shiradhonkar, V., Soto, T., & Zelenevskiy, V. (2022). OPS-SAT Spacecraft Autonomy with TensorFlow Lite, Unsupervised Learning, and Online Machine Learning. _2022 IEEE Aerospace Conference (AERO)_, 2022, pp. 1-17, doi: [10.1109/AERO53065.2022.9843402](https://ieeexplore.ieee.org/document/9843402).
 
 ### BibTex
 ```bibtex
 @INPROCEEDINGS{9843402,
   author={Labrèche, Georges and Evans, David and Marszk, Dominik and Mladenov, Tom and Shiradhonkar, Vasundhara and Soto, Tanguy and Zelenevskiy, Vladimir},
-  booktitle={2022 IEEE Aerospace Conference (AERO)}, 
-  title={OPS-SAT Spacecraft Autonomy with TensorFlow Lite, Unsupervised Learning, and Online Machine Learning}, 
+  booktitle={2022 IEEE Aerospace Conference (AERO)},
+  title={{OPS-SAT Spacecraft Autonomy with TensorFlow Lite, Unsupervised Learning, and Online Machine Learning}},
   year={2022},
   volume={},
   number={},

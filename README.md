@@ -6,7 +6,27 @@
 </h2>
 
 # Abstract
-The **SaaSyML** app developed for the OPS-SAT spacecraft provides open access to on-board Machine Learning (ML) capabilities that an experimenter can interact with via Application Programming Interface (API) endpoints. The app architecture is **as-a-Service**, drawing inspiration from the successes of Software as a Service (SaaS) in modern Web-based software engineering. An experimenter app on-board OPS-SAT can subscribe to SaaSyML training data feed and pull measurement, telemetry, and housekeeping data from any of spacecraft's instruments or its On-board Software datapool. The ML features provided by the SaaSyML app cover training and prediction operations. The Java Statistical Analysis Tool (JSAT) open-source java library for ML is used thus unlocking access to over 100 training algorithms on-board a flying mission. Past experiments have successfully implemented ML on-board OPS-SAT but have yet to offer any comprehensive re-usability. SaaSyML's service-oriented approach spares the experimenters the complexities of having to implement their data provisioning and ML solutions so that they can focus instead on expanding the field of experimentation and use-cases for applied ML in space. A further novelty is also introduced with a plugin design for an software extension mechanism that allows experimenters to inject custom code to address ML needs specific to their experiments (e.g., calculating target labels/classes during supervised learning training operations). SaaSyML is developed using the Eclipse Vert.x event-driven application toolkit that runs on the Java Virtual Machine (JVM). Our design choice introduces event-driven software engineering and practical use of the spacecraft dual-core payload computer and Linux environment. SaaSyML is a reference in embracing and leveraging multi-threaded and multi-core software design for space applications, which translates to non-blocking ML training and prediction operations running in parallel while multiple experimenter apps interact with the service. SaaSyML demonstrates how a more capable space-grade processor enables a paradigm shift towards developing more sophisticated client facing space software with reduced development effort and cost.
+The **SaaSyML** app developed for the OPS-SAT spacecraft provides open access to on-board Machine Learning (ML) capabilities that an experimenter can interact with via RESTful Application Programming Interface (API) endpoints. The app's architecture follows the successes of Software as a Service (SaaS) in modern Web-based software engineering and implements the "**as-a-Service**" model, thus introducing the concept of Satellite Platform as a Service (SPaaS). An experimenter app on-board OPS-SAT can subscribe to SaaSyML's training data feed and pull measurement, telemetry, and housekeeping data from any of the spacecraft's instruments or its on-board software datapool. The ML features provided by the SaaSyML app cover both training and prediction operations. The Java Statistical Analysis Tool (JSAT) open-source java library for ML is used thus unlocking access to over 100 training algorithms on-board a flying mission. Past experiments have successfully implemented ML on-board OPS-SAT but have yet to offer any comprehensive re-usability. SaaSyML's service-oriented approach spares the experimenters the complexities of having to implement their data provisioning and ML solutions so that they can focus instead on expanding the field of experimentation and use-cases for applied ML in space. A further novelty is also introduced with a plugin design for an software extension mechanism that allows experimenters to inject custom code to address ML needs specific to their experiments (e.g. calculating target labels/classes during supervised learning training operations). SaaSyML is developed using the Eclipse Vert.x event-driven application toolkit that runs on the Java Virtual Machine (JVM). This design choice introduces event-driven software engineering and practical use of the spacecraft dual-core payload computer and Linux environment. SaaSyML is a reference in embracing and leveraging multi-threaded and multi-core software design for space applications. This translates to non-blocking ML training and prediction operations running in parallel while multiple experimenter apps interact with the service. SaaSyML demonstrates how a more capable space-grade processor enables a paradigm shift towards developing more sophisticated client facing space software with reduced development complexity, effort, and cost.
+
+# Citation
+We appreciate citations if you reference this work in your upcoming publication. Thank you!
+
+## Plain Text
+Labrèche, G. & Alvarez, C. G. (2023). SaaSyML: Software as a Service for Machine Learning On-board the OPS-SAT Spacecraft. _2023 IEEE Aerospace Conference (AERO)_, 2023.
+
+## BibTex
+```bibtex
+@INPROCEEDINGS{Labreche2023_IEEE_AeroConf,
+  author={Labrèche, Georges and Alvarez, Cesar Guzman},
+  booktitle={2023 IEEE Aerospace Conference (AERO)},
+  title={{SaaSyML: Software as a Service for Machine Learning On-board the OPS-SAT Spacecraft}},
+  year={2023},
+  volume={},
+  number={},
+  pages={},
+  doi={}}
+```
+
 
 # Requirements
 
@@ -38,8 +58,9 @@ $ mvn install -DskipTests
 ```
 
 # Project Modules
+Start with instructions in [saasy-ml-app](src/saasy-ml-app):
 
-- [saasy-ml-app](src/saasy-ml-app): the SaasyML NMF app, i.e. the main application.
+- [saasy-ml-app](src/saasy-ml-app): the SaaSyML NMF app, i.e. the main application.
 - [saasy-ml-layer-pipeline](src/saasy-ml-layer-pipeline): the ML pipeline that invokes JSAT algorithms.
 - [saasy-ml-app-plugins-api](src/saasy-ml-app-plugins-api): defines _Interfaces_ that concrete plugin classes must implement.
 - [saasy-ml-app-plugins](src/saasy-ml-app-plugins): collects class implementations for interfaces defined in [saasy-ml-app-plugins-api](src/saasy-ml-app-plugins-api).
