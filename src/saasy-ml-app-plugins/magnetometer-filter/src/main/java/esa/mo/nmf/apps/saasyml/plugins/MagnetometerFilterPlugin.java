@@ -14,11 +14,11 @@ import esa.mo.nmf.apps.saasyml.plugins.api.ExpectedLabels;
 
 /**
  * This plugn is to train a binary classification mode that filters out magnetometer measurements 
- * with diple moments that are not within a preset threshold.
+ * with magnetic field values that are not within a preset range.
  * 
  * Two ExpectedLabels classes are implemented:
- *  - MagnetometerSingleDipoleMomentFilter: used to train a model in 1D input space for a single dipole moment training input (x, y, OR z).
- *  - MagnetometerAllDipoleMomentFilter: used to train a model in 3D input space with all dipole moments as traing input (x, y, AND z).
+ *  - MagnetometerFilterMagneticFieldSingleAxis: used to train a model in 1D input space for a single magnetic field axis as training input (X, Y, or Z).
+ *  - MagnetometerFilterMagneticFieldAllAxes: used to train a model in 3D input space with all magnetic field axes as training input (X, Y, and Z).
  */
 public class MagnetometerFilterPlugin extends Plugin {
 
@@ -26,17 +26,17 @@ public class MagnetometerFilterPlugin extends Plugin {
     private static final Logger LOGGER = Logger.getLogger(MagnetometerFilterPlugin.class.getName());
 
     /**
-     * We want to filter out magnetometer measurements with diple moments that are either:
+     * We want to filter out magnetometer measurements with magnetic field values that are either:
      *  - lesser than or equal to -5e-5.
-     *  - greater than or equal to 5e-5.  
+     *  - greater than or equal to 5e-5.
      */
     private static final double MAGNETOMETER_FILTER_THRESHOLD = 5.0E-5;
 
     // The datapool parameters for the measured magnetometer values.
     private static final String[] MAGNETOMETER_PARAM_NAMES = new String[] {
-        "CADC0872", // Dipole Moment X.
-        "CADC0873", // Dipole Moment Y.
-        "CADC0874"  // Dipole Moment Z.
+        "CADC0872", // Magnetic Field X-Axis.
+        "CADC0873", // Magnetic Field Y-Axis.
+        "CADC0874"  // Magnetic Field Z-Axis.
     };
     
     /**
@@ -49,23 +49,23 @@ public class MagnetometerFilterPlugin extends Plugin {
 
     /**
      * Determine the expected labels on whether or not given magnetometer measurements need to be discarded or not.
-     * Magnetometer measurements is discarded if one of the dipole moment's value is M >= 5e-5 or M <= -5e-5.
+     * Magnetometer measurements is discarded if one of the magnetic field values is x >= 5e-5 or x <= -5e-5.
      */
     @Extension
-    public static class MagnetometerFilterSingleDipoleMoment implements ExpectedLabels {
+    public static class MagnetometerFilterMagneticFieldSingleAxis implements ExpectedLabels {
 
         /** 
-         * Returns a "0" or "1" label indicating whether or the given single dipole moment magnetometer
-         * measurements has a value that is beyond the threshold value (M >= 5e-5 or M <= -5e-5).
+         * Returns a "0" or "1" label indicating whether the given magnetic field axis value
+         * has a value that is beyond the threshold value (x >= 5e-5 or x <= -5e-5).
          * 
-         *      Label 0 means keep the measurement (-5e-5 < M < 5e-5 ).
-         *      Label 1 means filter out the measurement (M >= 5e-5 or M <= -5e-5).
+         *      Label 0 means keep the measurement (-5e-5 < x < 5e-5 ).
+         *      Label 1 means filter out the measurement (x >= 5e-5 or x <= -5e-5).
          */
         public Map<String, Boolean> getLabels(Map<String, Double> params) {
 
-            // We expect only a single value representing ONE dipole measurement (x, y, or z).
+            // We expect only a single value representing ONE magnetic field axis measurement (X, Y, or Z).
             if(params.size() != 1){
-                LOGGER.log(Level.WARNING, "No expected labels created: only one dipole moment measurement is expected as input.");
+                LOGGER.log(Level.WARNING, "No expected labels created: only one magnetic field axis measurement is expected as input.");
                 return null;
             }
 
@@ -84,16 +84,16 @@ public class MagnetometerFilterPlugin extends Plugin {
             }
             
 
-            // Get dipole moment param name and value.
+            // Get magnetic field axis param name and value.
             Map.Entry<String, Double> entry = params.entrySet().iterator().next();
-            String dipoleMomentParamName = entry.getKey(); // Not used.
-            double dipoleMomentValue = entry.getValue().doubleValue();
+            String magneticFieldAxisParamName = entry.getKey(); // Not used.
+            double magneticFieldAxis = entry.getValue().doubleValue();
 
             // The expected label map that we will set and return.
             Map<String, Boolean> labelMap = new HashMap<String, Boolean>();            
 
             // Return the "0" label if measurements need to be kept.
-            if(Math.abs(dipoleMomentValue) >= MAGNETOMETER_FILTER_THRESHOLD) {
+            if(Math.abs(magneticFieldAxis) >= MAGNETOMETER_FILTER_THRESHOLD) {
                 labelMap.put("0", false);
                 labelMap.put("1", true);
 
@@ -110,17 +110,17 @@ public class MagnetometerFilterPlugin extends Plugin {
 
     /**
      * Determine the expected labels on whether or not given magnetometer measurements need to be discarded or not.
-     * Magnetometer measurements are discarded if at least one of dipole moment value is x >= 5e-5 or x <= -5e-5.
+     * Magnetometer measurements are discarded if at least one magnetic field axis value is x >= 5e-5 or x <= -5e-5.
      */
     @Extension
-    public static class MagnetometerFilterAllDipoleMoment implements ExpectedLabels {
+    public static class MagnetometerFilterMagneticFieldAllAxes implements ExpectedLabels {
 
         /** 
          * Returns a "0" or "1" label indicating whether or not at least one of the three magnetomer
-         * measurements contains a value that is beyond the threshold value (M >= 5e-5 or M <= -5e-5).
+         * measurements contains a value that is beyond the threshold value (x >= 5e-5 or x <= -5e-5).
          * 
-         *      Label 0 means keep the measurement (-5e-5 < M < 5e-5 ).
-         *      Label 1 means filter out the measurement (M >= 5e-5 or M <= -5e-5).
+         *      Label 0 means keep the measurement (-5e-5 < x < 5e-5 ).
+         *      Label 1 means filter out the measurement (x >= 5e-5 or x <= -5e-5).
          */
         public Map<String, Boolean> getLabels(Map<String, Double> params) {
 
@@ -138,11 +138,11 @@ public class MagnetometerFilterPlugin extends Plugin {
             // Set the expected label map based on parameter values.
             for (String paramName : MAGNETOMETER_PARAM_NAMES) {
 
-                // Get the dipole moment value.
-                double dipoleMomentValue = params.get(paramName).doubleValue();
+                // Get the magnetic field axis value
+                double magneticFieldAxisValue = params.get(paramName).doubleValue();
 
                 // Return the "1" label if measurements need to be filtered out.
-                if(Math.abs(dipoleMomentValue) >= MAGNETOMETER_FILTER_THRESHOLD){
+                if(Math.abs(magneticFieldAxisValue) >= MAGNETOMETER_FILTER_THRESHOLD){
                     labelMap.put("0", false);
                     labelMap.put("1", true);
                     
