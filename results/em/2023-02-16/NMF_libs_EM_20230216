@@ -1,0 +1,144 @@
+root@sepp:/home/exp213# ls -l /home/nmf/lib/
+total 26372
+-rw-r--r--    1 root     root        135711 Jan  1  1970 API_COMMON-8.0.jar
+-rw-r--r--    1 root     root        204811 Jan  1  1970 API_MAL-8.0.jar
+-rw-r--r--    1 root     root        466855 Jan  1  1970 API_MC-8.0.jar
+-rw-r--r--    1 root     root         47908 Jan  1  1970 ENCODING_BINARY-8.0.jar
+-rw-r--r--    1 root     root         22407 Jan  1  1970 ENCODING_GEN-8.0.jar
+-rw-r--r--    1 root     root         19322 Jan  1  1970 ENCODING_STRING-8.0.jar
+-rw-r--r--    1 root     root        123657 Jan  1  1970 MAL_IMPL-8.0.jar
+-rw-r--r--    1 root     root         64237 Jan  1  1970 TRANSPORT_GEN-8.0.jar
+-rw-r--r--    1 root     root         15587 Jan  1  1970 TRANSPORT_RMI-8.0.jar
+-rw-r--r--    1 root     root         50235 Jan  1  1970 TRANSPORT_TCPIP-8.0.jar
+-rw-r--r--    1 root     root         64772 Jan  1  1970 a3-common-5.8.0.jar
+-rw-r--r--    1 root     root        186792 Jan  1  1970 ccsds-com-2.1.0-SNAPSHOT.jar
+-rw-r--r--    1 root     root         32434 Jan  1  1970 ccsds-common-2.1.0-SNAPSHOT.jar
+-rw-r--r--    1 root     root        211135 Jan  1  1970 ccsds-mc-2.1.0-SNAPSHOT.jar
+-rw-r--r--    1 root     root        111076 Jan  1  1970 ccsds-mp-2.1.0-SNAPSHOT.jar
+-rw-r--r--    1 root     root        177454 Jan  1  1970 com-nmf-2.1.0-SNAPSHOT.jar
+-rw-r--r--    1 root     root         20585 Jan  1  1970 common-mo-adapter-2.1.0-SNAPSHOT.jar
+-rw-r--r--    1 root     root        588337 Jan  1  1970 commons-collections-3.2.2.jar
+-rw-r--r--    1 root     root         54423 Jan  1  1970 commons-exec-1.3.jar
+-rw-r--r--    1 root     root         25132 Jan  1  1970 consumers-2.1.0-SNAPSHOT.jar
+-rw-r--r--    1 root     root         38907 Jan  1  1970 generic-composite-model-2.1.0-SNAPSHOT.jar
+-rw-r--r--    1 root     root         50583 Jan  1  1970 helper-tools-2.1.0-SNAPSHOT.jar
+-rw-r--r--    1 root     root        993132 Jan  1  1970 hipparchus-core-1.5.jar
+-rw-r--r--    1 root     root         20435 Jan  1  1970 hipparchus-filtering-1.5.jar
+-rw-r--r--    1 root     root         31061 Jan  1  1970 hipparchus-fitting-1.5.jar
+-rw-r--r--    1 root     root        256994 Jan  1  1970 hipparchus-geometry-1.5.jar
+-rw-r--r--    1 root     root        255305 Jan  1  1970 hipparchus-ode-1.5.jar
+-rw-r--r--    1 root     root        180802 Jan  1  1970 hipparchus-optim-1.5.jar
+-rw-r--r--    1 root     root        216557 Jan  1  1970 hipparchus-stat-1.5.jar
+-rw-r--r--    1 root     root        150184 Jan  1  1970 iadcs-0.1.jar
+-rw-r--r--    1 root     root       2437818 Jan  1  1970 ij-1.53j.jar
+-rw-r--r--    1 root     root         16649 Jan  1  1970 image-debayer-2.1.0-SNAPSHOT.jar
+-rw-r--r--    1 root     root         12469 Jan  1  1970 ims100-0.1.jar
+-rw-r--r--    1 root     root        102220 Jan  1  1970 ini4j-0.5.4.jar
+-rw-r--r--    1 root     root         29888 Jan  1  1970 istack-commons-runtime-4.0.0.jar
+-rw-r--r--    1 root     root         62731 Jan  1  1970 jakarta.activation-2.0.0.jar
+-rw-r--r--    1 root     root        129000 Jan  1  1970 jakarta.xml.bind-api-3.0.0.jar
+-rw-r--r--    1 root     root        139683 Jan  1  1970 jaxb-core-3.0.0.jar
+-rw-r--r--    1 root     root        931852 Jan  1  1970 jaxb-runtime-3.0.0.jar
+-rw-r--r--    1 root     root         11529 Jan  1  1970 mainboard-0.1.jar
+-rw-r--r--    1 root     root         37182 Jan  1  1970 malspp-encoding-opssat-1.0.1-FC.jar
+-rw-r--r--    1 root     root         14450 Jan  1  1970 malspp-over-cfp-tcp-2.1.0-SNAPSHOT.jar
+-rw-r--r--    1 root     root         74604 Jan  1  1970 malspp-transport-1.0.1-FC.jar
+-rw-r--r--    1 root     root        123091 Jan  1  1970 monolog-2.1.12.jar
+-rw-r--r--    1 root     root        127788 Jan  1  1970 monolog-5.2.0.jar
+-rw-r--r--    1 root     root        933898 Jan  1  1970 mp-nmf-2.1.0-SNAPSHOT.jar
+-rw-r--r--    1 root     root        108799 Jan  1  1970 nanomind-api-com-2.1.0-SNAPSHOT.jar
+-rw-r--r--    1 root     root        244428 Jan  1  1970 nanomind-api-mc-2.1.0-SNAPSHOT.jar
+-rw-r--r--    1 root     root         37968 Jan  1  1970 nanomind-api-pf-2.1.0-SNAPSHOT.jar
+-rw-r--r--    1 root     root         14280 Jan  1  1970 nanosat-mo-connector-2.1.0-SNAPSHOT.jar
+-rw-r--r--    1 root     root        253350 Jan  1  1970 nanosat-mo-supervisor-2.1.0-SNAPSHOT.jar
+-rw-r--r--    1 root     root         32168 Jan  1  1970 nmf-package-lib-2.1.0-SNAPSHOT.jar
+-rw-r--r--    1 root     root         89409 Jan  1  1970 nmf-platform-generic-2.1.0-SNAPSHOT.jar
+-rw-r--r--    1 root     root        259774 Jan  1  1970 nmf-platform-impl-opssat-2.1.0-SNAPSHOT.jar
+-rw-r--r--    1 root     root         69376 Jan  1  1970 nmf-software-management-2.1.0-SNAPSHOT.jar
+-rw-r--r--    1 root     root          5275 Jan  1  1970 opt_rx-0.1.jar
+-rw-r--r--    1 root     root       2870355 Jan  1  1970 orekit-10.0.jar
+-rw-r--r--    1 root     root       4725143 Jan  1  1970 orekit-resources-2.1.0-SNAPSHOT.jar
+-rw-r--r--    1 root     root        338308 Jan  1  1970 org.osgi-3.0.0.jar
+-rw-r--r--    1 root     root         25813 Jan  1  1970 parameters-provisioning-2.1.0-SNAPSHOT.jar
+-rw-r--r--    1 root     root         29422 Jan  1  1970 payloads-test-2.1.0-SNAPSHOT.jar
+-rw-r--r--    1 root     root        304030 Jan  1  1970 platform-2.1.0-SNAPSHOT.jar
+-rw-r--r--    1 root     root         12185 Jan  1  1970 sdr-0.1.jar
+-rw-r--r--    1 root     root         17717 Jan  1  1970 sepp_api_core-0.1.jar
+-rw-r--r--    1 root     root         94037 Jan  1  1970 software-management-2.1.0-SNAPSHOT.jar
+-rw-r--r--    1 root     root          5036 Jan  1  1970 space-mo-adapter-2.1.0-SNAPSHOT.jar
+-rw-r--r--    1 root     root       7210681 Jan  1  1970 sqlite-jdbc-3.32.3.2.jar
+-rw-r--r--    1 root     root         71973 Jan  1  1970 txw2-3.0.0.jar
+-rw-r--r--    1 root     root         33417 Jan  1  1970 xml-2.1.0-SNAPSHOT.jar
+
+root@sepp:/home/exp213# md5sum /home/nmf/lib/*
+b5e54b7d7ff20796e844d362e2e0cc5f  /home/nmf/lib/API_COMMON-8.0.jar
+c83b14149e2e882f7787d53cd1a86097  /home/nmf/lib/API_MAL-8.0.jar
+f0f0a647085cd3ff358611a754ae6540  /home/nmf/lib/API_MC-8.0.jar
+af8e7d55f503df6b0b6e3b51bddda517  /home/nmf/lib/ENCODING_BINARY-8.0.jar
+6e00c7a42b054a6e7d8bf56d51bb3b8f  /home/nmf/lib/ENCODING_GEN-8.0.jar
+e124989e32cdad13c62e4f098961377f  /home/nmf/lib/ENCODING_STRING-8.0.jar
+3b33f88f90b554c06644fe597bbadaf7  /home/nmf/lib/MAL_IMPL-8.0.jar
+da591f4b79da9985fef56c2c1b85d191  /home/nmf/lib/TRANSPORT_GEN-8.0.jar
+c49da025574300766073c5af4b1b06d2  /home/nmf/lib/TRANSPORT_RMI-8.0.jar
+39138f0633953e6f4d14d509417cde0e  /home/nmf/lib/TRANSPORT_TCPIP-8.0.jar
+0e4ed87d308ad2c0364b374fa7e93e77  /home/nmf/lib/a3-common-5.8.0.jar
+7d9b7a9a626b2783ab1e62200e54599a  /home/nmf/lib/ccsds-com-2.1.0-SNAPSHOT.jar
+133098140e9cab5ea5e9cab49c99965d  /home/nmf/lib/ccsds-common-2.1.0-SNAPSHOT.jar
+8ef16d68370520f24486cf25990fad23  /home/nmf/lib/ccsds-mc-2.1.0-SNAPSHOT.jar
+89a38b7a14e1ddd4e1d1de4fc817a374  /home/nmf/lib/ccsds-mp-2.1.0-SNAPSHOT.jar
+12a0742ced5200477227bb307b35cb1a  /home/nmf/lib/com-nmf-2.1.0-SNAPSHOT.jar
+6ef43a06a910eaddd92c2dc89a79fcb8  /home/nmf/lib/common-mo-adapter-2.1.0-SNAPSHOT.jar
+f54a8510f834a1a57166970bfc982e94  /home/nmf/lib/commons-collections-3.2.2.jar
+8bb8fa2edfd60d5c7ed6bf9923d14aa8  /home/nmf/lib/commons-exec-1.3.jar
+00f4220f259f794d52622771adece9d4  /home/nmf/lib/consumers-2.1.0-SNAPSHOT.jar
+4be075c89cad37972cb268fe00d4cdf4  /home/nmf/lib/generic-composite-model-2.1.0-SNAPSHOT.jar
+c7b23c217703b55f274d9b25ed596666  /home/nmf/lib/helper-tools-2.1.0-SNAPSHOT.jar
+be6267d779b123bf36fe18a99a0c1678  /home/nmf/lib/hipparchus-core-1.5.jar
+50060ac0817a70e71e127f3ff3fff216  /home/nmf/lib/hipparchus-filtering-1.5.jar
+ba4cc6a17acb93e989f12cf7c06d026c  /home/nmf/lib/hipparchus-fitting-1.5.jar
+73a843ec4d9426d77096377088e4ef81  /home/nmf/lib/hipparchus-geometry-1.5.jar
+f01f325536ff54edffcd8cd1a60d77d2  /home/nmf/lib/hipparchus-ode-1.5.jar
+ddf1278f5ec930f89c0552edbd8272c2  /home/nmf/lib/hipparchus-optim-1.5.jar
+0fda2d0131ae9f26457e4d2589f0a50d  /home/nmf/lib/hipparchus-stat-1.5.jar
+85d93db0ad95d6ded280976a8ea74470  /home/nmf/lib/iadcs-0.1.jar
+48b094ebc6cce194ce8b972ea0099994  /home/nmf/lib/ij-1.53j.jar
+76670de6cb1884ef01070d707b9e4d6d  /home/nmf/lib/image-debayer-2.1.0-SNAPSHOT.jar
+9bb5a575babd77ca9bb7ad9bbd1412c1  /home/nmf/lib/ims100-0.1.jar
+b117a54eef58b4511aae3bb5882e0d8b  /home/nmf/lib/ini4j-0.5.4.jar
+4a840a89100dd964e56a233ffe92d0e6  /home/nmf/lib/istack-commons-runtime-4.0.0.jar
+e8fe27b2ed2bec52b561e4e0348a1a9f  /home/nmf/lib/jakarta.activation-2.0.0.jar
+78cf2b809e4daa0beff13efdad12da76  /home/nmf/lib/jakarta.xml.bind-api-3.0.0.jar
+0529ad63165dc6ff29329750b62f4e7d  /home/nmf/lib/jaxb-core-3.0.0.jar
+d590096425363dadb2eb95d892bc4ef7  /home/nmf/lib/jaxb-runtime-3.0.0.jar
+96855667c6d11b5047ca1ff22cac5671  /home/nmf/lib/mainboard-0.1.jar
+fb6929b90e87a3dfb3481923757b87af  /home/nmf/lib/malspp-encoding-opssat-1.0.1-FC.jar
+38f42ce227b691fc2ab69bb3eb4bdce5  /home/nmf/lib/malspp-over-cfp-tcp-2.1.0-SNAPSHOT.jar
+48947ddc7bee3c164619dfabadc32ed9  /home/nmf/lib/malspp-transport-1.0.1-FC.jar
+534cb0e3aa6b6320709e8f942041548b  /home/nmf/lib/monolog-2.1.12.jar
+843c7f0c6d65065dfd9520f3902cb719  /home/nmf/lib/monolog-5.2.0.jar
+a28c234d5d3f77593316c71981a35c52  /home/nmf/lib/mp-nmf-2.1.0-SNAPSHOT.jar
+7f38be64eb2328a6f0b6dc965e75fcf2  /home/nmf/lib/nanomind-api-com-2.1.0-SNAPSHOT.jar
+9af46000560893da3e770787a35f443e  /home/nmf/lib/nanomind-api-mc-2.1.0-SNAPSHOT.jar
+230fc815796885478bddcbd08455a4f3  /home/nmf/lib/nanomind-api-pf-2.1.0-SNAPSHOT.jar
+4a1d677fe2bb551dd775ac22c997294b  /home/nmf/lib/nanosat-mo-connector-2.1.0-SNAPSHOT.jar
+b915c2fe57a1245cd8320eb6a58cae5d  /home/nmf/lib/nanosat-mo-supervisor-2.1.0-SNAPSHOT.jar
+020d2a262f0e5cc8436a5a75ecdf494b  /home/nmf/lib/nmf-package-lib-2.1.0-SNAPSHOT.jar
+ff1439ae8166b9ebc1e2c8e509f51104  /home/nmf/lib/nmf-platform-generic-2.1.0-SNAPSHOT.jar
+34830962b03c9103cd9edf88e17b3fc5  /home/nmf/lib/nmf-platform-impl-opssat-2.1.0-SNAPSHOT.jar
+ff6b359cf92742350fa4e360ae27cf64  /home/nmf/lib/nmf-software-management-2.1.0-SNAPSHOT.jar
+d6c4168872b73b77d3ac77cec8a0068e  /home/nmf/lib/opt_rx-0.1.jar
+50d8fbfcb639e2aa913f3c34ef4d58dd  /home/nmf/lib/orekit-10.0.jar
+dc8de79904bcc9b015decb1b111f9393  /home/nmf/lib/orekit-resources-2.1.0-SNAPSHOT.jar
+78b4add8293dae76d3750a17286383af  /home/nmf/lib/org.osgi-3.0.0.jar
+0117bb78895caf2532330456446d5684  /home/nmf/lib/parameters-provisioning-2.1.0-SNAPSHOT.jar
+66c76762e41cbab36ad8fd87cd9d5e06  /home/nmf/lib/payloads-test-2.1.0-SNAPSHOT.jar
+f857408f549835c9e4db0945f620a807  /home/nmf/lib/platform-2.1.0-SNAPSHOT.jar
+3bdd44d0e150f0e86a0094c0d7628bd5  /home/nmf/lib/sdr-0.1.jar
+806e7a1371ce7be328fa3af491d99a8d  /home/nmf/lib/sepp_api_core-0.1.jar
+57315693f15f8b93c839348c61892ce4  /home/nmf/lib/software-management-2.1.0-SNAPSHOT.jar
+18545a8955a915009d848a9246e78497  /home/nmf/lib/space-mo-adapter-2.1.0-SNAPSHOT.jar
+d16a8924a16b95ee67c5db67f8d9a48b  /home/nmf/lib/sqlite-jdbc-3.32.3.2.jar
+2a1d385c609f13bbe5dddf3fb80902f3  /home/nmf/lib/txw2-3.0.0.jar
+b6f1c4883e16ef8cd7be0b0307ce4958  /home/nmf/lib/xml-2.1.0-SNAPSHOT.jar
+
+
