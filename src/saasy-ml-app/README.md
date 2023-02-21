@@ -47,7 +47,7 @@ OS name: "linux", version: "5.10.16.3-microsoft-standard-wsl2", arch: "amd64", f
 
 ## Quick Install
 
-1. Clone the SaaSyML App and NMF repositories
+1. Clone the SaaSyML App and NMF repositories under the same parent directory:
 
     ```shell
     $ git clone https://github.com/visionspacetec/opssat-saasy-ml.git
@@ -63,7 +63,7 @@ OS name: "linux", version: "5.10.16.3-microsoft-standard-wsl2", arch: "amd64", f
     $ mvn install
     ```
 
-3. Modify the **sdk/sdk-package/pom.xml** copy instruction to match the environment's location
+3. Check athat the **sdk/sdk-package/pom.xml** copy instruction match the local environment's file system:
 
     ```xml
     <!-- SaaSyML: resource and config files -->
@@ -72,7 +72,7 @@ OS name: "linux", version: "5.10.16.3-microsoft-standard-wsl2", arch: "amd64", f
       <fileset dir="${basedir}/src/main/resources/space-app-root"/>
       <fileset dir="${basedir}/../../../opssat-saasy-ml/src/saasy-ml-app/conf"/>
     </copy>
-    <!-- SaaSyML: plugins directory -->
+    <!-- SaaSyML: create plugins directory and copy the plugin archives into it -->
     <mkdir dir="${esa.nmf.sdk.assembly.outputdir}/home/saasy-ml/plugins"/>
     <copy todir="${esa.nmf.sdk.assembly.outputdir}/home/saasy-ml/plugins">
       <fileset dir="${basedir}/../../../opssat-saasy-ml/src/saasy-ml-app/plugins">
