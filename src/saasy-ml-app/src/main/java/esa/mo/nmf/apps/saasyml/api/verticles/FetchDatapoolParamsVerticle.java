@@ -75,33 +75,23 @@ public class FetchDatapoolParamsVerticle extends AbstractVerticle {
             // check periodically when to stop fetching data if "interations" is set and > 0
             if (iterations > 0) {
 
-                // set the periodic timer            
+                // set the periodic timer
                 int periodicTimer = PropertiesManager.getInstance().getFetchDatapoolParamsVerticlePeriodicTimer();
 
-                
-                vertx.eventBus().request(Constants.ADDRESS_DATA_COUNT, payloadCount, reply -> {
-                    JsonObject response = (JsonObject) (reply.result().body());
-
-                    if (response.containsKey(Constants.KEY_COUNT)) {
-                        payloadCount.put(Constants.KEY_STARTED_COUNT, response.getInteger(Constants.KEY_COUNT).intValue());
-                    }
-                });
-                
                 // register periodic timer
                 vertx.setPeriodic(periodicTimer, id -> {
                     vertx.eventBus().request(Constants.ADDRESS_DATA_COUNT, payloadCount, reply -> {
                         JsonObject response = (JsonObject) (reply.result().body());
 
-                        // response object is somehow does not contain the expected parameter (impossible?)
+                        // response object somehow does not contain the expected parameter (impossible?)
                         // stop timer if this happens
                         if (!response.containsKey(Constants.KEY_COUNT)) {
                             vertx.cancelTimer(id);
 
                         } else {
-                            int startedCount = payloadCount.getInteger(Constants.KEY_STARTED_COUNT).intValue();
-                            int count = response.getInteger(Constants.KEY_COUNT).intValue() - startedCount;
+                            // get the number of database rows introduced so far
+                            int count = response.getInteger(Constants.KEY_COUNT).intValue();
 
-                            // get training data row count
                             // fixme: dividing by paramNameList.size() will break if the number of params change from one data fetching session to another for
                             // the same expId and datasetId
                             int counter = count / paramNameList.size();
@@ -110,6 +100,7 @@ public class FetchDatapoolParamsVerticle extends AbstractVerticle {
                             // stop timer if  this happens
                             if (counter < 0) {
                                 vertx.cancelTimer(id);
+
                             } else if (counter >= iterations) {
 
                                 // target number of training dataset has been achieved
