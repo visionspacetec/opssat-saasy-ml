@@ -12,7 +12,7 @@ The **SaaSyML** app developed for the OPS-SAT spacecraft provides open access to
 We appreciate citations if you reference this work in your upcoming publication. Thank you!
 
 ## Plain Text
-Labrèche, G. & Alvarez, C. G. (2023). SaaSyML: Software as a Service for Machine Learning On-board the OPS-SAT Spacecraft. _2023 IEEE Aerospace Conference (AERO)_, 2023.
+Labrèche, G. & Alvarez, C. G. (2023). SaaSyML: Software as a Service for Machine Learning On-board the OPS-SAT Spacecraft. _2023 IEEE Aerospace Conference (AERO)_.
 
 ## BibTex
 ```bibtex
@@ -39,10 +39,10 @@ Follow [these instructions](https://www.techruzz.com/blog/how-to-download-and-in
 ## JSAT 
 
 ```bash
-$ cd src/lib-sat    
-$ git submodule init    
+$ cd src/lib-jsat
+$ git submodule init
 $ git submodule update
-$ cd JSAT    
+$ cd JSAT
 $ mvn install
 ```
 
