@@ -204,6 +204,8 @@ Sample payload:
 }
 ```
 
+**IMPORTANT**: The `iterations` parameter is used to signal when to stop the feed, i.e. as soon as the total count of fetched data stored in the database is equal or greater to `iterations` (this includes counting data fetched during past requests).
+
 Sample payload with label values (expected output) provided by the client:
 
 ```json
