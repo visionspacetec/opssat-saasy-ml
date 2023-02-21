@@ -63,7 +63,7 @@ OS name: "linux", version: "5.10.16.3-microsoft-standard-wsl2", arch: "amd64", f
     $ mvn install
     ```
 
-3. Check athat the **sdk/sdk-package/pom.xml** copy instruction match the local environment's file system:
+3. Check athat the **sdk/sdk-package/pom.xml** copy instruction to match the local environment's file system:
 
     ```xml
     <!-- SaaSyML: resource and config files -->

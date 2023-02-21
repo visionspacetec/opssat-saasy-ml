@@ -111,6 +111,14 @@ public class PropertiesManager {
         return getProperty("db.url");
     }
 
+    public String getDatabaseJournalMode() {
+        return getProperty("db.journalMode");
+    }
+
+    public int getDatabaseJournalSizeLimit() {
+        return Integer.parseInt(getProperty("db.journalSizeLimit"));
+    }
+
     public boolean getThread() {
         return Boolean.parseBoolean(getProperty("mlpipeline.thread"));
     }
