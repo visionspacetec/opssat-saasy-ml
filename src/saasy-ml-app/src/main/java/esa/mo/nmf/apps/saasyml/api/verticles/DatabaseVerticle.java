@@ -133,14 +133,20 @@ public class DatabaseVerticle extends AbstractVerticle {
                     new Pair<String, String>(TABLE_MODELS, SQL_CREATE_TABLE_MODELS),
                     new Pair<String, String>(TABLE_INFERENCES, SQL_CREATE_TABLE_INFERENCES));
                 
+                StringBuilder  tableExist = new StringBuilder();
+
                 for (Pair<String, String> pair : pairTableAndSQLCreate) {    
                     // check if training data table exists and create it if it does not.
                     if(!this.tableExists(pair.getKey())) {
                         this.createTable(pair.getValue());
                         LOGGER.log(Level.INFO, "Created the {0} table.", pair.getKey());
-                    }else {
-                        LOGGER.log(Level.INFO, "The {0} table already exists.", pair.getKey());
+                    } else {
+                        tableExist.append(pair.getKey());
                     }
+                }
+
+                if (!tableExist.isEmpty()) {
+                    LOGGER.log(Level.INFO, "The tables {0} already exists.", tableExist.toString());
                 }
                     
             } catch (Exception e) {
@@ -458,8 +464,7 @@ public class DatabaseVerticle extends AbstractVerticle {
 
             // check if we are counting collected training data or collected inference data input.
             final boolean isInference = payload.containsKey(Constants.KEY_INTERVAL)
-                ? payload.getBoolean(Constants.KEY_INTERVAL)
-                : false;
+                && payload.getBoolean(Constants.KEY_INTERVAL);
 
             // count training data records
             int counter = -1;
@@ -864,7 +869,7 @@ public class DatabaseVerticle extends AbstractVerticle {
         ResultSet tables = md.getTables(null, null, tableName, null);
 
         // return true if the table exists and false if it does not
-        return tables.next() ? true : false;
+        return tables.next();
     }
 
     private void createTable(String SQL_QUERY) throws Exception {

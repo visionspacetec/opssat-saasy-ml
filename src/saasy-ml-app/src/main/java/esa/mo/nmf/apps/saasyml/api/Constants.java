@@ -8,6 +8,10 @@ public final class Constants {
     // experiment id
     public static final int EXPERIMENT_ID = 213;
 
+    // miliseconds to sleep
+    public static final int MILLISECONDS_TO_WAIT_DEFAULT = 1; 
+    public static final int MILLISECONDS_TO_WAIT = 4000; // 600000;
+
     // labels 
     public static final String KEY_CONTENT_TYPE = "content-type";
     public static final String KEY_CONTENT_TYPE_JSON = "application/json; charset=utf-8";
@@ -37,12 +41,19 @@ public final class Constants {
     public static final String KEY_CLUSTER_NUMBER = "clusterNumber";
     public static final String KEY_PARAMS = "params";
     public static final String KEY_COUNT = "count";
+    public static final String KEY_STARTED_COUNT = "startedCount";
+    public static final String KEY_PREVIOUS_COUNTER = "previousCount";    
+    public static final String KEY_TRIES = "number_tries";
+    public static final String KEY_MAX_TRIES = "max_number_tries";
     public static final String KEY_DIMENSIONS = "dimensions";
     public static final String KEY_MODEL_PATH = "model_path";
     public static final String KEY_INFERENCE = "inference";
     public static final String KEY_FORMAT_TO_INFERENCE = "formatToInference";
     public static final String KEY_ERROR = "error";
     public static final String KEY_FILEPATH = "filepath";
+
+    public static final String KEY_TO_WAIT_IN_MILLISECONDS = "KEY_MS_TO_SLEEP";
+    // public static final String KEY_TO_SIMULATE_WAIT_MUTEX = "KEY_SIMULATE_WAIT_MUTEX";
 
     public static final String KEY_MODEL_CLASSIFIER = "Classifier";
     public static final String KEY_MODEL_REGRESSOR = "Regressor";
@@ -94,6 +105,6 @@ public final class Constants {
     public static final String BASE_ADDRESS_INFERENCE = "saasyml.inference";
     public static final String BASE_ADDRESS_INFERENCE_SUBSCRIBE = BASE_ADDRESS_INFERENCE + ".subscribe";
     public static final String BASE_ADDRESS_INFERENCE_UNSUBSCRIBE = BASE_ADDRESS_INFERENCE + ".unsubscribe";
-    public static final String ADDRESS_INFERENCE_CLASSIFIER = BASE_ADDRESS_INFERENCE + ".classifier";    
-
+    public static final String ADDRESS_INFERENCE_CLASSIFIER = BASE_ADDRESS_INFERENCE + ".classifier";
+	
 }

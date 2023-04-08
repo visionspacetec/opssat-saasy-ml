@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.JsonArray;
 
@@ -33,6 +34,7 @@ public class FetchDatapoolParamsVerticle extends AbstractVerticle {
         final int expId = payload.getInteger(Constants.KEY_EXPID).intValue();
         final int datasetId = payload.getInteger(Constants.KEY_DATASETID).intValue();
         final double interval = payload.getInteger(Constants.KEY_INTERVAL).doubleValue();
+        final String KEY_ID = "-" + expId + "-" + datasetId;
         
         // iterations payload parameter is optional, set it to -1 if it wasn't provided
         final int iterations = payload.containsKey(Constants.KEY_ITERATIONS)
@@ -75,89 +77,161 @@ public class FetchDatapoolParamsVerticle extends AbstractVerticle {
             // check periodically when to stop fetching data if "interations" is set and > 0
             if (iterations > 0) {
 
+                LOGGER.log(Level.INFO, String.format("[TRACE LOG] Iterations %d", iterations));
+
                 // set the periodic timer
                 int periodicTimer = PropertiesManager.getInstance().getFetchDatapoolParamsVerticlePeriodicTimer();
 
+                // init default values for simulate wait mutex
+                payloadCount.put(Constants.KEY_TO_WAIT_IN_MILLISECONDS, Constants.MILLISECONDS_TO_WAIT_DEFAULT);
+                // payloadCount.put(Constants.KEY_TO_SIMULATE_WAIT_MUTEX, false);
+
+                // get the started data count and initialize some values
+                vertx.eventBus().request(Constants.ADDRESS_DATA_COUNT, payloadCount, reply -> {
+                    JsonObject response = (JsonObject) (reply.result().body());
+
+                    if (response.containsKey(Constants.KEY_COUNT)) {
+                        payloadCount.put(Constants.KEY_STARTED_COUNT + KEY_ID, response.getInteger(Constants.KEY_COUNT).intValue());
+                        payloadCount.put(Constants.KEY_PREVIOUS_COUNTER + KEY_ID, 0);
+                        payloadCount.put(Constants.KEY_TRIES + KEY_ID, 0);
+                        payloadCount.put(Constants.KEY_MAX_TRIES, 4);
+                    }
+                });
+
                 // register periodic timer
                 vertx.setPeriodic(periodicTimer, id -> {
-                    vertx.eventBus().request(Constants.ADDRESS_DATA_COUNT, payloadCount, reply -> {
-                        JsonObject response = (JsonObject) (reply.result().body());
 
-                        // response object somehow does not contain the expected parameter (impossible?)
-                        // stop timer if this happens
-                        if (!response.containsKey(Constants.KEY_COUNT)) {
-                            vertx.cancelTimer(id);
+                        vertx.setTimer(payloadCount.getInteger(Constants.KEY_TO_WAIT_IN_MILLISECONDS), id2 -> {
+                        
+                            // if simulate wait mutex is not activate
+                            // if (Boolean.FALSE.equals(payloadCount.getBoolean(Constants.KEY_TO_SIMULATE_WAIT_MUTEX))){
+                                
+                                // reset the default value 
+                                payloadCount.put(Constants.KEY_TO_WAIT_IN_MILLISECONDS, Constants.MILLISECONDS_TO_WAIT_DEFAULT);
+                                // payloadCount.put(Constants.KEY_TO_SIMULATE_WAIT_MUTEX, false);
+        
+                                vertx.eventBus().request(Constants.ADDRESS_DATA_COUNT, payloadCount, reply -> {
+        
+                                    Message<Object> result = reply.result();
+        
+                                    // stop timer if the result is null. I do not know the exact reason but is happening
+                                    if (result == null){
+                                        vertx.cancelTimer(id);
+                                    } else {
+                                        JsonObject response = (JsonObject) (result.body());
+        
+                                        // response object somehow does not contain the expected parameter (impossible?)
+                                        // stop timer if this happens
+                                        if (!response.containsKey(Constants.KEY_COUNT)) {
+                                            vertx.cancelTimer(id);
+                                        } else {
+        
+                                            int startedCount = payloadCount.getInteger(Constants.KEY_STARTED_COUNT + KEY_ID).intValue();
+                                        
+                                            // get the number of database rows introduced so far
+                                            int count = response.getInteger(Constants.KEY_COUNT).intValue() - startedCount;
+        
+                                            // fixme: dividing by paramNameList.size() will break if the number of params change from one data fetching session to another for
+                                            // the same expId and datasetId
+                                            int counter = count / paramNameList.size();
+        
+                                            int previousCounter = payloadCount.getInteger(Constants.KEY_PREVIOUS_COUNTER + KEY_ID);
+        
+                                            LOGGER.log(Level.INFO, String.format("[E%d-D%d] Count %d, Counter %d, previous counter %d and number of rows in database when fetch data train started %d", expId, datasetId, count, counter, previousCounter, startedCount));
+        
 
-                        } else {
-                            // get the number of database rows introduced so far
-                            int count = response.getInteger(Constants.KEY_COUNT).intValue();
+                                            int tries = 0;
+                                            if (counter != previousCounter){
+                                                // add current counter as previous counter
+                                                payloadCount.put(Constants.KEY_PREVIOUS_COUNTER + KEY_ID, counter);
+                                            } else {
+                                                tries = payloadCount.getInteger(Constants.KEY_TRIES + KEY_ID);
+                                                ++tries;
+                                                LOGGER.log(Level.INFO, String.format("[E%d-D%d] We have not received new data. Number of tries %d/4", expId, datasetId, tries));
+                                            }
+                                            payloadCount.put(Constants.KEY_TRIES + KEY_ID, tries);
 
-                            // fixme: dividing by paramNameList.size() will break if the number of params change from one data fetching session to another for
-                            // the same expId and datasetId
-                            int counter = count / paramNameList.size();
-
-                            // the counter is set to -1 if there was an error while attempting to query the database
-                            // stop timer if  this happens
-                            if (counter < 0) {
-                                vertx.cancelTimer(id);
-
-                            } else if (counter >= iterations) {
-
-                                // target number of training dataset has been achieved
-                                // unsubscribe from the training data feed
-                                try {
-                                    try {
-                                        // disable parameter feed
-                                        ApplicationManager.getInstance().enableSupervisorParametersSubscription(
-                                            expId, datasetId, false);
-                    
-                                        LOGGER.log(Level.INFO, String.format("[TRACE LOG] Disabled parameter feed"));
-                                    } catch (Exception e) {
-                                        LOGGER.log(Level.SEVERE, String.format("[TRACE LOG] Exception Disable parameter feed", e));
-                                    }
-
-                                    // remove the aggregation handler from the map
-                                    ApplicationManager.getInstance().removeAggregationHandler(expId, datasetId);
-
-                                    // auto-trigger training if the payload is configured to do so
-                                    if (payload.containsKey(Constants.KEY_TRAINING)) {
-
-                                        // the training parameters can be for more than one algorithm
-                                        final JsonArray trainings = payload.getJsonArray(Constants.KEY_TRAINING);
-
-                                        // trigger training for each request
-                                        for (int i = 0; i < trainings.size(); i++) {
-                                            final JsonObject t = trainings.getJsonObject(i);
-
-                                            // fetch training algorithm selection
-                                            String type = t.getString(Constants.KEY_TYPE);
-
-                                            // build JSON payload object 
-                                            JsonObject trainPayload = new JsonObject();
-                                            trainPayload.put(Constants.KEY_EXPID, expId);
-                                            trainPayload.put(Constants.KEY_DATASETID, datasetId);
-                                            trainPayload.put(Constants.KEY_ALGORITHM,
-                                                    t.getString(Constants.KEY_ALGORITHM));
-                                            trainPayload.put(Constants.KEY_THREAD,
-                                                    t.getBoolean(Constants.KEY_THREAD));
-
-                                            // trigger training
-                                            // resulting model will be saved in the filesystem and referenced from the database
-                                            vertx.eventBus().send(Constants.BASE_ADDRESS_TRAINING + "." + type, trainPayload); 
+        
+                                            // if we reached the maximum number of tries, we change the value in KEY_TO_WAIT_IN_MILLISECONDS 
+                                            if (tries > payloadCount.getInteger(Constants.KEY_MAX_TRIES)) {
+                                                LOGGER.log(Level.INFO, String.format("[E%d-D%d] Maximum number of tries reached. We sleep %d milliseconds.", expId, datasetId, Constants.MILLISECONDS_TO_WAIT));
+                                                payloadCount.put(Constants.KEY_TO_WAIT_IN_MILLISECONDS, Constants.MILLISECONDS_TO_WAIT);
+                                                payloadCount.put(Constants.KEY_TRIES + KEY_ID, 0);
+                                                // we change the simulate wait mutex to true
+                                                // payload.put(Constants.KEY_TO_SIMULATE_WAIT_MUTEX, true);
+                                            } else {
+                                                // the counter is set to -1 if there was an error while attempting to query the database
+                                                // stop timer if  this happens
+                                                if (counter < 0) {
+                                                    vertx.cancelTimer(id);
+                                                } else if (counter >= iterations) {
+        
+                                                    LOGGER.log(Level.INFO, String.format("[TRACE LOG] Counter higher than iterations"));
+        
+                                                    // target number of training dataset has been achieved
+                                                    // unsubscribe from the training data feed
+                                                    try {
+                                                        try {
+                                                            // disable parameter feed
+                                                            ApplicationManager.getInstance().enableSupervisorParametersSubscription(
+                                                                expId, datasetId, false);
+                                        
+                                                            LOGGER.log(Level.INFO, String.format("[TRACE LOG] Disabled parameter feed"));
+                                                        } catch (Exception e) {
+                                                            LOGGER.log(Level.SEVERE, String.format("[TRACE LOG] Exception Disable parameter feed", e));
+                                                        }
+        
+                                                        // remove the aggregation handler from the map
+                                                        ApplicationManager.getInstance().removeAggregationHandler(expId, datasetId);
+        
+                                                        // auto-trigger training if the payload is configured to do so
+                                                        if (payload.containsKey(Constants.KEY_TRAINING)) {
+        
+                                                            // the training parameters can be for more than one algorithm
+                                                            final JsonArray trainings = payload.getJsonArray(Constants.KEY_TRAINING);
+        
+                                                            // trigger training for each request
+                                                            for (int i = 0; i < trainings.size(); i++) {
+                                                                final JsonObject t = trainings.getJsonObject(i);
+        
+                                                                // fetch training algorithm selection
+                                                                String type = t.getString(Constants.KEY_TYPE);
+        
+                                                                // build JSON payload object 
+                                                                JsonObject trainPayload = new JsonObject();
+                                                                trainPayload.put(Constants.KEY_EXPID, expId);
+                                                                trainPayload.put(Constants.KEY_DATASETID, datasetId);
+                                                                trainPayload.put(Constants.KEY_ALGORITHM,
+                                                                        t.getString(Constants.KEY_ALGORITHM));
+                                                                trainPayload.put(Constants.KEY_THREAD,
+                                                                        t.getBoolean(Constants.KEY_THREAD));
+        
+                                                                // trigger training
+                                                                // resulting model will be saved in the filesystem and referenced from the database
+                                                                vertx.eventBus().send(Constants.BASE_ADDRESS_TRAINING + "." + type, trainPayload); 
+                                                            }
+                                                        }
+        
+                                                        LOGGER.log(Level.INFO, String.format("[TRACE LOG] Stop periodic check"));
+        
+                                                        // can now stop this periodic check
+                                                        vertx.cancelTimer(id);
+        
+                                                    } catch (Exception e) {
+                                                        LOGGER.log(Level.SEVERE, "Failed to unsubscribe from training data feed.", e);
+                                                    }
+                                                }
+                                            }
+        
                                         }
                                     }
+                                });
 
-                                    LOGGER.log(Level.INFO, String.format("[TRACE LOG] Stop periodic check"));
+                            //} else {
+                            //    LOGGER.log(Level.INFO, String.format("[E%d-D%d] I am waiting, can not continue  ----  :(", expId, datasetId));
+                            //}
+                        });
 
-                                    // can now stop this periodic check
-                                    vertx.cancelTimer(id);
-
-                                } catch (Exception e) {
-                                    LOGGER.log(Level.SEVERE, "Failed to unsubscribe from training data feed.", e);
-                                }
-                            }
-                        }
-                    });
                 });
             }
 

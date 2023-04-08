@@ -89,25 +89,29 @@ public class AggregationWriter implements CompleteAggregationReceivedListener {
             // build the params array
             JsonArray params = new JsonArray();
 
-            for(int i = 0; i < paramNames.size(); i++) {                          
-                // populate the Json array
-                JsonObject param = new JsonObject();
-                param.put(Constants.KEY_NAME, paramNames.get(i));
-                param.put(Constants.KEY_VALUE, paramValues.get(i).getValue());
-                param.put(Constants.KEY_DATA_TYPE, paramValues.get(i).getKey());
-                param.put(Constants.KEY_TIMESTAMP, timestamp);
-                params.add(param);
+            if (paramNames != null && paramNames.size() == paramValues.size()){
+                for(int i = 0; i < paramNames.size(); i++) {                          
+                    // populate the Json array
+                    JsonObject param = new JsonObject();
+                    param.put(Constants.KEY_NAME, paramNames.get(i));
+                    param.put(Constants.KEY_VALUE, paramValues.get(i).getValue());
+                    param.put(Constants.KEY_DATA_TYPE, paramValues.get(i).getKey());
+                    param.put(Constants.KEY_TIMESTAMP, timestamp);
+                    params.add(param);
+                }
+
+                // need to wrap everything in an array because that's what the database verticle expects
+                JsonArray data = new JsonArray();
+                data.add(params);
+    
+                // put the training data array into the payload json object
+                payload.put(Constants.KEY_DATA, data);
+    
+                // send the payload to the database verticle
+                this.vertx.eventBus().send(Constants.ADDRESS_DATA_SAVE, payload);
+            }else {
+                LOGGER.log(Level.SEVERE, "Failed fetching and writing parameters for aggregation " + aggId + ". The size of values and names are different.");
             }
-
-            // need to wrap everything in an array because that's what the database verticle expects
-            JsonArray data = new JsonArray();
-            data.add(params);
-
-            // put the training data array into the payload json object
-            payload.put(Constants.KEY_DATA, data);
-
-            // send the payload to the database verticle
-            this.vertx.eventBus().send(Constants.ADDRESS_DATA_SAVE, payload);   
 
         }catch(Exception e) {
             LOGGER.log(Level.SEVERE, "Error fetching and writing parameters for aggregation " + aggId + ".", e);
